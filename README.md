@@ -2,7 +2,7 @@
 A hobby operating system in C.
 
 # Goals
-+ Booting!
++ ~~Booting!~~
 + Visuals!
 + A shell
 + Color!
@@ -14,10 +14,14 @@ A hobby operating system in C.
 # Depends
 Normal GNU buildutils.
 
+# Docs
+[OS Dev Wiki](http://wiki.osdev.org/Main_Page)
+Also check the Google Drive folder.
+
 # Code Style Guide
-Refer to the [GNU Coding Standards.](https://www.gnu.org/prep/standards/standards.html)
+Refer to the [GNU Coding Standards.](https://www.gnu.org/prep/standards/standards.html) for a general guide.
 
 # License
-GPL V3.0+ (See LICENSE file for details)
+GPL V3.0+ (See LICENSE file for details.)
 
 *This document is subject to change*
