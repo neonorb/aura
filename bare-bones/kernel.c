@@ -96,31 +96,11 @@ void terminal_writestring(const char* data) {
 	for (size_t i = 0; i < datalen; i++)
 		terminal_putchar(data[i]);
 }
-
-void switch_to_32bit(){
-	__asm__(
-		"cli;" // turn of interrupts
-		"lgdt [gdt_descriptor];" // load GDT
-		"mov eax, cr0;" // set the crontrol register
-		"or eax, 0x1;"
-		"mov cr0, eax;"
-                "mov ax, DATA_SEG;" // now in protected mode, our old segments are meaningless, so we point our segment registers to the data selector we defined in our GDT
-                "mov ds, ax;"
-                "mov ss, ax;"
-                "mov es, ax;"
-                "mov fs, ax;"
-                "mov gs, ax;"
-                "mov ebp, 0x90000;" // update our stack position so it is right at the top of the free space
-                "mov esp, ebp;"
-		);
-}
  
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
 void kernel_main() {
-	switch_to_32bit();
-
 	/* Initialize terminal interface */
 	terminal_initialize();
  
