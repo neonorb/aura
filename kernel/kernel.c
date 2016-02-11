@@ -19,6 +19,7 @@ extern "C" /* Use C linkage for kernel_main. */
 #endif
 
 #include "../modules/screen/vga.h"
+#include "../modules/keyboard/ps2.h"
 
 void kernel_main() {
 	/* Initialize terminal interface */
@@ -29,4 +30,8 @@ void kernel_main() {
          * This is normal.
          */
 	terminal_writestring("Hello, kernel World!\nThis is on a new line.");
+
+	while(true){
+		terminal_putchar(getchar());
+	}
 }
