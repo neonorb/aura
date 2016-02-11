@@ -18,6 +18,8 @@
 extern "C" /* Use C linkage for kernel_main. */
 #endif
 
+#include "../utils/utils.h"
+
 #include "../modules/screen/vga.h"
 #include "../modules/keyboard/ps2.h"
 

@@ -1,3 +1,5 @@
+char scancodes[] = {'?', '1', '2'}; // TODO finish this table, see http://wiki.osdev.org/Keyboard#Scan_Code_Set_1
+
 static inline void outb(uint16_t port, uint8_t val) {
     asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
     /* There's an outb %al, $imm8  encoding, for compile-time constant port numbers that fit in 8b.  (N constraint).
@@ -9,7 +11,7 @@ static inline void outb(uint16_t port, uint8_t val) {
 static inline uint8_t inb(uint16_t port) {
     uint8_t ret;
     asm volatile ( "inb %[port], %[ret]"
-                   : [result] "=a"(ret)   // using symbolic operand names as an example, mainly because they're not used in order
+                   : [ret] "=a"(ret)   // using symbolic operand names as an example, mainly because they're not used in order
                    : [port] "Nd"(port) );
     return ret;
 }
@@ -26,5 +28,11 @@ char getScancode() {
 }
 
 char getchar() {
-	return scancode[getScancode()+1];
+	int scancode = getScancode() - 1;
+
+	if(scancode > array_length_char(scancodes)){
+		return '?';
+	}
+
+	return scancodes[scancode];
 }
