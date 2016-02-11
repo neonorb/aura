@@ -77,6 +77,17 @@ void terminal_putchar(char c) {
  
 void terminal_writestring(const char* data) {
 	size_t datalen = strlen(data);
-	for (size_t i = 0; i < datalen; i++)
-		terminal_putchar(data[i]);
+	for (size_t i = 0; i < datalen; i++) {
+		if (data[i] == 10){
+			terminal_newline();
+		}else{
+			terminal_putchar(data[i]);
+		}
+	}
+}
+
+void terminal_newline() {
+	for (size_t x = terminal_column; x < VGA_WIDTH; x++) {
+		terminal_putchar(' ');
+	}
 }

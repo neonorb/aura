@@ -108,5 +108,5 @@ void kernel_main() {
          * yet, '\n' will produce some VGA specific character instead.
          * This is normal.
          */
-	terminal_writestring("Hello, kernel World!\n");
+	terminal_writestring("Hello, kernel World!ffff\n");
 }

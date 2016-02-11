@@ -1,0 +1,5 @@
+--
+Numbers are any object that can be added, subtracted, incremented, decremented, or compared. Implement this class if you are doing that.
+--
+
+object : Addable, Subtractable, Incrementable, Decrementable, Comparable

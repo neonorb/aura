@@ -1,0 +1,7 @@
+--
+Implement this when you are trying to take one object and convert it to another.
+--
+
+object<T[]> {
+	sub init Method<impl, T[I]>[I] from // init indicates that the value must be initialized by an implmenting class
+}

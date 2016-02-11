@@ -1,0 +1,8 @@
+--
+Implement this when you are trying to take one object and convert it to another when assigning it to a variable.
+--
+
+object<T[]> {
+	--a list of froms to be used--
+	sub init Method<?, T[from%]>[] from
+}

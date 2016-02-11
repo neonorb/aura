@@ -1,0 +1,12 @@
+field : From<_double_> {
+	Double min
+	Double max
+	
+	from = (_double_ value){
+		new (value: value)
+	}
+}
+
+object : Number {
+	_double_ value
+}
