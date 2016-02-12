@@ -34,6 +34,9 @@ void kernel_main() {
 	terminal_writestring("Hello, kernel World!\nThis is on a new line.");
 
 	while(true){
-		terminal_putchar(getchar());
+		char c = getchar();
+		if(c > 0){
+			terminal_putchar(c);
+		}
 	}
 }
