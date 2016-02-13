@@ -99,9 +99,9 @@ void terminal_putchar(char c) {
 }
 
 void terminal_backup(){
-	if (--terminal_column == -1) {
+	if (--terminal_column == (unsigned)-1) {
 	        terminal_column = VGA_WIDTH - 1;
-                if (--terminal_row == -1) {
+          if (--terminal_row == (unsigned)-1) {
                         terminal_row = VGA_HEIGHT - 1;
                 }
         }
