@@ -17,7 +17,11 @@ enum vga_color {
 	COLOR_LIGHT_BROWN = 14,
 	COLOR_WHITE = 15,
 };
- 
+
+// FIX TO -Wimplicit-function-declaration WARNING
+void terminal_backup();
+void terminal_newline();
+
 uint8_t make_color(enum vga_color fg, enum vga_color bg) {
 	return fg | bg << 4;
 }
