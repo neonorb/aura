@@ -1,18 +1,20 @@
 # Project Asiago
-A hobby operating system in C.
+A hobby operating system based C and a hobby language.
 
 # Goals
 + ~~Booting!~~
-+ Visuals!
-+ A shell
++ ~~Output!~~
++ ~~Keyboard input!~~
 + Color!
-+ Porting various GNU utils
-+ Guile! (or some LISP)
-+ Self-hosting
-+ Java...?
++ Visuals!
++ A shell!
++ Cheese Lang!
++ Self-hosted in Cheese!
 
 # Depends
-Normal GNU buildutils.
+GNU Toolchain
+
+Later to use the Cheese Lang toolchain.
 
 # Docs
 [OS Dev Wiki](http://wiki.osdev.org/Main_Page)
@@ -23,10 +25,8 @@ Also check the Google Drive folder.
 Refer to the [GNU Coding Standards.](https://www.gnu.org/prep/standards/standards.html) for a general guide.
 
 View [this](https://rogerdudler.github.io/git-guide/) if you're unfarmilar with using git.
-
-When using git please follow the guidelines listed [here](http://nvie.com/posts/a-successful-git-branching-model/).
   
 # License
-GPL V3.0+ (See LICENSE file for details.)
+GPL V3.0 or later (See LICENSE file for details.)
 
 *This document is subject to change*
