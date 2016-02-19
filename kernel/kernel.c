@@ -26,11 +26,7 @@ extern "C" /* Use C linkage for kernel_main. */
 void kernel_main() {
 	/* Initialize terminal interface */
 	terminal_initialize();
- 
-	/* Since there is no support for newlines in terminal_putchar
-         * yet, '\n' will produce some VGA specific character instead.
-         * This is normal.
-         */
+
 	terminal_writestring("Hello, kernel World!\nThis is on a new line.");
 
 	while(true){
