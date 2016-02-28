@@ -1,6 +1,8 @@
 # Project Asiago
 A hobby operating system based C and a hobby language.
 
+See the [wiki](https://en.wikipedia.org/wiki/Project_Asiago) for more information.
+
 # Goals
 + ~~Booting!~~
 + ~~Output!~~
