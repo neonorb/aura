@@ -22,51 +22,54 @@ extern "C" /* Use C linkage for kernel_main. */
 
 #include "../modules/screen/vga.h"
 #include "../modules/keyboard/ps2.h"
-
-void log(const char* data){
+// Write len copies of val into dest.
+void memset(uint8_t *dest, uint8_t val, uint32_t len) {
+	uint8_t *temp = (uint8_t *) dest;
+	for (; len != 0; len--)
+		*temp++ = val;
+}
+void log(const char* data) {
 	terminal_writestring(data);
 	terminal_writestring("\n");
 }
 
-struct gdt_entry_struct
-{
-    uint16_t limit_low;           // The lower 16 bits of the limit.
-    uint16_t base_low;            // The lower 16 bits of the base.
-    uint8_t  base_middle;         // The next 8 bits of the base.
-    uint8_t  access;              // Access flags, determine what ring this segment can be used in.
-    uint8_t  granularity;
-    uint8_t  base_high;           // The last 8 bits of the base.
-} __attribute__((packed));
+struct gdt_entry_struct {
+	uint16_t limit_low;           // The lower 16 bits of the limit.
+	uint16_t base_low;            // The lower 16 bits of the base.
+	uint8_t base_middle;         // The next 8 bits of the base.
+	uint8_t access; // Access flags, determine what ring this segment can be used in.
+	uint8_t granularity;
+	uint8_t base_high;           // The last 8 bits of the base.
+}__attribute__((packed));
 
 typedef struct gdt_entry_struct gdt_entry_t;
 
 gdt_entry_t gdt_entries[5];
 
 // Set the value of one GDT entry.
-static void gdt_set_gate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran)
-{
-    gdt_entries[num].base_low    = (base & 0xFFFF);
-    gdt_entries[num].base_middle = (base >> 16) & 0xFF;
-    gdt_entries[num].base_high   = (base >> 24) & 0xFF;
+static void gdt_set_gate(uint32_t num, uint32_t base, uint32_t limit,
+		uint8_t access, uint8_t gran) {
+	gdt_entries[num].base_low = (base & 0xFFFF);
+	gdt_entries[num].base_middle = (base >> 16) & 0xFF;
+	gdt_entries[num].base_high = (base >> 24) & 0xFF;
 
-    gdt_entries[num].limit_low   = (limit & 0xFFFF);
-    gdt_entries[num].granularity = (limit >> 16) & 0x0F;
+	gdt_entries[num].limit_low = (limit & 0xFFFF);
+	gdt_entries[num].granularity = (limit >> 16) & 0x0F;
 
-    gdt_entries[num].granularity |= gran & 0xF0;
-    gdt_entries[num].access      = access;
-}struct gdt_ptr_struct
-{
-    uint16_t limit;               // The upper 16 bits of all selector limits.
-    uint32_t base;                // The address of the first gdt_entry_t struct.
-} __attribute__((packed));
+	gdt_entries[num].granularity |= gran & 0xF0;
+	gdt_entries[num].access = access;
+}
+struct gdt_ptr_struct {
+	uint16_t limit;               // The upper 16 bits of all selector limits.
+	uint32_t base;               // The address of the first gdt_entry_t struct.
+}__attribute__((packed));
 
 typedef struct gdt_ptr_struct gdt_ptr_t;
-gdt_ptr_t   gdt_ptr;
+gdt_ptr_t gdt_ptr;
 extern void gdt_flush();
-static void init_gdt()
-{
+static void init_gdt() {
 	gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;
-	gdt_ptr.base  = (uint32_t)&gdt_entries;
+	gdt_ptr.base = (uint32_t) &gdt_entries;
 
 	log("setting gates");
 	gdt_set_gate(0, 0, 0, 0, 0);                // Null segment
@@ -75,7 +78,7 @@ static void init_gdt()
 	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
 	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
 
-	gdt_flush((uint32_t)&gdt_ptr);
+	gdt_flush((uint32_t) &gdt_ptr);
 }
 struct IDTDescr { // http://wiki.osdev.org/Interrupt_Descriptor_Table#Structure
 	uint16_t offset_1; // offset bits 0..15
@@ -103,22 +106,25 @@ void PIC_sendEOI(unsigned char irq) {
 extern void interrupt();
 void interrupt_handler() {
 	// test function, this will eventually be replaced with more intelligent code
-	terminal_writestring("keyboard interrupt!");
+	log("interrupt!");
 }
 
-static inline void lidt(uint32_t base, uint16_t size)
-{   // This function works in 32 and 64bit mode
-    struct {
-        uint16_t length;
-        uint32_t    base;
-    } __attribute__((packed)) IDTR = { size, base };
+static inline void lidt(uint32_t base, uint16_t size) { // This function works in 32 and 64bit mode
+	struct {
+		uint16_t length;
+		uint32_t base;
+	}__attribute__((packed)) IDTR = { size, base };
 
-    asm ( "lidt %0" : : "m"(IDTR) );  // let the compiler choose an addressing mode
+	asm ( "lidt %0" : : "m"(IDTR) );
+	// let the compiler choose an addressing mode
 }
 
 struct IDTDescr idt_table[256];
 void initialize_idt_table() {
 	//PIC_remap(0x20, 0x28); // http://wiki.osdev.org/PIC#Protected_Mode
+
+	memset((uint8_t*) &idt_table, 0, sizeof(struct IDTDescr) * 256); // no idea if this is needed
+
 	outb(0x20, 0x11);
 	outb(0xA0, 0x11);
 	outb(0x21, 0x20);
@@ -139,11 +145,11 @@ void initialize_idt_table() {
 
 		idt_table[c].selector = 0x08;
 
-		idt_table[c].type_attr = 0x8E;
+		idt_table[c].type_attr = 0x8E; // | 0x60; this is for user-mode or something
 	}
 
 	// tell CPU about descriptor table
-	lidt( sizeof(struct IDTDescr) * 256 - 1, (int) &idt_table );
+	lidt(sizeof(struct IDTDescr) * 256 - 1, (int) &idt_table);
 	//IRQ_clear_mask(33);
 }
 
@@ -219,7 +225,7 @@ void kernel_main() {
 	terminal_initialize();
 
 	log("disabling interrupts");
-	asm("cli");
+	asm volatile ("cli");
 
 	log("setting up GDT");
 	//if(false)
@@ -228,14 +234,11 @@ void kernel_main() {
 	log("setting up IDT");
 	initialize_idt_table();
 
-	terminal_writestring("Pressing a key should print out:\nkeyboard interrupt!");
-
 	// we're ready to go, enable interrupts
 	log("enabling interrupts");
-	asm("sti");
+	asm volatile ("sti");
 
-	while (true) {
-	}
+	log("ready to go");
 
 	/*while(true){
 	 char c = getchar();
@@ -243,4 +246,6 @@ void kernel_main() {
 	 terminal_putchar(c);
 	 }
 	 }*/
+
+	log("end of kernel_main");
 }
