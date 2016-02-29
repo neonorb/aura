@@ -78,6 +78,7 @@ static void init_gdt() {
 	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
 	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
 
+	log("flushing");
 	gdt_flush((uint32_t) &gdt_ptr);
 }
 struct IDTDescr { // http://wiki.osdev.org/Interrupt_Descriptor_Table#Structure
@@ -240,6 +241,10 @@ void kernel_main() {
 
 	log("ready to go");
 
+	while(true){
+		// this will eventually be replaced with more intelligent code
+	}
+
 	/*while(true){
 	 char c = getchar();
 	 if(c > 0){
@@ -247,5 +252,5 @@ void kernel_main() {
 	 }
 	 }*/
 
-	log("end of kernel_main");
+	log("FUCK! We're at the end of kernel_main which shouldn't happen!");
 }
