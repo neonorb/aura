@@ -23,6 +23,7 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "../modules/screen/vga.h"
 #include "../modules/keyboard/ps2.h"
 
+
 void do_interrupts(){
 	terminal_writestring("doing interrupts");
 }
@@ -68,10 +69,10 @@ void handle_keyboard_interrupt(){
 struct IDTDescr idt_table[34];
 void initialize_idt_table(){
 	// keyboard
-	terminal_writestring(&handle_keyboard_interrupt);
+	terminal_writestring((const char *)handle_keyboard_interrupt);
 	// first 32 are exceptions, #1 (32) is Programmable Interrupt Timer Interrupt, #2 (33) is Keyboard Interrupt - http://wiki.osdev.org/Interrupts#Interrupt_Overview
 	idt_table[33] = (struct IDTDescr) {
-		(uint16_t)&handle_keyboard_interrupt, // lower-half of pointer
+		(uintptr_t)&handle_keyboard_interrupt, // lower-half of pointer
 		33 << 3 | 0b00000001, // selector - http://wiki.osdev.org/Selector
 		0, // always zero
 		0b01110001, // no idea what I'm doing here
@@ -79,7 +80,7 @@ void initialize_idt_table(){
 	};
 
 	// tell CPU about descriptor table
-	struct IDT idt = {sizeof(idt_table) - 1, &idt_table};
+	struct IDT idt = {sizeof(idt_table) - 1, (int)&idt_table};
 	asm ("lidt (%0)" :: ""(idt));
 }
 
