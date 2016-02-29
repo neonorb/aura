@@ -252,5 +252,5 @@ void kernel_main() {
 	 }
 	 }*/
 
-	log("FUCK! We're at the end of kernel_main which shouldn't happen!");
+	log("FUCK! We're at the end of kernel_main which shouldn't happen!"); // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 }
