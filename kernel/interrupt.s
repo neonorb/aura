@@ -3,7 +3,6 @@
 .global interrupt
 .align 4
 interrupt:
-	cli
 	pusha
 
     mov %ax, %ds
@@ -25,7 +24,6 @@ interrupt:
 
     popa #Restore registers
     add %esp, 8 #Removes data from ISR (error code and INT number)
-    sti
     iret
 
 .global gdt_flush
