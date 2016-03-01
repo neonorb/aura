@@ -1,8 +1,21 @@
 .extern interrupt_handler
 
 .global interrupt
+.align 4
 interrupt:
-	pusha
+    /* store registers */
+	pushl %eax
+	pushl %ds
+	pushl %es
+	pushl %fs
+	pushl %gs
+    /* set descriptors to a DATA selector */
+	movl $0x10, %eax
+	movw %ax, %ds
+	movw %ax, %es
+	movw %ax, %fs
+	movw %ax, %gs
+	//pusha
 	// TODO add detection for the interrupt number,
 	//      this is by using different interrupt code
 	//      for each interrupt and then call a common
@@ -22,6 +35,7 @@ interrupt:
     mov %gs, %ax
 */
     call interrupt_handler
+
 /*
     pop %ebx #Back to original state (descriptors)
     mov %ds, %bx
@@ -29,8 +43,14 @@ interrupt:
     mov %fs, %bx
     mov %gs, %bx
 */
-    popa #Restore registers
+    //popa #Restore registers
     //add %esp, 8 #Removes data from ISR (error code and INT number)
+    // restore registers
+	popl %gs
+	popl %fs
+	popl %es
+	popl %ds
+	popl %eax
     iret
 
 .global gdt_flush
@@ -45,7 +65,7 @@ gdt_flush:
     mov %ax, %gs
     mov %ax, %ss
 
-    jmp $0x08, $flush   # 0x08 is the offset to our code segment: Far jump!
-
-flush:
+	ljmp $0x08, $flush2 // 0x08 is the offset to our code segment: Far jump!
+flush2:
+   ret
     ret

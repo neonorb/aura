@@ -108,6 +108,8 @@ extern void interrupt();
 void interrupt_handler() {
 	// test function, this will eventually be replaced with more intelligent code
 	log("interrupt!");
+
+	outb(0x20, 0x20);
 }
 
 static inline void lidt(uint32_t base, uint16_t size) { // This function works in 32 and 64bit mode
