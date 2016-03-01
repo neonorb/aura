@@ -13,4 +13,4 @@ debug-os: build/asiago.bin
 		$(AS) kernel/interrupt.s -o build/interrupt.o
 		$(CC) -c kernel/kernel.c -o build/kernel.o -std=gnu99 -g -ffreestanding -O0 -Wall -Wextra -Werror
 		$(CC) -T utils/linker.ld -o build/asiago.bin -ffreestanding -g -O0 -nostdlib build/boot.o build/interrupt.o build/kernel.o -lgcc -Wall -Wextra -Werror
-		qemu-system-i386 -s -S -kernel build/asiago.bin
+		qemu-system-i386 -d int,pcall -s -S -kernel build/asiago.bin
