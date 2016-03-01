@@ -138,7 +138,7 @@ void initialize_idt_table() {
 	outb(0xA1, 0x0);
 
 	// first 32 are exceptions, #1 (32) is Programmable Interrupt Timer Interrupt, #2 (33) is Keyboard Interrupt - http://wiki.osdev.org/Interrupts#Interrupt_Overview
-	for (uint16_t c = 1; c < 256; c++) { // FIXME c should be 8 bit or char but GCC gives a warning..try it
+	for (uint8_t c = 0; true; c++) { // FIXME c should be 8 bit or char but GCC gives a warning..try it
 		idt_table[c].alwaysZero = 0;
 
 		idt_table[c].offset_1 = ((uint32_t) interrupt) & 0xFFFF;
@@ -147,6 +147,10 @@ void initialize_idt_table() {
 		idt_table[c].selector = 0x08;
 
 		idt_table[c].type_attr = 0x8E; // | 0x60; this is for user-mode or something
+
+		if(c >= 255){ // avoid the error
+			break;
+		}
 	}
 
 	// tell CPU about descriptor table
