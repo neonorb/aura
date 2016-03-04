@@ -4,19 +4,27 @@ A hobby operating system based C and a hobby language.
 See the [wiki](http://neonorb.com/wiki/Project_Asiago) for more information.
 
 # Goals
-+ ~~Booting!~~
-+ ~~Output!~~
-+ ~~Keyboard input!~~
-+ Color!
-+ Visuals!
-+ A shell!
-+ Cheese Lang!
-+ Self-hosted in Cheese!
++ ~~Booting~~
++ ~~Output~~
++ ~~Keyboard Input~~
++ Interrupts
++ Mish
++ Shell
++ Gouda
++ Video Mode
++ Graphical Shell
+
+# Other Goals (long term or not in a specific order)
++ Long Mode
++ Paging
++ IP
++ Custom Bootloader
++ UEFI Support
 
 # Depends
 GNU Toolchain
 
-Later to use the Cheese Lang toolchain.
+Later to use the Mish toolchain.
 
 # Docs
 [OS Dev Wiki](http://wiki.osdev.org/Main_Page)
