@@ -1,4 +1,6 @@
+#include <stdbool.h>
 #include "ps2.h"
+#include "../../kernel/ports.c"
 
 uint8_t getScancode() {
 	//outb(0x60, 0xF0); // send EOI
