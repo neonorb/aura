@@ -2,14 +2,17 @@
 # It can be structured way better, but it still beats manually compilation.
 
 CC=i686-elf-gcc # Both the compiler and assembler need crosscompiled http://wiki.osdev.org/GCC_Cross-Compiler
-AS=i686-elf-as
-CFLAGS=-ffreestanding -Wall -Wextra -Werror # Considering removing Werror as it can be annoying
+AS=nasm
+CFLAGS=-ffreestanding -Wall -Wextra # Considering removing Werror as it can be annoying
 SOURCES= kernel/kernel.c kernel/interrupt.s utils/linker.ld boot/boot.s # This will likely increase
 LIBS=-lgcc
 
+compile:
+	# this is a convenience alias so anybody can simply run `make compile`
+	make compile-os
 compile-os: $(SOURCES)
-		$(AS) boot/boot.s -o build/boot.o
-		$(AS) kernel/interrupt.s -o build/interrupt.o
+		$(AS) -f elf boot/boot.s -o build/boot.o
+		$(AS) -f elf kernel/interrupt.s -o build/interrupt.o
 		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -O2 -std=gnu99
 		$(CC) -T utils/linker.ld -o build/asiago.bin  $(CFLAGS) $(LIBS) -O2 -nostdlib build/boot.o build/interrupt.o build/kernel.o
 		@echo
