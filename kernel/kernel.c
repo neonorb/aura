@@ -21,7 +21,7 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "../utils/utils.h"
 
 #include "../modules/screen/vga.h"
-#include "../modules/keyboard/ps2.h"
+#include "../modules/keyboard/keyboard.c"
 
 void log(const char* data) {
 	terminal_writestring(data);
@@ -482,12 +482,38 @@ void irq_handler(struct regs *r) {
 	outb(0x20, 0x20);
 }
 
-void keyboard_handler(){
-	int8_t c = getchar();
+void reverse(char s[])
+{
+    int i, j;
+    char c;
 
-	if(c != -1){
-		terminal_putchar(c);
-	}
+    for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+void itoa(int n, char s[])
+{
+    int i, sign;
+
+    if ((sign = n) < 0)  /* record sign */
+        n = -n;          /* make n positive */
+    i = 0;
+    do {       /* generate digits in reverse order */
+        s[i++] = n % 10 + '0';   /* get next digit */
+    } while ((n /= 10) > 0);     /* delete it */
+    if (sign < 0)
+        s[i++] = '-';
+    s[i] = '\0';
+    reverse(s);
+}
+
+void handler(KeyEvent e){
+	char s[] = {0};
+	itoa(e.type, *s);
+	log(*s);
 }
 
 void kernel_main() {
@@ -500,25 +526,19 @@ void kernel_main() {
 	log("setting up GDT and IDT");
 	x86_init_descriptor_tables();
 
+	log("initializing keyboard");
+	register_interrupt_handler(IRQ1, &keyboard_interrupt);
+	registerKeyboardHandler(&handler);
+
 	// we're ready to go, enable interrupts
 	log("enabling interrupts");
 	asm volatile ("sti");
 
-	log("ready to go");
-
-	register_interrupt_handler(IRQ1, &keyboard_handler);
+	log("finished setting up");
 
 	while (true) {
 		// this will eventually be replaced with more intelligent code
-		//log("test");
 	}
-
-	/*while(true){
-	 char c = getchar();
-	 if(c > 0){
-	 terminal_putchar(c);
-	 }
-	 }*/
 
 	log("FUCK! We're at the end of kernel_main which shouldn't happen!"); // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 }
