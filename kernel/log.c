@@ -17,19 +17,19 @@ void log_write(LogType logType, char* message) {
 	switch (logType) {
 	case NORMAL:
 		terminal_setcolor(COLOR_GREEN);
-		terminal_writestring("[NORMAL] ");
+		terminal_writeString("[NORMAL] ");
 		break;
 	case WARNING:
 		terminal_setcolor(COLOR_LIGHT_RED);
-		terminal_writestring("[WARNING] ");
+		terminal_writeString("[WARNING] ");
 		break;
 	case FAULT:
 		terminal_setcolor(COLOR_RED);
-		terminal_writestring("[FAULT] ");
+		terminal_writeString("[FAULT] ");
 		break;
 	}
 
 	terminal_setcolor(COLOR_LIGHT_GREY);
-	terminal_writestring(message);
-	terminal_writestring("\n");
+	terminal_writeString(message);
+	terminal_writeString("\n");
 }

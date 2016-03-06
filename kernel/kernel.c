@@ -28,16 +28,20 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "../modules/screen/vga.h"
 #include "../modules/keyboard/keyboard.c"
 
-void handler(KeyEvent e) {
-	char string[digitCount(e.type)];
-	toString(string, e.type);
+void handler(KeyEvent keyEvent) {
+	char c = keyboard_eventToChar(keyEvent);
+	if (c > 0) {
+		terminal_putchar(c);
+	}
+	/*char string[digitCount(e.type)];
+	 toString(string, e.type);
 
-	char message[] = "Event type: ";
+	 char message[] = "Event type: ";
 
-	char result[sizeof(e.type) + sizeof(message)];
-	concat(result, message, string);
+	 char result[sizeof(e.type) + sizeof(message)];
+	 concat(result, message, string);
 
-	log(result);
+	 log(result);*/
 }
 
 void kernel_main() {

@@ -2,12 +2,12 @@
 #include "ps2.h"
 #include "../../kernel/ports.c"
 
-uint8_t getScancode() {
+static uint8_t getScancode() {
 	//outb(0x60, 0xF0); // send EOI
 	return inb(0x60);
 }
 
-void ps2_readkeyboard() {
+static void readKeyboard() {
 	uint8_t scancode = getScancode();
 	//bool second = false;
 	if(scancode == 0xE0){
@@ -15,9 +15,9 @@ void ps2_readkeyboard() {
 		scancode = getScancode();
 	}
 
-	fire_keyboard_event(scanCodeSet1[scancode]);
+	keyUpdate(scanCodeSet1[scancode]);
 }
 
 void ps2_interrupt() {
-	ps2_readkeyboard();
+	readKeyboard();
 }

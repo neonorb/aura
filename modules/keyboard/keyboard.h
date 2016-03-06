@@ -1,6 +1,8 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 
+#include <stdbool.h>
+
 typedef enum {
 	KEY_UNDEFINED,
 
@@ -84,7 +86,7 @@ typedef enum {
 	HYPHEN,
 	EQUALS,
 	SEMICOLON,
-	SINGLE_QUOTE,
+	QUOTE,
 	COMMA,
 	PERIOD,
 
@@ -127,26 +129,41 @@ typedef enum {
 
 	LEFT_GUI,
 	RIGHT_GUI,
-	APPS
+	/* if this end marker is changed, update KEY_COUNT macro */APPS
 } Key;
 
+#define KEY_COUNT APPS - KEY_UNDEFINED
+
 typedef enum {
-	TYPE_UNDEFINED, PRESSED, RELEASED
-} KeyEventType;
+	PRESSURE_UNDEFINED, PRESSED, RELEASED
+} KeyPressure;
 
 typedef struct {
 	Key key;
-	KeyEventType type;
+	KeyPressure pressure;
+} KeyMapping;
+
+#define NULL_MAPPING {KEY_UNDEFINED, PRESSURE_UNDEFINED}
+
+typedef struct {
+	Key key;
+	KeyPressure pressure;
+
+	bool shift;
+	bool ctrl;
+	bool alt;
+	bool meta;
+	bool numLock;
+	bool capsLock;
 } KeyEvent;
 
-#define EVENT_NULL {KEY_UNDEFINED, TYPE_UNDEFINED}
-
-typedef void (*KeyboardHandler)(KeyEvent);
-
-void fire_keyboard_event(KeyEvent);
-
-void registerKeyboardHandler(KeyboardHandler handler);
+static bool pressedKeys[KEY_COUNT];
 
 void keyboard_interrupt();
+
+void keyUpdate(KeyMapping);
+
+typedef void (*KeyboardHandler)(KeyEvent);
+void registerKeyboardHandler(KeyboardHandler handler);
 
 #endif /* KEYBOARD_H_ */

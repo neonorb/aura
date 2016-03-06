@@ -84,6 +84,7 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
 static void shiftUp() {
 	for (unsigned int i = VGA_WIDTH; i < VGA_WIDTH * VGA_HEIGHT; i +=
 			VGA_WIDTH) {
+		// FIXME when shifting up, only the left half of the screen is moved
 		memcpy(&terminalBuffer[i - VGA_WIDTH], &terminalBuffer[i], VGA_WIDTH);
 	}
 }
@@ -129,7 +130,7 @@ void terminal_backup() {
 	}
 }
 
-void terminal_writestring(const char* data) {
+void terminal_writeString(const char* data) {
 	size_t datalen = strlen(data);
 	for (size_t i = 0; i < datalen; i++) {
 		char c = data[i];
