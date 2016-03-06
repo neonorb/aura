@@ -29,7 +29,7 @@ void log_write(LogType logType, char* message) {
 		break;
 	}
 
-	terminal_setcolor(COLOR_WHITE);
+	terminal_setcolor(COLOR_LIGHT_GREY);
 	terminal_writestring(message);
 	terminal_writestring("\n");
 }

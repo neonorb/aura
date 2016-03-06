@@ -1,3 +1,6 @@
+#ifndef UTILS_H_
+#define UTILS_H_
+
 #include "../kernel/log.h"
 
 int array_length_char(char a[]) {
@@ -95,3 +98,5 @@ void toString(char* dest, unsigned int num) {
 	}
 	itoa(num, dest);
 }
+
+#endif /* UTILS_H_ */
