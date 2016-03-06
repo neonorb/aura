@@ -78,6 +78,9 @@ void itoa(int n, char s[]) {
 }
 
 void concat(char* dest, char* first, char* second) {
+	for(unsigned int i = 0; i < strlen(first) + strlen(second); i++){
+		dest[i] = 0;
+	}
 	memcpy(dest, first, strlen(first));
 	memcpy(dest + strlen(first), second, strlen(second));
 }
@@ -93,7 +96,7 @@ unsigned int digitCount(unsigned int num){
 }
 
 void toString(char* dest, unsigned int num) {
-	for (unsigned int i = 0; i < digitCount(num); i++) {
+	for (unsigned int i = 0; i < strlen(dest); i++) {
 		dest[i] = 0;
 	}
 	itoa(num, dest);

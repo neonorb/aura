@@ -1,3 +1,5 @@
+#include "ports.h"
+
 inline void outb(uint16_t port, uint8_t val) {
 	asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
 	/* There's an outb %al, $imm8  encoding, for compile-time constant port numbers that fit in 8b.  (N constraint).
