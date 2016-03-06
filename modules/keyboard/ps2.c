@@ -9,9 +9,9 @@ uint8_t getScancode() {
 
 void ps2_readkeyboard() {
 	uint8_t scancode = getScancode();
-	bool second = false;
+	//bool second = false;
 	if(scancode == 0xE0){
-		second = true;
+		//second = true;
 		scancode = getScancode();
 	}
 

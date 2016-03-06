@@ -1,4 +1,5 @@
-
+extern void gdt_flush();
+extern void tss_flush();
 
 // Write len copies of val into dest.
 void memset(uint8_t *dest, uint8_t val, uint32_t len) {
@@ -7,24 +8,24 @@ void memset(uint8_t *dest, uint8_t val, uint32_t len) {
 		*temp++ = val;
 }
 
-struct gdt_entry {
-	unsigned short limit_low;
-	unsigned short base_low;
-	unsigned char base_middle;
-	unsigned char access;
-	unsigned char granularity;
-	unsigned char base_high;
-}__attribute__((packed));
+typedef struct {
+	uint16_t limit_low;
+	uint16_t base_low;
+	uint8_t base_middle;
+	uint8_t access;
+	uint8_t granularity;
+	uint8_t base_high;
+}__attribute__((packed)) GDTEntry;
 
-struct gdt_ptr {
-	unsigned short limit;
-	unsigned int base;
-}__attribute__((packed));
+typedef struct GDTPointer {
+	uint16_t limit;
+	uint32_t base;
+}__attribute__((packed)) GDTPointer;
 
-void gdt_set_gate(signed int num, uint32_t base, uint32_t limit, uint8_t access,
+void gdtSetGate(signed int num, uint32_t base, uint32_t limit, uint8_t access,
 		uint8_t gran);
 
-struct tss_entry_struct {
+typedef struct {
 	uint32_t prev_tss; // The previous TSS - if we used hardware task switching this would form a linked list.
 	uint32_t esp0;   // The stack pointer to load when we change to kernel mode.
 	uint32_t ss0;    // The stack segment to load when we change to kernel mode.
@@ -52,61 +53,53 @@ struct tss_entry_struct {
 	uint32_t ldt;        // Unused...
 	uint16_t trap;
 	uint16_t iomap_base;
-}__attribute__((packed));
+}__attribute__((packed)) TSSEntry;
 
-typedef struct tss_entry_struct tss_entry_t;
-struct gdt_entry gdt_entries[6];
-struct gdt_ptr gdt_ptr;
-tss_entry_t tss_entry;
+GDTEntry gdtEntries[6];
+GDTPointer gdtPointer;
+TSSEntry tssEntry;
 
 ///Sets a gate in the GDT
-void gdt_set_gate(signed int num, uint32_t base, uint32_t limit, uint8_t access,
+void gdtSetGate(signed int num, uint32_t base, uint32_t limit, uint8_t access,
 		uint8_t gran) {
-	gdt_entries[num].base_low = (base & 0xFFFF);
-	gdt_entries[num].base_middle = (base >> 16) & 0xFF;
-	gdt_entries[num].base_high = (base >> 24) & 0xFF;
+	gdtEntries[num].base_low = (base & 0xFFFF);
+	gdtEntries[num].base_middle = (base >> 16) & 0xFF;
+	gdtEntries[num].base_high = (base >> 24) & 0xFF;
 
-	gdt_entries[num].limit_low = (limit & 0xFFFF);
-	gdt_entries[num].granularity = (limit >> 16) & 0x0F;
+	gdtEntries[num].limit_low = (limit & 0xFFFF);
+	gdtEntries[num].granularity = (limit >> 16) & 0x0F;
 
-	gdt_entries[num].granularity |= gran & 0xF0;
-	gdt_entries[num].access = access;
+	gdtEntries[num].granularity |= gran & 0xF0;
+	gdtEntries[num].access = access;
 }
 
-void set_kernel_stack(uint32_t stack) {
-	tss_entry.esp0 = stack;
-}
-extern void gdt_flush();
-extern void tss_flush();
+static void writeTss(int32_t num, uint32_t ss0, uint32_t esp0) {
+	uint32_t base = (uint32_t) &tssEntry;
+	uint32_t limit = base + sizeof(tssEntry);
 
-static void write_tss(int32_t num, uint32_t ss0, uint32_t esp0) {
-	uint32_t base = (uint32_t) &tss_entry;
-	uint32_t limit = base + sizeof(tss_entry);
+	gdtSetGate(num, base, limit, 0xE9, 0x00);
 
-	gdt_set_gate(num, base, limit, 0xE9, 0x00);
+	memset(&tssEntry, 0, sizeof(tssEntry));
 
-	memset(&tss_entry, 0, sizeof(tss_entry));
+	tssEntry.ss0 = ss0;
+	tssEntry.esp0 = esp0;
 
-	tss_entry.ss0 = ss0;
-	tss_entry.esp0 = esp0;
-
-	tss_entry.cs = 0x0b;
-	tss_entry.ss = tss_entry.ds = tss_entry.es = tss_entry.fs = tss_entry.gs =
-			0x13;
+	tssEntry.cs = 0x0b;
+	tssEntry.ss = tssEntry.ds = tssEntry.es = tssEntry.fs = tssEntry.gs = 0x13;
 }
 
-void init_gdt() {
-	gdt_ptr.limit = (sizeof(struct gdt_entry) * 6) - 1;
-	gdt_ptr.base = (uint32_t) &gdt_entries;
+void gdt_init() {
+	gdtPointer.limit = (sizeof(GDTEntry) * 6) - 1;
+	gdtPointer.base = (uint32_t) &gdtEntries;
 
-	gdt_set_gate(0, 0, 0, 0, 0);                // Null segment
-	gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
-	gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
-	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
-	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
-	write_tss(5, 0x10, 0x0);
+	gdtSetGate(0, 0, 0, 0, 0);                // Null segment
+	gdtSetGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
+	gdtSetGate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
+	gdtSetGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
+	gdtSetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
+	writeTss(5, 0x10, 0x0);
 
-	gdt_flush((uint32_t) &gdt_ptr);
+	gdt_flush((uint32_t) &gdtPointer);
 
 	tss_flush();
 }

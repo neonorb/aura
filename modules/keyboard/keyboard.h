@@ -1,5 +1,5 @@
-#ifndef KEYBOARD
-#define KEYBOARD
+#ifndef KEYBOARD_H_
+#define KEYBOARD_H_
 
 typedef enum {
 	KEY_UNDEFINED,
@@ -149,4 +149,4 @@ void registerKeyboardHandler(KeyboardHandler handler);
 
 void keyboard_interrupt();
 
-#endif
+#endif /* KEYBOARD_H_ */

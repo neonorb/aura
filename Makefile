@@ -3,7 +3,7 @@
 
 CC=i686-elf-gcc # Both the compiler and assembler need crosscompiled http://wiki.osdev.org/GCC_Cross-Compiler
 AS=nasm
-CFLAGS=-ffreestanding -Wall -Wextra # Considering removing Werror as it can be annoying
+CFLAGS=-ffreestanding -Wall -Wextra #-Werror # Considering removing Werror as it can be annoying
 SOURCES= kernel/kernel.c kernel/gdt.s kernel/idt.s utils/linker.ld boot/boot.s # This will likely increase
 LIBS=-lgcc
 

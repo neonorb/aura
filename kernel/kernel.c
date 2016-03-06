@@ -20,77 +20,52 @@ extern "C" /* Use C linkage for kernel_main. */
 
 #include "../utils/utils.h"
 
+#include "log.c"
+
 #include "gdt.c"
 #include "idt.c"
 
 #include "../modules/screen/vga.h"
 #include "../modules/keyboard/keyboard.c"
 
-void log(const char* data) {
-	terminal_writestring(data);
-	terminal_writestring("\n");
-}
+void handler(KeyEvent e) {
+	char string[digitCount(e.type)];
+	toString(string, e.type);
 
-void reverse(char s[])
-{
-    int i, j;
-    char c;
+	char message[] = "Event type: ";
 
-    for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
-        c = s[i];
-        s[i] = s[j];
-        s[j] = c;
-    }
-}
+	char result[sizeof(e.type) + sizeof(message)];
+	concat(result, message, string);
 
-void itoa(int n, char s[])
-{
-    int i, sign;
-
-    if ((sign = n) < 0)  /* record sign */
-        n = -n;          /* make n positive */
-    i = 0;
-    do {       /* generate digits in reverse order */
-        s[i++] = n % 10 + '0';   /* get next digit */
-    } while ((n /= 10) > 0);     /* delete it */
-    if (sign < 0)
-        s[i++] = '-';
-    s[i] = '\0';
-    reverse(s);
-}
-
-void handler(KeyEvent e){
-	char s[] = {0};
-	itoa(e.type, *s);
-	log(*s);
+	log(result);
 }
 
 void kernel_main() {
 	/* Initialize terminal interface */
 	terminal_initialize();
 
-	log("disabling interrupts");
+	log("Disabling interrupts");
 	asm volatile ("cli");
 
-	log("setting up GDT");
-	init_gdt();
+	log("Setting up GDT");
+	gdt_init();
 
-	log("setting up IDT");
+	log("Setting up IDT");
 	init_idt();
 
-	log("initializing keyboard");
+	log("Initializing keyboard");
 	register_interrupt_handler(IRQ1, &keyboard_interrupt);
 	registerKeyboardHandler(&handler);
 
 	// we're ready to go, enable interrupts
-	log("enabling interrupts");
+	log("Enabling interrupts");
 	asm volatile ("sti");
 
-	log("finished setting up");
+	log("Welcome to Aura!");
 
 	while (true) {
 		// this will eventually be replaced with more intelligent code
 	}
 
-	log("FUCK! We're at the end of kernel_main which shouldn't happen!"); // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
+	fault("FUCK! We're at the end of kernel_main which shouldn't happen!"); // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 }

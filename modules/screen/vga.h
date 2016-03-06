@@ -1,5 +1,8 @@
+#ifndef VGA_H_
+#define VGA_H_
+
 /* Hardware text mode color constants. */
-enum vga_color {
+typedef enum {
 	COLOR_BLACK = 0,
 	COLOR_BLUE = 1,
 	COLOR_GREEN = 2,
@@ -15,14 +18,14 @@ enum vga_color {
 	COLOR_LIGHT_RED = 12,
 	COLOR_LIGHT_MAGENTA = 13,
 	COLOR_LIGHT_BROWN = 14,
-	COLOR_WHITE = 15,
-};
+	COLOR_WHITE = 15
+} VGAColor;
 
 // FIX TO -Wimplicit-function-declaration WARNING
 void terminal_backup();
 void terminal_newline();
 
-uint8_t make_color(enum vga_color fg, enum vga_color bg) {
+uint8_t make_color(VGAColor fg, VGAColor bg) {
 	return fg | bg << 4;
 }
  
@@ -31,14 +34,7 @@ uint16_t make_vgaentry(char c, uint8_t color) {
 	uint16_t color16 = color;
 	return c16 | color16 << 8;
 }
- 
-size_t strlen(const char* str) {
-	size_t ret = 0;
-	while ( str[ret] != 0 )
-		ret++;
-	return ret;
-}
- 
+
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
 
@@ -137,3 +133,5 @@ void terminal_newline() {
 		terminal_putchar(' ');
 	}
 }
+
+#endif /* VGA_H_ */
