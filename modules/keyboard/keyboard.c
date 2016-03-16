@@ -5,7 +5,7 @@
 
 static KeyboardHandler keyboardHandler;
 
-static void interrupt() {
+static void keyboardInterrupt() {
 	ps2_interrupt();
 }
 
@@ -41,7 +41,9 @@ void keyboard_keyUpdate(KeyMapping keyMapping) {
 //keyEvent.capsLock = capsLock;
 
 // fire event
-	keyboardHandler(keyEvent);
+	if (keyboardHandler != 0) {
+		keyboardHandler(keyEvent);
+	}
 }
 
 // public API
@@ -147,5 +149,5 @@ char keyboard_eventToChar(KeyEvent keyEvent) {
 }
 
 void keyboard_initialize() {
-	register_interrupt_handler(IRQ1, &interrupt);
+	register_interrupt_handler(IRQ1, &keyboardInterrupt);
 }

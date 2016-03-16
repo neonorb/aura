@@ -25,6 +25,7 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "gdt.c"
 #include "idt.c"
 
+#include "../modules/clock/clock.c"
 #include "../modules/screen/screen.c"
 #include "../modules/keyboard/keyboard.c"
 
@@ -42,6 +43,9 @@ void kernel_main() {
 
 	log("Setting up IDT");
 	init_idt();
+
+	log("Setting up clock");
+	clock_initialize();
 
 	log("Setting up keyboard");
 	keyboard_initialize();
