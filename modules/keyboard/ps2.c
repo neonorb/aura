@@ -15,7 +15,7 @@ static void readKeyboard() {
 		scancode = getScancode();
 	}
 
-	keyUpdate(scanCodeSet1[scancode]);
+	keyboard_keyUpdate(scanCodeSet1[scancode]);
 }
 
 void ps2_interrupt() {

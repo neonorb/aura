@@ -352,4 +352,24 @@ int memcmp(const void* s1, const void* s2, size_t len) {
 	return 0;
 }
 
+uint8_t setBit(uint8_t number, uint8_t pos) {
+	return number | 1 << pos;
+}
+
+uint8_t clearBit(uint8_t number, uint8_t pos) {
+	return number & ~(1 << pos);
+}
+
+uint8_t toggleBit(uint8_t number, uint8_t pos) {
+	return number ^ 1 << pos;
+}
+
+uint8_t getBit(uint8_t number, uint8_t pos) {
+	return (number >> pos) & 1;
+}
+
+uint8_t changeBit(uint8_t number, uint8_t pos, uint8_t value) {
+	return number ^ ((-value ^ number) & (1 << pos));
+}
+
 #endif /* UTILS_H_ */

@@ -159,11 +159,13 @@ typedef struct {
 
 static bool pressedKeys[KEY_COUNT];
 
-void keyboard_interrupt();
-
-void keyUpdate(KeyMapping);
-
+void keyboard_keyUpdate(KeyMapping);
 typedef void (*KeyboardHandler)(KeyEvent);
-void registerKeyboardHandler(KeyboardHandler handler);
+
+//public API
+
+void keyboard_handler(KeyboardHandler handler);
+char keyboard_eventToChar(KeyEvent keyEvent);
+void keyboard_initialize();
 
 #endif /* KEYBOARD_H_ */

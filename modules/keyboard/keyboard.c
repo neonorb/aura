@@ -3,13 +3,51 @@
 
 #include "../../utils/utils.h"
 
-KeyboardHandler keyboardHandler;
-void registerKeyboardHandler(KeyboardHandler handler) {
-	keyboardHandler = handler;
+static KeyboardHandler keyboardHandler;
+
+static void interrupt() {
+	ps2_interrupt();
 }
 
-void keyboard_interrupt() {
-	ps2_interrupt();
+// callback from driver
+void keyboard_keyUpdate(KeyMapping keyMapping) {
+// determine pressure and update pressed keys map
+	if (keyMapping.pressure == PRESSED) {
+		if (!pressedKeys[keyMapping.key]) { // if key is not pressed
+			// key is now pressed
+			pressedKeys[keyMapping.key] = true;
+		} else {
+			// ignore
+		}
+	} else if (keyMapping.pressure == RELEASED) {
+		if (pressedKeys[keyMapping.key]) { // if key is pressed
+			// key is now released
+			pressedKeys[keyMapping.key] = false;
+		} else {
+			// ignore
+		}
+	}
+
+// construct event
+	KeyEvent keyEvent;
+	keyEvent.key = keyMapping.key;
+	keyEvent.pressure = keyMapping.pressure;
+	keyEvent.shift = pressedKeys[LEFT_SHIFT] || pressedKeys[RIGHT_SHIFT];
+	keyEvent.ctrl = pressedKeys[LEFT_CONTROL] || pressedKeys[RIGHT_CONTROL];
+	keyEvent.alt = pressedKeys[LEFT_ALT] || pressedKeys[RIGHT_ALT];
+// keyEvent.meta = pressedKeys[META or LEFT_GUI];
+
+//keyEvent.numLock = numLock;
+//keyEvent.capsLock = capsLock;
+
+// fire event
+	keyboardHandler(keyEvent);
+}
+
+// public API
+
+void keyboard_handler(KeyboardHandler handler) {
+	keyboardHandler = handler;
 }
 
 char keyboard_eventToChar(KeyEvent keyEvent) {
@@ -61,11 +99,11 @@ char keyboard_eventToChar(KeyEvent keyEvent) {
 			// numbers
 			return 0x30 + keyEvent.key - DIGIT0;
 		}
-	}else if(keyEvent.key == SPACE){
+	} else if (keyEvent.key == SPACE) {
 		return ' ';
-	}else if(keyEvent.key == TAB){
+	} else if (keyEvent.key == TAB) {
 		return '\t';
-	}else if(keyEvent.key == ENTER){
+	} else if (keyEvent.key == ENTER) {
 		return '\n';
 	}
 	switch (keyEvent.key) {
@@ -108,36 +146,6 @@ char keyboard_eventToChar(KeyEvent keyEvent) {
 	}
 }
 
-void keyUpdate(KeyMapping keyMapping) {
-// determine pressure and update pressed keys map
-	if (keyMapping.pressure == PRESSED) {
-		if (!pressedKeys[keyMapping.key]) { // if key is not pressed
-			// key is now pressed
-			pressedKeys[keyMapping.key] = true;
-		} else {
-			// ignore
-		}
-	} else if (keyMapping.pressure == RELEASED) {
-		if (pressedKeys[keyMapping.key]) { // if key is pressed
-			// key is now released
-			pressedKeys[keyMapping.key] = false;
-		} else {
-			// ignore
-		}
-	}
-
-// construct event
-	KeyEvent keyEvent;
-	keyEvent.key = keyMapping.key;
-	keyEvent.pressure = keyMapping.pressure;
-	keyEvent.shift = pressedKeys[LEFT_SHIFT] || pressedKeys[RIGHT_SHIFT];
-	keyEvent.ctrl = pressedKeys[LEFT_CONTROL] || pressedKeys[RIGHT_CONTROL];
-	keyEvent.alt = pressedKeys[LEFT_ALT] || pressedKeys[RIGHT_ALT];
-// keyEvent.meta = pressedKeys[META or LEFT_GUI];
-
-//keyEvent.numLock = numLock;
-//keyEvent.capsLock = capsLock;
-
-// fire event
-	keyboardHandler(keyEvent);
+void keyboard_initialize() {
+	register_interrupt_handler(IRQ1, &interrupt);
 }

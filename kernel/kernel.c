@@ -25,34 +25,14 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "gdt.c"
 #include "idt.c"
 
-#include "../modules/screen/vga.h"
+#include "../modules/screen/screen.c"
 #include "../modules/keyboard/keyboard.c"
 
-uint8_t x = 0;
-void handler(KeyEvent keyEvent) {
-	char c = keyboard_eventToChar(keyEvent);
-	if (c > 0) {
-		graphics_rectangle(0, 0, x, x, 0, 0, 0);
-		graphics_rectangle(0, 0, x, x, 64, 64, 64);
-		x++;
-		//terminal_putchar(c);
-	}
+#include "../implementation/implementation.c"
 
-	//acpiPowerOff();
-	/*char string[digitCount(e.type)];
-	 toString(string, e.type);
-
-	 char message[] = "Event type: ";
-
-	 char result[sizeof(e.type) + sizeof(message)];
-	 concat(result, message, string);
-
-	 log(result);*/
-}
 
 void kernel_main() {
-	/* Initialize terminal interface */
-	terminal_initialize();
+	screen_terminal_initialize();
 
 	log("Disabling interrupts");
 	asm volatile ("cli");
@@ -63,14 +43,11 @@ void kernel_main() {
 	log("Setting up IDT");
 	init_idt();
 
-	log("Initializing ACPI");
+	log("Setting up keyboard");
+	keyboard_initialize();
+
+	//log("Initializing ACPI");
 	//initAcpi();
-
-	log("Initializing keyboard");
-	register_interrupt_handler(IRQ1, &keyboard_interrupt);
-	registerKeyboardHandler(&handler);
-
-	graphicsMode();
 
 	// we're ready to go, enable interrupts
 	log("Enabling interrupts");
@@ -78,9 +55,7 @@ void kernel_main() {
 
 	log("Welcome to Aura!");
 
-	while (true) {
-		// this will eventually be replaced with more intelligent code
-	}
+	implementation();
 
 	fault("FUCK! We're at the end of kernel_main which shouldn't happen!"); // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 }

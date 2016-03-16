@@ -1,5 +1,7 @@
 #include "log.h"
-#include "../modules/screen/vga.h"
+#include "../modules/screen/screen.h"
+
+#include "../modules/screen/vga.h" // TODO remove this include
 
 void log(char* message){
 	log_write(NORMAL, message);
@@ -15,21 +17,21 @@ void fault(char* message){
 
 void log_write(LogType logType, char* message) {
 	switch (logType) {
-	case NORMAL:
-		terminal_setcolor(COLOR_GREEN);
-		terminal_writeString("[NORMAL] ");
+	case NORMAL:// TODO change vga color change to screen
+		vga_terminal_backgroundColor(COLOR_GREEN);
+		screen_terminal_writeString("[NORMAL] ");
 		break;
 	case WARNING:
-		terminal_setcolor(COLOR_LIGHT_RED);
-		terminal_writeString("[WARNING] ");
+		vga_terminal_backgroundColor(COLOR_LIGHT_RED);
+		screen_terminal_writeString("[WARNING] ");
 		break;
 	case FAULT:
-		terminal_setcolor(COLOR_RED);
-		terminal_writeString("[FAULT] ");
+		vga_terminal_backgroundColor(COLOR_RED);
+		screen_terminal_writeString("[FAULT] ");
 		break;
 	}
 
-	terminal_setcolor(COLOR_LIGHT_GREY);
-	terminal_writeString(message);
-	terminal_writeString("\n");
+	vga_terminal_backgroundColor(COLOR_LIGHT_GREY);
+	screen_terminal_writeString(message);
+	screen_terminal_writeString("\n");
 }
