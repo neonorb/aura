@@ -28,11 +28,17 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "../modules/screen/vga.h"
 #include "../modules/keyboard/keyboard.c"
 
+uint8_t x = 0;
 void handler(KeyEvent keyEvent) {
 	char c = keyboard_eventToChar(keyEvent);
 	if (c > 0) {
-		terminal_putchar(c);
+		graphics_rectangle(0, 0, x, x, 0, 0, 0);
+		graphics_rectangle(0, 0, x, x, 64, 64, 64);
+		x++;
+		//terminal_putchar(c);
 	}
+
+	//acpiPowerOff();
 	/*char string[digitCount(e.type)];
 	 toString(string, e.type);
 
@@ -57,9 +63,14 @@ void kernel_main() {
 	log("Setting up IDT");
 	init_idt();
 
+	log("Initializing ACPI");
+	//initAcpi();
+
 	log("Initializing keyboard");
 	register_interrupt_handler(IRQ1, &keyboard_interrupt);
 	registerKeyboardHandler(&handler);
+
+	graphicsMode();
 
 	// we're ready to go, enable interrupts
 	log("Enabling interrupts");
