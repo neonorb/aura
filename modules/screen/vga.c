@@ -3,6 +3,8 @@
 #include "../../utils/utils.h"
 #include "../../kernel/ports.h"
 
+#include <stdbool.h>
+
 // TODO externalize this
 static uint8_t TAB_SIZE = 2;
 
@@ -174,7 +176,7 @@ static void vsync() {
 // public API
 
 void vga_graphics_initialize() {
-	graphicsBuffer = 0xA0000;
+	graphicsBuffer = (uint8_t*) 0xA0000;
 }
 
 void vga_graphics_flip() {
@@ -184,30 +186,36 @@ void vga_graphics_flip() {
 	VGA_GRAPHICS_WIDTH * VGA_GRAPHICS_HEIGHT);
 }
 
-void vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
+bool vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
 		uint8_t blue) {
 	if (x > VGA_GRAPHICS_WIDTH)
-		return;
+		return false;
 	if (y > VGA_GRAPHICS_HEIGHT)
-		return;
+		return false;
 
 	setColor(y * VGA_GRAPHICS_WIDTH + x, red, green, blue);
+
+	return true;
 }
 
-void vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
+bool vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
 		uint32_t height, uint8_t red, uint8_t green, uint8_t blue) {
 	if (x + width > VGA_GRAPHICS_WIDTH)
-		return;
+		return false;
 	if (y + height > VGA_GRAPHICS_HEIGHT)
-		return;
+		return false;
 
 	for (uint16_t xp = x; xp < x + width; xp++) {
 		for (uint8_t yp = y; yp < y + height; yp++) {
-			vga_graphics_pixel(xp, yp, red, green, blue);
+			if (!vga_graphics_pixel(xp, yp, red, green, blue)) {
+				return false;
+			}
 		}
 	}
 
-	//vga_graphics_flip();
+	//vga_graphics_flip(); // TODO Make this an option...maybe?
+
+	return true;
 }
 
 // TODO make the stuff below make sense

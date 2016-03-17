@@ -8,14 +8,13 @@
 
 static ClockHandler clockHandler;
 
-static void clockPitHandler(){
+static void clockPitHandler() {
 	if (clockHandler != 0) {
 		clockHandler();
 	}
 }
 
-static void clockRtcHandler(){
-
+static void clockRtcHandler() {
 }
 
 void clock_initialize() {

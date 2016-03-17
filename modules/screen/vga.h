@@ -40,9 +40,9 @@ void vga_terminal_initialize();
 
 void vga_graphics_initialize();
 void vga_graphics_flip();
-void vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
+bool vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
 		uint8_t blue);
-void vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
+bool vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
 		uint32_t height, uint8_t red, uint8_t green, uint8_t blue);
 void vga_graphicsMode();
 

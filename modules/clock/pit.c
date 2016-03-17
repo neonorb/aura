@@ -1,7 +1,7 @@
 #include "../../kernel/ports.h"
 #include "../../kernel/log.h"
 
-#define CLOCK_FREQUENCY 1
+#define CLOCK_FREQUENCY 60
 
 typedef void (*PITHandler)(void);
 

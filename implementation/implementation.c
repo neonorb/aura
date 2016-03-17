@@ -3,7 +3,3 @@
 void implementation(){
 	pong();
 }
-
-void graphicsTest(){
-
-}

@@ -4,7 +4,9 @@
 CC=i686-elf-gcc # Both the compiler and assembler need crosscompiled http://wiki.osdev.org/GCC_Cross-Compiler
 AS=nasm
 CFLAGS=-ffreestanding -Wall -Wextra #-Werror # Considering removing Werror as it can be annoying
+LDFLAGS= -T utils/linker.ld -melf_i386
 SOURCES= kernel/kernel.c kernel/gdt.s kernel/idt.s utils/linker.ld boot/boot.s # This will likely increase
+OUT= build/kernel.o build/boot.o build/gdt.o build/idt.o
 LIBS=-lgcc
 
 compile:
@@ -15,7 +17,7 @@ compile-os: $(SOURCES)
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
 		$(AS) -f elf kernel/idt.s -o build/idt.o
 		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -O2 -std=gnu99
-		$(CC) -T utils/linker.ld -o build/asiago.bin  $(CFLAGS) $(LIBS) -O2 -nostdlib build/boot.o build/gdt.o build/idt.o build/kernel.o
+		$(CC) -T utils/linker.ld -o build/asiago.bin  $(CFLAGS) $(LIBS) -O2 -nostdlib $(OUT)
 		@echo
 		@echo Compiation of Asiago succeeded, boot with \"make run-os\"
 		@echo
@@ -25,10 +27,25 @@ debug-os: $(SOURCES)
 		$(AS) boot/boot.s -o build/boot.o
 		$(AS) kernel/interrupt.s -o build/interrupt.o
 		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -g -std=gnu99 -O0
-		$(CC) -T utils/linker.ld -o build/asiago.bin $(CFLAGS) $(LIBS) -g -O0 -nostdlib build/boot.o build/interrupt.o build/kernel.o
+		$(CC) -T utils/linker.ld -o build/asiago.bin $(CFLAGS) $(LIBS) -g -O0 -nostdlib $(OUT)
 		@echo
 		@echo Compilation of Asiago with debugging symbols and \-O0 succeeded, booting QEMU with debugging flags, connect with gdb.
 		@echo
 		qemu-system-i386 -d int,pcall -s -S -kernel build/asiago.bin
+		
+elf: $(OUT)
+		ld $(LDFLAGS) $(OUT) -o build/kernel.elf
+iso: build/kernel.elf
+		cp build/kernel.elf iso/boot/kernel.elf
+		genisoimage -R								\
+				-b boot/grub/stage2_eltorito		\
+				-no-emul-boot						\
+				-boot-load-size 4					\
+				-A os								\
+				-input-charset utf8					\
+				-quiet								\
+				-boot-info-table					\
+				-o build/asiago.iso					\
+				iso
 clean: 
-		rm build/*o build/*bin
+		rm build/*o build/*bin build/*elf build/*iso
