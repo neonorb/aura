@@ -33,10 +33,9 @@ extern "C" /* Use C linkage for kernel_main. */
 
 
 void kernel_main() {
-	screen_terminal_initialize();
+	cli();
 
-	log("Disabling interrupts");
-	asm volatile ("cli");
+	screen_terminal_initialize();
 
 	log("Setting up GDT");
 	gdt_init();
@@ -53,9 +52,7 @@ void kernel_main() {
 	//log("Initializing ACPI");
 	//initAcpi();
 
-	// we're ready to go, enable interrupts
-	log("Enabling interrupts");
-	asm volatile ("sti");
+	sti();
 
 	log("Welcome to Aura!");
 

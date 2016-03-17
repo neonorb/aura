@@ -6,7 +6,6 @@
 #include "pit.c"
 #include "rtc.c"
 
-//long time;
 static ClockHandler clockHandler;
 
 static void clockPitHandler(){

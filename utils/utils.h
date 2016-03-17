@@ -3,6 +3,14 @@
 
 #include "../kernel/log.h"
 
+void cli(){
+	asm("cli");
+}
+
+void sti(){
+	asm("sti");
+}
+
 int array_length_char(char a[]) {
 	return sizeof(&a) / sizeof(char);
 }

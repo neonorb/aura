@@ -17,14 +17,14 @@ void keyboard_keyUpdate(KeyMapping keyMapping) {
 			// key is now pressed
 			pressedKeys[keyMapping.key] = true;
 		} else {
-			// ignore
+			// no-op
 		}
 	} else if (keyMapping.pressure == RELEASED) {
 		if (pressedKeys[keyMapping.key]) { // if key is pressed
 			// key is now released
 			pressedKeys[keyMapping.key] = false;
 		} else {
-			// ignore
+			// no-op
 		}
 	}
 

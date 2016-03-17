@@ -196,7 +196,6 @@ void vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
 
 void vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
 		uint32_t height, uint8_t red, uint8_t green, uint8_t blue) {
-
 	if (x + width > VGA_GRAPHICS_WIDTH)
 		return;
 	if (y + height > VGA_GRAPHICS_HEIGHT)
@@ -208,7 +207,7 @@ void vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
 		}
 	}
 
-	vga_graphics_flip();
+	//vga_graphics_flip();
 }
 
 // TODO make the stuff below make sense
