@@ -77,7 +77,14 @@ static void pongHandler() {
 	// ---- render ----
 
 	// clear
-	screen_graphics_rectangle(0, 0, WIDTH, HEIGHT, 0, 0, 0); a//when commenting out this line, the paddles move
+	if (intCount > 6 && intCount < 8) {f
+		// notice that the paddle moves for 3 key strokes, then stops moving,
+		// if interrupts were working, getting above 8 would make the system work again...
+		// note that each stroke is 2 interrupts, up and down
+
+		// you can also try by commenting out the IF and trying with and without the below call
+		screen_graphics_rectangle(0, 0, WIDTH, HEIGHT, 0, 0, 0);
+	}
 
 	// p1
 	screen_graphics_rectangle(0, p1, PLAYER_WIDTH, PLAYER_HEIGHT, 255, 255,
