@@ -1,4 +1,4 @@
-# Project Asiago
+# Aura
 A hobby operating system based C and a hobby language.
 
 See the [wiki](http://neonorb.com/wiki/Project_Asiago) for more information.
