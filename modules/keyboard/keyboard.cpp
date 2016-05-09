@@ -1,11 +1,12 @@
-#include "keyboard.h"
-#include "ps2.c"
+#include <int.h>
 
+#include "keyboard.h"
 #include "../../utils/utils.h"
+#include "ps2.cpp"
 
 static KeyboardHandler keyboardHandler;
 
-uint8_t intCount; // FIXME this is a test variable to try to fix the pong moving paddles - remove once fixed
+uint8 intCount; // FIXME this is a test variable to try to fix the pong moving paddles - remove once fixed
 
 static void keyboardInterrupt() {
 	intCount++;

@@ -1,6 +1,9 @@
 #ifndef VGA_H_
 #define VGA_H_
 
+#include <int.h>
+#include <bool.h>
+
 /* Hardware text mode color constants. */
 typedef enum {
 	COLOR_BLACK = 0,
@@ -26,8 +29,8 @@ typedef enum {
 #define VGA_TEXT_WIDTH 80
 #define VGA_TEXT_HEIGHT 25
 
-uint8_t vga_terminal_makeColor(VGATextColor fg, VGATextColor bg);
-void vga_terminal_backgroundColor(uint8_t color);
+uint8 vga_terminal_makeColor(VGATextColor fg, VGATextColor bg);
+void vga_terminal_backgroundColor(uint8 color);
 void vga_terminal_writeString(const char* data);
 void vga_terminal_initialize();
 
@@ -40,10 +43,10 @@ void vga_terminal_initialize();
 
 void vga_graphics_initialize();
 void vga_graphics_flip();
-bool vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
-		uint8_t blue);
-bool vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
-		uint32_t height, uint8_t red, uint8_t green, uint8_t blue);
+bool vga_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,
+		uint8 blue);
+bool vga_graphics_rectangle(uint32 x, uint32 y, uint32 width,
+		uint32 height, uint8 red, uint8 green, uint8 blue);
 void vga_graphicsMode();
 
 #endif /* VGA_H_ */

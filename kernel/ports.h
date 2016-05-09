@@ -1,11 +1,13 @@
 #ifndef PORTS_H_
 #define PORTS_H_
 
-inline void outb(uint16_t, uint8_t);
-inline void outw(uint16_t, uint16_t);
+#include <int.h>
 
-inline uint8_t inb(uint16_t);
-inline uint16_t inw(uint16_t);
+inline void outb(uint16, uint8);
+inline void outw(uint16, uint16);
+
+inline uint8 inb(uint16);
+inline uint16 inw(uint16);
 
 inline void io_wait(void)
 {

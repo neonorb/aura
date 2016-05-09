@@ -1,5 +1,8 @@
+#include <int.h>
+
 #include "screen.h"
-#include "vga.c"
+
+#include "vga.cpp"
 
 // ---- terminal ----
 
@@ -16,12 +19,12 @@ void screen_terminal_writeString(const char* data){
 void screen_graphics_initialize(){
 	vga_graphics_initialize();
 }
-void screen_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height,
-		uint8_t red, uint8_t green, uint8_t blue){
+void screen_graphics_rectangle(uint32 x, uint32 y, uint32 width, uint32 height,
+		uint8 red, uint8 green, uint8 blue){
 	vga_graphics_rectangle(x, y, width, height, red, green, blue);
 }
-void screen_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
-		uint8_t blue){
+void screen_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,
+		uint8 blue){
 	vga_graphics_pixel(x, y, red, green, blue);
 }
 void screen_graphics_flip(){

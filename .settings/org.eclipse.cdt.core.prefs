@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/0.990183870/PATH/delimiter=\:
+environment/project/0.990183870/PATH/operation=replace
+environment/project/0.990183870/PATH/value=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/usr/games\:/usr/local/games\:${HOME}/opt/cross/bin
+environment/project/0.990183870/append=true
+environment/project/0.990183870/appendContributed=true

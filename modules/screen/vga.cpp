@@ -1,27 +1,28 @@
+#include <int.h>
+#include <bool.h>
+
 #include "vga.h"
 
 #include "../../utils/utils.h"
 #include "../../kernel/ports.h"
 
-#include <stdbool.h>
-
 // TODO externalize this
-static uint8_t TAB_SIZE = 2;
+static uint8 TAB_SIZE = 2;
 
 // ---- terminal ----
 
 static size_t terminalRow;
 static size_t terminalColumn;
-static uint8_t terminalColor;
-static uint16_t* terminalBuffer;
+static uint8 terminalColor;
+static uint16* terminalBuffer;
 
-static uint16_t entry(char c, uint8_t color) {
-	uint16_t c16 = c;
-	uint16_t color16 = color;
+static uint16 entry(char c, uint8 color) {
+	uint16 c16 = c;
+	uint16 color16 = color;
 	return c16 | color16 << 8;
 }
 
-static void putEntryAt(char c, uint8_t color, size_t x, size_t y) {
+static void putEntryAt(char c, uint8 color, size_t x, size_t y) {
 	const size_t index = y * VGA_TEXT_WIDTH + x;
 	terminalBuffer[index] = entry(c, color);
 }
@@ -92,11 +93,11 @@ static void putChar(char c) {
 
 // public API
 
-uint8_t vga_terminal_makeColor(VGATextColor fg, VGATextColor bg) {
+uint8 vga_terminal_makeColor(VGATextColor fg, VGATextColor bg) {
 	return fg | bg << 4;
 }
 
-void vga_terminal_backgroundColor(uint8_t color) {
+void vga_terminal_backgroundColor(uint8 color) {
 	terminalColor = color;
 }
 
@@ -131,7 +132,7 @@ void vga_terminal_initialize() {
 	terminalRow = 0;
 	terminalColumn = 0;
 	terminalColor = vga_terminal_makeColor(COLOR_LIGHT_GREY, COLOR_BLACK);
-	terminalBuffer = (uint16_t*) 0xB8000;
+	terminalBuffer = (uint16*) 0xB8000;
 	for (size_t y = 0; y < VGA_TEXT_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_TEXT_WIDTH; x++) {
 			const size_t index = y * VGA_TEXT_WIDTH + x;
@@ -142,15 +143,15 @@ void vga_terminal_initialize() {
 
 // ---- graphics ----
 
-static uint8_t* graphicsBuffer;
-static uint8_t graphicsDoubleBuffer[VGA_GRAPHICS_WIDTH * VGA_GRAPHICS_HEIGHT];
+static uint8* graphicsBuffer;
+static uint8 graphicsDoubleBuffer[VGA_GRAPHICS_WIDTH * VGA_GRAPHICS_HEIGHT];
 
-static void setColor(uint32_t index, uint8_t red, uint8_t green, uint8_t blue) {
-	uint8_t r = red / 64;
-	uint8_t g = green / 64;
-	uint8_t b = blue / 64;
+static void setColor(uint32 index, uint8 red, uint8 green, uint8 blue) {
+	uint8 r = red / 64;
+	uint8 g = green / 64;
+	uint8 b = blue / 64;
 
-	uint8_t color = 0;
+	uint8 color = 0;
 
 	color = changeBit(color, 0, getBit(b, 1));
 	color = changeBit(color, 1, getBit(g, 1));
@@ -176,7 +177,7 @@ static void vsync() {
 // public API
 
 void vga_graphics_initialize() {
-	graphicsBuffer = (uint8_t*) 0xA0000;
+	graphicsBuffer = (uint8*) 0xA0000;
 }
 
 void vga_graphics_flip() {
@@ -186,8 +187,8 @@ void vga_graphics_flip() {
 	VGA_GRAPHICS_WIDTH * VGA_GRAPHICS_HEIGHT);
 }
 
-bool vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
-		uint8_t blue) {
+bool vga_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,
+		uint8 blue) {
 	if (x > VGA_GRAPHICS_WIDTH)
 		return false;
 	if (y > VGA_GRAPHICS_HEIGHT)
@@ -198,15 +199,15 @@ bool vga_graphics_pixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green,
 	return true;
 }
 
-bool vga_graphics_rectangle(uint32_t x, uint32_t y, uint32_t width,
-		uint32_t height, uint8_t red, uint8_t green, uint8_t blue) {
+bool vga_graphics_rectangle(uint32 x, uint32 y, uint32 width,
+		uint32 height, uint8 red, uint8 green, uint8 blue) {
 	if (x + width > VGA_GRAPHICS_WIDTH)
 		return false;
 	if (y + height > VGA_GRAPHICS_HEIGHT)
 		return false;
 
-	for (uint16_t xp = x; xp < x + width; xp++) {
-		for (uint8_t yp = y; yp < y + height; yp++) {
+	for (uint16 xp = x; xp < x + width; xp++) {
+		for (uint8 yp = y; yp < y + height; yp++) {
 			if (!vga_graphics_pixel(xp, yp, red, green, blue)) {
 				return false;
 			}

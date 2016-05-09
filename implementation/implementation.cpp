@@ -1,4 +1,4 @@
-#include "pong.c"
+#include "pong.cpp"
 
 void implementation(){
 	pong();

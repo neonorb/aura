@@ -7,17 +7,17 @@ CFLAGS=-ffreestanding -Wall -Wextra #-Werror # Considering removing Werror as it
 LDFLAGS= -T utils/linker.ld -melf_i386
 SOURCES= kernel/kernel.c kernel/gdt.s kernel/idt.s utils/linker.ld boot/boot.s # This will likely increase
 OUT= build/kernel.o build/boot.o build/gdt.o build/idt.o
+INCLUDE= -I"../feta/include" -I"../mish/include"
 LIBS=-lgcc
 
-compile:
-	# this is a convenience alias so anybody can simply run `make compile`
-	make compile-os
+all: compile
+compile: compile-os
 compile-os: $(SOURCES)
 		$(AS) -f elf boot/boot.s -o build/boot.o
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
 		$(AS) -f elf kernel/idt.s -o build/idt.o
-		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -O2 -std=gnu99
-		$(CC) -T utils/linker.ld -o build/asiago.bin  $(CFLAGS) $(LIBS) -O2 -nostdlib $(OUT)
+		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -O2 -std=gnu99 $(INCLUDE)
+		$(CC) -T utils/linker.ld -o build/asiago.bin  $(CFLAGS) $(LIBS) -O2 -nostdlib $(OUT) $(INCLUDE)
 		@echo
 		@echo Compiation of Asiago succeeded, boot with \"make run-os\"
 		@echo
@@ -26,8 +26,10 @@ run-os: build/asiago.bin
 debug-os: $(SOURCES)
 		$(AS) boot/boot.s -o build/boot.o
 		$(AS) kernel/interrupt.s -o build/interrupt.o
-		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -g -std=gnu99 -O0
-		$(CC) -T utils/linker.ld -o build/asiago.bin $(CFLAGS) $(LIBS) -g -O0 -nostdlib $(OUT)
+		$(AS) -f elf kernel/gdt.s -o build/gdt.o
+		$(AS) -f elf kernel/idt.s -o build/idt.o
+		$(CC) -c kernel/kernel.c -o build/kernel.o $(CFLAGS) -g -std=gnu99 -O0 $(INCLUDE)
+		$(CC) -T utils/linker.ld -o build/asiago.bin $(CFLAGS) $(LIBS) -g -O0 -nostdlib $(OUT) $(INCLUDE)
 		@echo
 		@echo Compilation of Asiago with debugging symbols and \-O0 succeeded, booting QEMU with debugging flags, connect with gdb.
 		@echo

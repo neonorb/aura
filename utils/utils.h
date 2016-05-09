@@ -1,6 +1,8 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+#include <int.h>
+#include <string.h>
 #include "../kernel/log.h"
 
 void cli() {
@@ -15,7 +17,42 @@ int array_length_char(char a[]) {
 	return sizeof(&a) / sizeof(char);
 }
 
-size_t strlen(const char *str) {
+String toString(int value, char* str, int base) {
+	char * rc;
+	char * ptr;
+	char * low;
+	// Check for supported base.
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return str;
+	}
+	rc = ptr = str;
+	// Set '-' for negative decimals.
+	if (value < 0 && base == 10) {
+		*ptr++ = '-';
+	}
+	// Remember where the numbers start.
+	low = ptr;
+	// The actual conversion.
+	do {
+		// Modulo is negative for negative value. This trick makes abs() unnecessary.
+		*ptr++ =
+				"zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35
+						+ value % base];
+		value /= base;
+	} while (value);
+	// Terminating the string.
+	*ptr-- = '\0';
+	// Invert the numbers.
+	while (low < ptr) {
+		char tmp = *low;
+		*low++ = *ptr;
+		*ptr-- = tmp;
+	}
+	return rc;
+}
+
+size_t strlen(String str) {
 	const char *char_ptr;
 	const unsigned long int *longword_ptr;
 	unsigned long int longword, himagic, lomagic;
@@ -84,7 +121,7 @@ size_t strlen(const char *str) {
 	}
 }
 
-void *memcpy(void *dst, const void *src, size_t len) {
+void* memcpy(void* dst, const void* src, size_t len) {
 	size_t i;
 
 	/*
@@ -100,7 +137,7 @@ void *memcpy(void *dst, const void *src, size_t len) {
 	 * the divides and modulos out. Fortunately, it is.
 	 */
 
-	if ((uint32_t) dst % sizeof(long) == 0 && (uint32_t) src % sizeof(long) == 0
+	if ((uint32) dst % sizeof(long) == 0 && (uint32) src % sizeof(long) == 0
 			&& len % sizeof(long) == 0) {
 
 		long *d = dst;
@@ -127,8 +164,8 @@ static int memcmp_uint8_ts(unsigned long int a, unsigned long int b) {
 	unsigned long int a0, b0;
 
 	do {
-		a0 = ((uint8_t *) srcp1)[0];
-		b0 = ((uint8_t *) srcp2)[0];
+		a0 = ((uint8 *) srcp1)[0];
+		b0 = ((uint8 *) srcp2)[0];
 		srcp1 += 1;
 		srcp2 += 1;
 	} while (a0 == b0);
@@ -310,8 +347,8 @@ int memcmp(const void* s1, const void* s2, size_t len) {
 		/* There are at least some uint8_ts to compare.  No need to test
 		 for LEN == 0 in this alignment loop.  */
 		while (srcp2 % sizeof(unsigned long int) != 0) {
-			a0 = ((uint8_t *) srcp1)[0];
-			b0 = ((uint8_t *) srcp2)[0];
+			a0 = ((uint8 *) srcp1)[0];
+			b0 = ((uint8 *) srcp2)[0];
 			srcp1 += 1;
 			srcp2 += 1;
 			res = a0 - b0;
@@ -341,8 +378,8 @@ int memcmp(const void* s1, const void* s2, size_t len) {
 
 	/* There are just a few uint8_ts to compare.  Use uint8_t memory operations.  */
 	while (len != 0) {
-		a0 = ((uint8_t *) srcp1)[0];
-		b0 = ((uint8_t *) srcp2)[0];
+		a0 = ((uint8 *) srcp1)[0];
+		b0 = ((uint8 *) srcp2)[0];
 		srcp1 += 1;
 		srcp2 += 1;
 		res = a0 - b0;
@@ -354,24 +391,28 @@ int memcmp(const void* s1, const void* s2, size_t len) {
 	return 0;
 }
 
-uint8_t setBit(uint8_t number, uint8_t pos) {
+uint8 setBit(uint8 number, uint8 pos) {
 	return number | 1 << pos;
 }
 
-uint8_t clearBit(uint8_t number, uint8_t pos) {
+uint8 clearBit(uint8 number, uint8 pos) {
 	return number & ~(1 << pos);
 }
 
-uint8_t toggleBit(uint8_t number, uint8_t pos) {
+uint8 toggleBit(uint8 number, uint8 pos) {
 	return number ^ 1 << pos;
 }
 
-uint8_t getBit(uint8_t number, uint8_t pos) {
+uint8 getBit(uint8 number, uint8 pos) {
 	return (number >> pos) & 1;
 }
 
-uint8_t changeBit(uint8_t number, uint8_t pos, uint8_t value) {
+uint8 changeBit(uint8 number, uint8 pos, uint8 value) {
 	return number ^ ((-value ^ number) & (1 << pos));
+}
+
+uint64 merge(uint32 mostSignificant, uint32 leastSignificant){
+	return ((uint64) mostSignificant << 32) | leastSignificant;
 }
 
 static unsigned int next = 1;
@@ -380,7 +421,7 @@ int rand() { // RAND_MAX assumed to be 32767
 	return (unsigned int) (next / 65536) % 32768;
 }
 
-int random(int min, int max){
+int random(int min, int max) {
 	return rand() % (max - min) + min;
 }
 

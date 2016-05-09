@@ -1,19 +1,22 @@
-    /* idt.c - Sets up the IDT */
-    /* Copyright (C) 2016  Chris Smith */
+/* idt.c - Sets up the IDT */
+/* Copyright (C) 2016  Chris Smith */
 
-    /* This program is free software: you can redistribute it and/or modify */
-    /* it under the terms of the GNU General Public License as published by */
-    /* the Free Software Foundation, either version 3 of the License, or */
-    /* (at your option) any later version. */
+/* This program is free software: you can redistribute it and/or modify */
+/* it under the terms of the GNU General Public License as published by */
+/* the Free Software Foundation, either version 3 of the License, or */
+/* (at your option) any later version. */
 
-    /* This program is distributed in the hope that it will be useful, */
-    /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-    /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
-    /* GNU General Public License for more details. */
+/* This program is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU General Public License for more details. */
 
-    /* You should have received a copy of the GNU General Public License */
-    /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* You should have received a copy of the GNU General Public License */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <int.h>
+
+/*********** ------------------------- THIS CRAP WILL BE REMOVED LATER ---------------------------- *********************/
 
 #define DO_DEBUG_LOGGING 1
 
@@ -30,7 +33,7 @@ void low_printname();
 void text_console_init();
 // High level
 void printk(int severity, char * type, const char *fmt, ...);
-void logging_printbestunit(uint32_t bytes, uint8_t newline);
+void logging_printbestunit(uint32 bytes, uint8 newline);
 
 void printk(int severity, char * type, const char *fmt, ...) {
 	/*switch(severity) {
@@ -66,6 +69,8 @@ void printk(int severity, char * type, const char *fmt, ...) {
 	log(fmt);
 
 }
+
+/********************** ------------------------- END TO REMOVE CRAP ------------------- **********************/
 
 ///Installs all irqs
 void irq_install();
@@ -158,18 +163,15 @@ typedef struct regs {
 	unsigned int eip, cs, eflags, useresp, ss; /* pushed by the processor automatically */
 } registers_t;
 
-
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
 		unsigned char flags);
 extern void idt_flush();
 typedef void (*interrupt_handler_t)(registers_t *);
-void register_interrupt_handler(uint8_t n, interrupt_handler_t h); //TODO: Rename to a more x86 specific name
-void deregister_interrupt_handler(uint8_t n);
+void register_interrupt_handler(uint8 n, interrupt_handler_t h); //TODO: Rename to a more x86 specific name
+void deregister_interrupt_handler(uint8 n);
 
 struct idt_entry idt_entries[256];
 struct idt_ptr idt_ptr;
-
-
 
 ///Inits interrupt services
 void idt_init_isrs() {
@@ -222,7 +224,6 @@ void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
 	idt_entries[num].always0 = 0;
 	idt_entries[num].flags = flags;
 }
-
 
 ///Table of all exception messages
 const char *exception_messages[] = { "Division By Zero", "Debug",
@@ -287,13 +288,13 @@ extern void fault_handler(struct regs *r) {
 }
 
 /** This installs a custom IRQ handler for the given IRQ **/
-void register_interrupt_handler(uint8_t n, interrupt_handler_t h) {
+void register_interrupt_handler(uint8 n, interrupt_handler_t h) {
 	interrupt_handlers[n] = h;
 
 }
 
 /** This clears the handler for a given IRQ **/
-void deregister_interrupt_handler(uint8_t n) {
+void deregister_interrupt_handler(uint8 n) {
 	interrupt_handlers[n] = 0;
 }
 ///Remaps the irq's in the PIC
@@ -351,9 +352,9 @@ void irq_handler(struct regs *r) {
 	outb(0x20, 0x20);
 }
 
-void init_idt(){
+void init_idt() {
 	idt_ptr.limit = sizeof(struct idt_entry) * 256 - 1;
-	idt_ptr.base = (uint32_t) &idt_entries;
+	idt_ptr.base = (uint32) & idt_entries;
 
 	memset(&idt_entries, 0, sizeof(struct idt_entry) * 256);
 

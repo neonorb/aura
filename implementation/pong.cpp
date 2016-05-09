@@ -1,19 +1,21 @@
-    /* pong - Simple C program implementing the game Pong */
-    /* Copyright (C) 2016  Chris Smith */
+/* pong - Simple C program implementing the game Pong */
+/* Copyright (C) 2016  Chris Smith */
 
-    /* This program is free software: you can redistribute it and/or modify */
-    /* it under the terms of the GNU General Public License as published by */
-    /* the Free Software Foundation, either version 3 of the License, or */
-    /* (at your option) any later version. */
+/* This program is free software: you can redistribute it and/or modify */
+/* it under the terms of the GNU General Public License as published by */
+/* the Free Software Foundation, either version 3 of the License, or */
+/* (at your option) any later version. */
 
-    /* This program is distributed in the hope that it will be useful, */
-    /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-    /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
-    /* GNU General Public License for more details. */
+/* This program is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU General Public License for more details. */
 
-    /* You should have received a copy of the GNU General Public License */
-    /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* You should have received a copy of the GNU General Public License */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <int.h>
+#include <bool.h>
 
 #include "../modules/screen/screen.h"
 #include "../modules/keyboard/keyboard.h"
@@ -39,11 +41,11 @@
 #define PLAYER_WIDTH 5
 #define PLAYER_HEIGHT 50
 
-static int16_t p1;
-static uint8_t ps1;
+static int16 p1;
+static uint8 ps1;
 
-static int16_t p2;
-static uint8_t ps2;
+static int16 p2;
+static uint8 ps2;
 
 // ball
 
@@ -53,11 +55,11 @@ static uint8_t ps2;
 #define BALL_ACCELERATION 4
 
 typedef struct {
-	int16_t bx;
-	int16_t by;
+	int16 bx;
+	int16 by;
 
-	int8_t bmx;
-	int8_t bmy;
+	int8 bmx;
+	int8 bmy;
 } Ball;
 
 #define BALL_COUNT 1
@@ -66,7 +68,7 @@ static Ball balls[BALL_COUNT];
 
 static bool paused = false;
 static bool started = false;
-static uint8_t collisionCount = 0;
+static uint8 collisionCount = 0;
 static int win;
 
 static void resetBall() {
@@ -138,7 +140,7 @@ static void render() {
 	// ball
 	for (int i = 0; i < BALL_COUNT; i++) {
 		screen_graphics_rectangle(balls[i].bx, balls[i].by, BALL_WIDTH,
-				BALL_HEIGHT, 255, 255, 255);
+		BALL_HEIGHT, 255, 255, 255);
 	}
 
 	// separator
@@ -146,12 +148,12 @@ static void render() {
 
 	// score
 
-	for (uint8_t i = 0; i < ps1; i++) {
+	for (uint8 i = 0; i < ps1; i++) {
 		screen_graphics_rectangle(i * 4 + 1, USE_HEIGHT + 2, 3, 3, 255, 255,
 				255);
 	}
 
-	for (uint8_t i = 0; i < ps2; i++) {
+	for (uint8 i = 0; i < ps2; i++) {
 		screen_graphics_rectangle(i * 4 + 1, USE_HEIGHT + 6, 3, 3, 255, 255,
 				255);
 	}
@@ -160,7 +162,7 @@ static void render() {
 }
 
 static void pongHandler() {
-	static uint16_t counter;
+	static uint16 counter;
 	if (counter < 1) {
 		counter++;
 		return;

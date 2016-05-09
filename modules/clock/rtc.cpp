@@ -1,3 +1,5 @@
+#include <int.h>
+
 #include "../../kernel/ports.h"
 #include "../../kernel/log.h"
 
@@ -14,7 +16,7 @@ static void rtcInterrupt() {
 	inb(0x71);		// just throw away contents
 }
 
-static void rate(uint8_t rate) {
+static void rate(uint8 rate) {
 	//uint8_t rate = (32768 >> frequency) + 1;
 
 	rate &= 0x0F;			// rate must be above 2 and not over 15

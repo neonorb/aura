@@ -2,9 +2,9 @@
 
 #include "../../kernel/ports.h"
 #include "../../kernel/log.h"
+#include "pit.cpp"
 
-#include "pit.c"
-#include "rtc.c"
+#include "rtc.cpp"
 
 static ClockHandler clockHandler;
 
