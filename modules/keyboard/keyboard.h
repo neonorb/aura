@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 
-#include <stdbool.h>
+#include <bool.h>
 
 typedef enum {
 	KEY_UNDEFINED,

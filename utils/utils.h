@@ -121,7 +121,7 @@ size_t strlen(String str) {
 	}
 }
 
-void* memcpy(void* dst, const void* src, size_t len) {
+void* memcpy(uint8* dst, const uint8* src, size_t len) {
 	size_t i;
 
 	/*
@@ -137,18 +137,18 @@ void* memcpy(void* dst, const void* src, size_t len) {
 	 * the divides and modulos out. Fortunately, it is.
 	 */
 
-	if ((uint32) dst % sizeof(long) == 0 && (uint32) src % sizeof(long) == 0
+	if ((uint32) dst % sizeof(uint32) == 0 && (uint32) src % sizeof(uint32) == 0
 			&& len % sizeof(long) == 0) {
 
-		long *d = dst;
-		const long *s = src;
+		uint32* d = (uint32*) dst;
+		uint32* s = (uint32*) src;
 
 		for (i = 0; i < len / sizeof(long); i++) {
 			d[i] = s[i];
 		}
 	} else {
-		char *d = dst;
-		const char *s = src;
+		uint8* d = (uint8*) dst;
+		uint8* s = (uint8*) src;
 
 		for (i = 0; i < len; i++) {
 			d[i] = s[i];
@@ -411,7 +411,7 @@ uint8 changeBit(uint8 number, uint8 pos, uint8 value) {
 	return number ^ ((-value ^ number) & (1 << pos));
 }
 
-uint64 merge(uint32 mostSignificant, uint32 leastSignificant){
+uint64 merge(uint32 mostSignificant, uint32 leastSignificant) {
 	return ((uint64) mostSignificant << 32) | leastSignificant;
 }
 

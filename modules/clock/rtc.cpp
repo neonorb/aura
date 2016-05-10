@@ -7,7 +7,7 @@ typedef void (*RTCHandler)(void);
 
 static RTCHandler rtcHandler;
 
-static void rtcInterrupt() {
+static void rtcInterrupt(registers_t* regs) {
 	if (rtcHandler != 0) {
 		rtcHandler();
 	}

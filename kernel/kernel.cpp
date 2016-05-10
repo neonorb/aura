@@ -14,10 +14,6 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#if defined(__cplusplus)
-extern "C" /* Use C linkage for kernel_main. */
-#endif
-
 #include "../boot/multiboot.h"
 
 #include "../utils/utils.h"
@@ -27,16 +23,21 @@ extern "C" /* Use C linkage for kernel_main. */
 #include "gdt.cpp"
 #include "idt.cpp"
 
+#include "memory.cpp"
 #include "../modules/clock/clock.cpp"
 #include "../modules/screen/screen.cpp"
 #include "../modules/keyboard/keyboard.cpp"
 
 #include "../implementation/implementation.cpp"
 
-void kernel_main(multiboot_info_t* mbd, unsigned int magic) {
+#include "ports.cpp"
+
+extern "C" void kernel_main(multiboot_info_t* mbd) {
 	cli();
 
-	screen_terminal_initialize(mbd);
+	memory_init(mbd);
+
+	screen_terminal_initialize();
 
 	log("Setting up GDT");
 	gdt_init();

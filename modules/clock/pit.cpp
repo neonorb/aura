@@ -9,7 +9,7 @@ typedef void (*PITHandler)(void);
 
 static PITHandler pitHandler;
 
-static void pitInterrupt() {
+static void pitInterrupt(registers_t* regs) {
 	if (pitHandler != 0) {
 		pitHandler();
 	}

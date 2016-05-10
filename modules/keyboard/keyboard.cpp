@@ -8,7 +8,7 @@ static KeyboardHandler keyboardHandler;
 
 uint8 intCount; // FIXME this is a test variable to try to fix the pong moving paddles - remove once fixed
 
-static void keyboardInterrupt() {
+static void keyboardInterrupt(registers_t* regs) {
 	intCount++;
 	ps2_interrupt();
 }

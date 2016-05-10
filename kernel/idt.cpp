@@ -15,6 +15,7 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <int.h>
+#include "ports.h"
 
 /*********** ------------------------- THIS CRAP WILL BE REMOVED LATER ---------------------------- *********************/
 
@@ -92,56 +93,56 @@ void irq_install();
 #define IRQ14 46
 #define IRQ15 47
 
-extern void isr0();
-extern void isr1();
-extern void isr2();
-extern void isr3();
-extern void isr4();
-extern void isr5();
-extern void isr6();
-extern void isr7();
-extern void isr8();
-extern void isr9();
-extern void isr10();
-extern void isr11();
-extern void isr12();
-extern void isr13();
-extern void isr14();
-extern void isr15();
-extern void isr16();
-extern void isr17();
-extern void isr18();
-extern void isr19();
-extern void isr20();
-extern void isr21();
-extern void isr22();
-extern void isr23();
-extern void isr24();
-extern void isr25();
-extern void isr26();
-extern void isr27();
-extern void isr28();
-extern void isr29();
-extern void isr30();
-extern void isr31();
-extern void isr100();
+extern "C" void isr0();
+extern "C" void isr1();
+extern "C" void isr2();
+extern "C" void isr3();
+extern "C" void isr4();
+extern "C" void isr5();
+extern "C" void isr6();
+extern "C" void isr7();
+extern "C" void isr8();
+extern "C" void isr9();
+extern "C" void isr10();
+extern "C" void isr11();
+extern "C" void isr12();
+extern "C" void isr13();
+extern "C" void isr14();
+extern "C" void isr15();
+extern "C" void isr16();
+extern "C" void isr17();
+extern "C" void isr18();
+extern "C" void isr19();
+extern "C" void isr20();
+extern "C" void isr21();
+extern "C" void isr22();
+extern "C" void isr23();
+extern "C" void isr24();
+extern "C" void isr25();
+extern "C" void isr26();
+extern "C" void isr27();
+extern "C" void isr28();
+extern "C" void isr29();
+extern "C" void isr30();
+extern "C" void isr31();
+extern "C" void isr100();
 
-extern void irq0();
-extern void irq1();
-extern void irq2();
-extern void irq3();
-extern void irq4();
-extern void irq5();
-extern void irq6();
-extern void irq7();
-extern void irq8();
-extern void irq9();
-extern void irq10();
-extern void irq11();
-extern void irq12();
-extern void irq13();
-extern void irq14();
-extern void irq15();
+extern "C" void irq0();
+extern "C" void irq1();
+extern "C" void irq2();
+extern "C" void irq3();
+extern "C" void irq4();
+extern "C" void irq5();
+extern "C" void irq6();
+extern "C" void irq7();
+extern "C" void irq8();
+extern "C" void irq9();
+extern "C" void irq10();
+extern "C" void irq11();
+extern "C" void irq12();
+extern "C" void irq13();
+extern "C" void irq14();
+extern "C" void irq15();
 
 struct idt_entry {
 	unsigned short base_lo;
@@ -165,7 +166,7 @@ typedef struct regs {
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
 		unsigned char flags);
-extern void idt_flush();
+extern "C" void idt_flush();
 typedef void (*interrupt_handler_t)(registers_t *);
 void register_interrupt_handler(uint8 n, interrupt_handler_t h); //TODO: Rename to a more x86 specific name
 void deregister_interrupt_handler(uint8 n);
@@ -249,7 +250,7 @@ interrupt_handler_t interrupt_handlers[0xff];
  unsigned int eip, cs, eflags, useresp, ss; //pushed by the processor automatically
  */
 //Handles interrupts
-extern void fault_handler(struct regs *r) {
+extern "C" void fault_handler(struct regs *r) {
 	if (interrupt_handlers[r->int_no] != 0) {
 		interrupt_handlers[r->int_no](r);
 		return;
@@ -332,7 +333,7 @@ void irq_install() {
 	return;
 }
 ///Handles IRQ's
-void irq_handler(struct regs *r) {
+extern "C" void irq_handler(struct regs *r) {
 	/* This is a blank function pointer */
 	if (interrupt_handlers[r->int_no] != 0) {
 		interrupt_handlers[r->int_no](r);
@@ -354,9 +355,9 @@ void irq_handler(struct regs *r) {
 
 void init_idt() {
 	idt_ptr.limit = sizeof(struct idt_entry) * 256 - 1;
-	idt_ptr.base = (uint32) & idt_entries;
+	idt_ptr.base = (uint32) &idt_entries;
 
-	memset(&idt_entries, 0, sizeof(struct idt_entry) * 256);
+	memset((uint8*) &idt_entries, 0, sizeof(struct idt_entry) * 256);
 
 	idt_init_isrs();
 	idt_flush();

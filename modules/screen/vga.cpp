@@ -31,8 +31,8 @@ static void shiftUp() {
 	for (unsigned int i = VGA_TEXT_WIDTH; i < VGA_TEXT_WIDTH * VGA_TEXT_HEIGHT;
 			i += VGA_TEXT_WIDTH) {
 		// FIXME when shifting up, only the left half of the screen is moved
-		memcpy(&terminalBuffer[i - VGA_TEXT_WIDTH], &terminalBuffer[i],
-		VGA_TEXT_WIDTH * 2);
+		memcpy((uint8*) &terminalBuffer[i - VGA_TEXT_WIDTH],
+				(uint8*) &terminalBuffer[i], VGA_TEXT_WIDTH * 2);
 	}
 }
 
@@ -199,8 +199,8 @@ bool vga_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,
 	return true;
 }
 
-bool vga_graphics_rectangle(uint32 x, uint32 y, uint32 width,
-		uint32 height, uint8 red, uint8 green, uint8 blue) {
+bool vga_graphics_rectangle(uint32 x, uint32 y, uint32 width, uint32 height,
+		uint8 red, uint8 green, uint8 blue) {
 	if (x + width > VGA_GRAPHICS_WIDTH)
 		return false;
 	if (y + height > VGA_GRAPHICS_HEIGHT)

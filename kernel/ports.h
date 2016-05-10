@@ -9,12 +9,6 @@ inline void outw(uint16, uint16);
 inline uint8 inb(uint16);
 inline uint16 inw(uint16);
 
-inline void io_wait(void)
-{
-    /* TODO: This is probably fragile. */
-    asm volatile ( "jmp 1f\n\t"
-                   "1:jmp 2f\n\t"
-                   "2:" );
-}
+inline void io_wait();
 
 #endif /* PORTS_H_ */

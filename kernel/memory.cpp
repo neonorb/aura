@@ -5,13 +5,13 @@
  *      Author: chris
  */
 
-#include <utils.h>
+#include "../utils/utils.h"
 #include <memory.h>
 #include <list.h>
 #include <errors.h>
 
 typedef struct {
-	void* location;
+	uint8* location;
 	size_t size;
 } Block;
 
@@ -23,27 +23,30 @@ static void clear(Block* block) {
 	}
 }
 
-void* allocateMemory(uint64 size) {
-	for (int i = 0; i < freeBlocks.size(); i++) {
+uint8* allocateMemory(size_t size);
+void free(uint8* location, size_t size);
+
+uint8* allocateMemory(size_t size) {
+	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
 		Block* block = freeBlocks.get(i);
 
 		if (size == block->size) { // correct block size
-			free(freeBlocks.remove(i), sizeof(Block*));
+			free((uint8*) freeBlocks.remove(i), sizeof(Block*));
 
 			clear(block);
 			return block->location;
 		} else if (size < block->size) {
 			// "split" block
-			uint64 location = block->location;
+			uint8* location = block->location;
 
 			block->location += size;
 			block->size -= size;
 
 			if (block->size == 0) {
 				// the block is empty, delete it
-				free(freeBlocks.remove(i), sizeof(Block*));
+				free((uint8*) freeBlocks.remove(i), sizeof(Block*));
 			}
 
 			clear(block);
@@ -57,31 +60,31 @@ void* allocateMemory(uint64 size) {
 	throw ALLOCATE_FAILED;
 }
 
-void free(void* location, size_t size) {
+void free(uint8* location, size_t size) {
 	bool didFree = false;
 
 	if (freeBlocks.isEmpty()) {
 		// we must manually allocate memory since we have no available blocks
 
-		Block* block = location;
+		Block* block = (Block*) location;
 		block->location = location + sizeof(Block) + sizeof(Element<Block*> );
 		block->size = size - sizeof(Block) + sizeof(Element<Block*> );
 
-		Element<Block*>* element = location + sizeof(Block);
+		Element<Block*>* element = (Element<Block*>*) location + sizeof(Block);
 		element->value = block;
 
 		freeBlocks.add(element);
 
 		didFree = true;
 	} else
-		for (int i = 0; i < freeBlocks.size() && !didFree; i++) {
+		for (uint64 i = 0; i < freeBlocks.size() && !didFree; i++) {
 			// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
 			Block* block = freeBlocks.get(i);
 
 			if (location + size < block->location) { // create new block below
 				// we need a new block
-				Block* newBlock = allocateMemory(sizeof(Block));
+				Block* newBlock = (Block*) allocateMemory(sizeof(Block));
 
 				newBlock->location = location;
 				newBlock->size = size;
@@ -104,7 +107,7 @@ void free(void* location, size_t size) {
 						block->size += previousBlock->size;
 						block->location -= previousBlock->size;
 
-						free(previousBlock, sizeof(Block));
+						free((uint8*) previousBlock, sizeof(Block));
 					}
 				}
 			} else if (block->location + block->size == location) { // memory is at the top of this block
@@ -121,12 +124,12 @@ void free(void* location, size_t size) {
 						// grow this block downwards
 						block->size += futureBlock->size;
 
-						free(futureBlock, sizeof(Block));
+						free((uint8*) futureBlock, sizeof(Block));
 					}
 				}
 			} else if (block->location + block->size < location + size) {
 				// we need a new block
-				Block* newBlock = allocateMemory(sizeof(Block));
+				Block* newBlock = (Block*) allocateMemory(sizeof(Block));
 
 				newBlock->location = location;
 				newBlock->size = size;
@@ -156,7 +159,7 @@ void memory_init(multiboot_info_t* mbd) {
 				+ sizeof(unsigned int));
 
 		if (mmap->type == 1) { // memory is useable
-			free((void*) merge(mmap->base_addr_high, mmap->base_addr_low),
+			free((uint8*) merge(mmap->base_addr_high, mmap->base_addr_low),
 					merge(mmap->length_high, mmap->length_low));
 		}
 	}

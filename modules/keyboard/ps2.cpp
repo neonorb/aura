@@ -2,7 +2,7 @@
 
 #include "ps2.h"
 
-#include "../../kernel/ports.cpp"
+#include "../../kernel/ports.h"
 
 static uint8 getScancode() {
 	//outb(0x60, 0xF0); // send EOI

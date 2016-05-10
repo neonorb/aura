@@ -16,14 +16,14 @@
 
 #include <int.h>
 
-extern void gdt_flush();
-extern void tss_flush();
+extern "C" void gdt_flush(uint8* gdt);
+extern "C" void tss_flush();
 
 // Write len copies of val into dest.
-void memset(uint8 *dest, uint8 val, uint32 len) {
-	uint8 *temp = (uint8 *) dest;
-	for (; len != 0; len--)
-		*temp++ = val;
+void memset(uint8* dest, uint8 val, size_t len) {
+	for (uint64 i = 0; i < len; i++) {
+		dest[i] = val;
+	}
 }
 
 typedef struct {
@@ -97,7 +97,7 @@ static void writeTss(int32 num, uint32 ss0, uint32 esp0) {
 
 	gdtSetGate(num, base, limit, 0xE9, 0x00);
 
-	memset(&tssEntry, 0, sizeof(tssEntry));
+	memset((uint8*) &tssEntry, 0, sizeof(tssEntry));
 
 	tssEntry.ss0 = ss0;
 	tssEntry.esp0 = esp0;
@@ -117,7 +117,7 @@ void gdt_init() {
 	gdtSetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
 	writeTss(5, 0x10, 0x0);
 
-	gdt_flush((uint32) &gdtPointer);
+	gdt_flush((uint8*) &gdtPointer);
 
 	tss_flush();
 }
