@@ -11,7 +11,7 @@
 #include <errors.h>
 
 typedef struct {
-	uint8* location;
+	void* location;
 	size_t size;
 } Block;
 
@@ -19,14 +19,14 @@ List<Block*> freeBlocks;
 
 static void clear(Block* block) {
 	for (uint64 i = 0; i < block->size; i++) {
-		block->location[i] = 0;
+		((uint8*)block->location)[i] = 0;
 	}
 }
 
-uint8* allocateMemory(size_t size);
-void free(uint8* location, size_t size);
+void* allocateMemory(size_t size);
+void free(void* location, size_t size);
 
-uint8* allocateMemory(size_t size) {
+void* allocateMemory(size_t size) {
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
@@ -39,7 +39,7 @@ uint8* allocateMemory(size_t size) {
 			return block->location;
 		} else if (size < block->size) {
 			// "split" block
-			uint8* location = block->location;
+			void* location = block->location;
 
 			block->location += size;
 			block->size -= size;
@@ -57,10 +57,12 @@ uint8* allocateMemory(size_t size) {
 	}
 
 	// out of blocks
-	throw ALLOCATE_FAILED;
+	crash(ALLOCATE_FAILED);
+
+	return 0;
 }
 
-void free(uint8* location, size_t size) {
+void free(void* location, size_t size) {
 	bool didFree = false;
 
 	if (freeBlocks.isEmpty()) {
@@ -137,13 +139,13 @@ void free(uint8* location, size_t size) {
 				didFree = true;
 			} else {
 				// we are freeing memory that was already freed
-				throw FREE_FAILED_FREED_ALREADY;
+				crash(FREE_FAILED_FREED_ALREADY);
 			}
 		}
 
 	if (!didFree) {
 		// could not free memory
-		throw FREE_FAILED;
+		crash(FREE_FAILED);
 	}
 }
 
@@ -159,7 +161,7 @@ void memory_init(multiboot_info_t* mbd) {
 				+ sizeof(unsigned int));
 
 		if (mmap->type == 1) { // memory is useable
-			free((uint8*) merge(mmap->base_addr_high, mmap->base_addr_low),
+			free((void*) merge(mmap->base_addr_high, mmap->base_addr_low),
 					merge(mmap->length_high, mmap->length_low));
 		}
 	}

@@ -61,5 +61,11 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 	//implementation();
 
 	// returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
-	fault("We have just returned from the implmentation :(");
+	crash("We have just returned from the implmentation :(");
+}
+
+void crash(String message){
+	fault(message);
+	sti();
+	asm("hlt");
 }
