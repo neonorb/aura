@@ -168,10 +168,14 @@ void memory_init(multiboot_info_t* mbd) {
 	}
 
 	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
-	debug("map location:", (uint64) mmap);
+	debug("map location", (uint64) mmap);
 	while ((uint32) mmap < mbd->mmap_addr + mbd->mmap_length) {
 		mmap = (memory_map_t*) ((unsigned int) mmap + mmap->size
 				+ sizeof(unsigned int));
+
+		debug("memory location",
+				merge(mmap->base_addr_high, mmap->base_addr_low));
+		debug("memory type", mmap->type);
 
 		if (mmap->type == 1) { // memory is useable
 			free((void*) merge(mmap->base_addr_high, mmap->base_addr_low) // + 0x1b

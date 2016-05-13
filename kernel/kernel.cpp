@@ -37,6 +37,8 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 
 	screen_terminal_initialize();
 
+	debug("kernel_main location", (uint64) &kernel_main);
+
 	memory_init(mbd);
 
 	log("Setting up GDT");

@@ -36,9 +36,10 @@ debug-os: $(SOURCES)
 		@echo Compilation of Asiago with debugging symbols and \-O0 succeeded, booting QEMU with debugging flags, connect with gdb.
 		@echo
 		qemu-system-i386 -d int,pcall -s -S -kernel build/aura.bin
-		
+	
+build/kernel.elf: elf	
 elf: $(OUT)
-		ld $(LDFLAGS) $(OUT) -o build/kernel.elf
+		ld $(LDFLAGS) $(OUT) $(LIBS) -o build/kernel.elf
 iso: build/kernel.elf
 		cp build/kernel.elf iso/boot/kernel.elf
 		genisoimage -R								\
@@ -49,7 +50,7 @@ iso: build/kernel.elf
 				-input-charset utf8					\
 				-quiet								\
 				-boot-info-table					\
-				-o build/asiago.iso					\
+				-o build/aura.iso					\
 				iso
 clean: 
 		rm build/*o build/*bin build/*elf build/*iso
