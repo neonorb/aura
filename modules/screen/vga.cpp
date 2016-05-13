@@ -102,7 +102,7 @@ void vga_terminal_backgroundColor(uint8 color) {
 }
 
 void vga_terminal_writeString(const char* data) {
-	size_t datalen = strlen(data);
+	size_t datalen = strlen((char*) data);
 	for (size_t i = 0; i < datalen; i++) {
 		char c = data[i];
 		if (c == '\n') {

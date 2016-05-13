@@ -16,6 +16,7 @@
 
 #include <int.h>
 #include "ports.h"
+#include "idt.h"
 
 /*********** ------------------------- THIS CRAP WILL BE REMOVED LATER ---------------------------- *********************/
 
@@ -36,7 +37,7 @@ void text_console_init();
 void printk(int severity, char * type, const char *fmt, ...);
 void logging_printbestunit(uint32 bytes, uint8 newline);
 
-void printk(int severity, char * type, const char *fmt, ...) {
+void printk(int severity, char* type, const char* fmt, ...) {
 	/*switch(severity) {
 	 case LOG_COMPLETE:
 	 text_console_change_color(0xA);
@@ -75,23 +76,6 @@ void printk(int severity, char * type, const char *fmt, ...) {
 
 ///Installs all irqs
 void irq_install();
-
-#define IRQ0 32
-#define IRQ1 33
-#define IRQ2 34
-#define IRQ3 35
-#define IRQ4 36
-#define IRQ5 37
-#define IRQ6 38
-#define IRQ7 39
-#define IRQ8 40
-#define IRQ9 41
-#define IRQ10 42
-#define IRQ11 43
-#define IRQ12 44
-#define IRQ13 45
-#define IRQ14 46
-#define IRQ15 47
 
 extern "C" void isr0();
 extern "C" void isr1();
@@ -143,26 +127,6 @@ extern "C" void irq12();
 extern "C" void irq13();
 extern "C" void irq14();
 extern "C" void irq15();
-
-struct idt_entry {
-	unsigned short base_lo;
-	unsigned short sel; /* Our kernel segment goes here! */
-	unsigned char always0; /* This will ALWAYS be set to 0! */
-	unsigned char flags; /* Set using the above table! */
-	unsigned short base_hi;
-}__attribute__((packed));
-
-struct idt_ptr {
-	unsigned short limit;
-	unsigned int base;
-}__attribute__((packed));
-
-typedef struct regs {
-	unsigned int gs, fs, es, ds; /* pushed the segs last */
-	unsigned int edi, esi, ebp, useless_value, ebx, edx, ecx, eax; /* pushed by pusha. useless value is esp */
-	unsigned int int_no, err_code; /* our 'push byte #' and ecodes do this */
-	unsigned int eip, cs, eflags, useresp, ss; /* pushed by the processor automatically */
-} registers_t;
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
 		unsigned char flags);

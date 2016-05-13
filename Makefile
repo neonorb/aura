@@ -24,7 +24,7 @@ compile-os: $(SOURCES)
 		@echo Compiation of Asura succeeded, boot with \"make run-os\"
 		@echo
 run-os: build/aura.bin
-		qemu-system-i386 -kernel build/aura.bin
+		qemu-system-i386 -serial stdio -kernel build/aura.bin
 debug-os: $(SOURCES)
 		$(AS) boot/boot.s -o build/boot.o
 		$(AS) kernel/interrupt.s -o build/interrupt.o

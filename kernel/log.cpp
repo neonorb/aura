@@ -19,6 +19,8 @@
 #include "log.h"
 #include "../modules/screen/screen.h"
 
+#include "ports.h"
+
 #include "../modules/screen/vga.h" // TODO remove this include
 
 void log(String message) {
@@ -52,4 +54,50 @@ void log_write(LogType logType, String message) {
 	vga_terminal_backgroundColor(COLOR_LIGHT_GREY);
 	screen_terminal_writeString(message);
 	screen_terminal_writeString("\n");
+}
+
+/****** serial debugging ********/
+
+#define PORT 0x3f8   /* COM1 */
+
+void init_serial() {
+	outb(PORT + 1, 0x00);    // Disable all interrupts
+	outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+	outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+	outb(PORT + 1, 0x00);    //                  (hi byte)
+	outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
+	outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+	outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+}
+
+int is_transmit_empty() {
+	return inb(PORT + 5) & 0x20;
+}
+
+void write_serial(char a) {
+	while (is_transmit_empty() == 0)
+		;
+
+	outb(PORT, a);
+}
+
+void debug(String name, uint64 value) {
+	debug(name, value, 16);
+}
+
+void debug(String name, uint64 value, uint8 base) {
+	debugPrint(name);
+	debugPrint(": ");
+	debug(toString(value, "          ", base));
+}
+
+void debug(String message) {
+	debugPrint(message);
+	debugPrint("\n");
+}
+
+void debugPrint(String message) {
+	for (uint64 i = 0; i < strlen(message); i++) {
+		write_serial(message[i]);
+	}
 }

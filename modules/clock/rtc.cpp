@@ -2,6 +2,7 @@
 
 #include "../../kernel/ports.h"
 #include "../../kernel/log.h"
+#include "../../kernel/idt.h"
 
 typedef void (*RTCHandler)(void);
 

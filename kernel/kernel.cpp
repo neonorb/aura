@@ -35,9 +35,9 @@
 extern "C" void kernel_main(multiboot_info_t* mbd) {
 	cli();
 
-	memory_init(mbd);
-
 	screen_terminal_initialize();
+
+	memory_init(mbd);
 
 	log("Setting up GDT");
 	gdt_init();
@@ -60,12 +60,16 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 
 	//implementation();
 
+	while(true){
+		// TODO testing memory manager crash: remove this later
+	}
+
 	// returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 	crash("We have just returned from the implmentation :(");
 }
 
 void crash(String message){
 	fault(message);
-	sti();
+	cli();
 	asm("hlt");
 }
