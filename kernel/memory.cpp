@@ -18,6 +18,10 @@ typedef struct {
 
 List<Block*> freeBlocks;
 
+/* these values are set by the linker; don't use the values*/
+extern uint8 kernelStart; // &kernelStart - start of the kernel
+extern uint8 kernelEnd; // &kernelEnd - end of the kernel
+
 static void clear(Block* block) {
 	for (uint64 i = 0; i < block->size; i++) {
 		((uint8*) block->location)[i] = 0;
@@ -167,6 +171,11 @@ void memory_init(multiboot_info_t* mbd) {
 		crash("6th bit in mbd is not set, cannot get memory map");
 	}
 
+	uint64 kernelSize = &kernelEnd - &kernelStart;
+	debug("kernelStart", (uint64) &kernelStart);
+	debug("kernelEnd", (uint64) &kernelEnd);
+	debug("kernelSize", kernelSize);
+
 	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
 	debug("map location", (uint64) mmap);
 	while ((uint32) mmap < mbd->mmap_addr + mbd->mmap_length) {
@@ -178,8 +187,16 @@ void memory_init(multiboot_info_t* mbd) {
 		debug("memory type", mmap->type);
 
 		if (mmap->type == 1) { // memory is useable
-			free((void*) merge(mmap->base_addr_high, mmap->base_addr_low) // + 0x1b
-					, merge(mmap->length_high, mmap->length_low));
+			uint64 memoryLocation = merge(mmap->base_addr_high,
+					mmap->base_addr_low);
+			uint64 memorySize = merge(mmap->length_high, mmap->length_low);
+			if (memoryLocation == (uint64) &kernelStart) {
+				memoryLocation += kernelSize;
+				memorySize -= kernelSize;
+			}
+
+			free((void*) memoryLocation // + 0x1b
+					, memorySize);
 		}
 	}
 
