@@ -19,13 +19,6 @@
 extern "C" void gdt_flush(uint8* gdt);
 extern "C" void tss_flush();
 
-// Write len copies of val into dest.
-void memset(uint8* dest, uint8 val, size_t len) {
-	for (uint64 i = 0; i < len; i++) {
-		dest[i] = val;
-	}
-}
-
 typedef struct {
 	uint16 limit_low;
 	uint16 base_low;

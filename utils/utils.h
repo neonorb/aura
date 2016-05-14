@@ -158,6 +158,13 @@ void* memcpy(uint8* dst, const uint8* src, size_t len) {
 	return dst;
 }
 
+// Write len copies of val into dest.
+void memset(uint8* dest, uint8 val, size_t len) {
+	for (uint64 i = 0; i < len; i++) {
+		dest[i] = val;
+	}
+}
+
 static int memcmp_uint8_ts(unsigned long int a, unsigned long int b) {
 	long int srcp1 = (long int) &a;
 	long int srcp2 = (long int) &b;

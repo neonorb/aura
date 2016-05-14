@@ -62,16 +62,28 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 
 	//implementation();
 
-	while(true){
-		// TODO testing memory manager crash: remove this later
+	for (int i = 0; i < 1000; i++) {
+		String x = (String) getMemory(10);
+		char* y = (char*) x;
+		debug(y);
+		for (uint8 i = 0; i < 10; i++) {
+			debug("appending");
+			y[i] = 'x';
+		}
+		debug(y);
+		log(y);
+
+		// ---------------------- when this is commented out, the thing "runs of of memory" after a few allocations, works fine when it is freed --------------
+		//free((void*) x, 10);
 	}
 
-	// returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
+// returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 	crash("We have just returned from the implmentation :(");
 }
 
-void crash(String message){
+void crash(String message) {
 	fault(message);
 	cli();
+	fault("Halting system!");
 	asm("hlt");
 }

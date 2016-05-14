@@ -22,43 +22,49 @@ List<Block*> freeBlocks;
 extern uint8 kernelStart; // &kernelStart - start of the kernel
 extern uint8 kernelEnd; // &kernelEnd - end of the kernel
 
-static void clear(Block* block) {
-	for (uint64 i = 0; i < block->size; i++) {
-		((uint8*) block->location)[i] = 0;
-	}
-}
-
 void* allocateMemory(size_t size);
 void free(void* location, size_t size);
 
 void* allocateMemory(size_t size) {
+	debug("-----allocating", size);
+	debug("blocks", freeBlocks.size());
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
 		Block* block = freeBlocks.get(i);
 
-		if (size == block->size) { // correct block size
+		debug("block size", block->size);
+
+		if (size == block->size) { // if block matches in size
+			// remove this block and return it's location
+			debug("block same size, removing");
 			free((uint8*) freeBlocks.remove(i), sizeof(Block*));
 
-			clear(block);
+			memset((uint8*) block->location, 0, size);
+
 			return block->location;
 		} else if (size < block->size) {
+			debug("splitting block");
 			// "split" block
 			void* location = block->location;
 
 			block->location += size;
 			block->size -= size;
 
+			debug("new block size", block->size);
+
 			if (block->size == 0) {
+				debug("block size == 0, removing");
 				// the block is empty, delete it
 				free((uint8*) freeBlocks.remove(i), sizeof(Block*));
 			}
 
-			clear(block);
+			memset((uint8*) location, 0, size);
+
 			return location;
 		}
 
-		// try the next block
+		// try the next block (if there is one)
 	}
 
 	// out of blocks
@@ -68,10 +74,7 @@ void* allocateMemory(size_t size) {
 }
 
 void free(void* location, size_t size) {
-	debug("location", (uint64) location);
-	debug("size", size);
-
-	//return;
+	debug("freeing", size);
 
 	bool didFree = false;
 
@@ -83,13 +86,8 @@ void free(void* location, size_t size) {
 		block->size = size - sizeof(Block) - sizeof(Element<Block*> );
 
 		Element<Block*>* element = (Element<Block*>*) location + sizeof(Block);
-		debug("element location", (uint64) element);
-		debug("element value (uncleared block location value)",
-				(uint64) element->value);
 
 		element->value = block;
-
-		debug("element value (block location)", (uint64) element->value);
 
 		freeBlocks.add(element);
 
@@ -145,7 +143,7 @@ void free(void* location, size_t size) {
 						free((uint8*) futureBlock, sizeof(Block));
 					}
 				}
-			} else if (block->location + block->size < location + size) {
+			} else if (block->location + block->size < location + size && freeBlocks.isLast(i)) {
 				// we need a new block
 				Block* newBlock = (Block*) allocateMemory(sizeof(Block));
 
@@ -153,9 +151,6 @@ void free(void* location, size_t size) {
 				newBlock->size = size;
 				freeBlocks.add(newBlock, freeBlocks.indexOf(block) + 1);
 				didFree = true;
-			} else {
-				// we are freeing memory that was already freed
-				crash(FREE_FAILED_FREED_ALREADY);
 			}
 		}
 	}
@@ -172,19 +167,11 @@ void memory_init(multiboot_info_t* mbd) {
 	}
 
 	uint64 kernelSize = &kernelEnd - &kernelStart;
-	debug("kernelStart", (uint64) &kernelStart);
-	debug("kernelEnd", (uint64) &kernelEnd);
-	debug("kernelSize", kernelSize);
 
 	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
-	debug("map location", (uint64) mmap);
 	while ((uint32) mmap < mbd->mmap_addr + mbd->mmap_length) {
 		mmap = (memory_map_t*) ((unsigned int) mmap + mmap->size
 				+ sizeof(unsigned int));
-
-		debug("memory location",
-				merge(mmap->base_addr_high, mmap->base_addr_low));
-		debug("memory type", mmap->type);
 
 		if (mmap->type == 1) { // memory is useable
 			uint64 memoryLocation = merge(mmap->base_addr_high,

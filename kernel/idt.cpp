@@ -321,11 +321,6 @@ void init_idt() {
 	idt_ptr.limit = sizeof(struct idt_entry) * 256 - 1;
 	idt_ptr.base = (uint32) &idt_entries;
 
-	debug("idt ptr location", (uint64) &idt_ptr);
-
-	debug("idt location", (uint64) idt_ptr.base);
-	debug("idt size", idt_ptr.limit);
-
 	memset((uint8*) &idt_entries, 0, sizeof(struct idt_entry) * 256);
 
 	idt_init_isrs();
