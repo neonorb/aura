@@ -63,18 +63,18 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 	//implementation();
 
 	for (int i = 0; i < 1000; i++) {
-		String x = (String) getMemory(10);
+		String x = dynamicString("0123456789");
 		char* y = (char*) x;
 		debug(y);
 		for (uint8 i = 0; i < 10; i++) {
-			debug("appending");
+			//debug("appending");
 			y[i] = 'x';
 		}
 		debug(y);
 		log(y);
 
 		// ---------------------- when this is commented out, the thing "runs of of memory" after a few allocations, works fine when it is freed --------------
-		//free((void*) x, 10);
+		//free((void*) x, strlen(x) + 1);
 	}
 
 // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)

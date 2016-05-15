@@ -46,6 +46,9 @@ void* allocateMemory(size_t size) {
 		} else if (size < block->size) {
 			debug("splitting block");
 			// "split" block
+
+			// we must copy the location to a local so that the block
+			// location can be updated to split it
 			void* location = block->location;
 
 			block->location += size;

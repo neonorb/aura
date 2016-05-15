@@ -3,6 +3,7 @@
 
 #include <int.h>
 #include <string.h>
+#include <memory.h>
 #include "../kernel/log.h"
 
 void cli() {
@@ -156,6 +157,12 @@ void* memcpy(uint8* dst, const uint8* src, size_t len) {
 	}
 
 	return dst;
+}
+
+String dynamicString(String string) {
+	String retString = (String) getMemory(strlen(string) + 1);
+	memcpy((uint8*) retString, (uint8*) string, strlen(string) + 1);
+	return retString;
 }
 
 // Write len copies of val into dest.
