@@ -28,6 +28,7 @@ void free(void* location, size_t size);
 void* allocateMemory(size_t size) {
 	debug("-----allocating", size);
 	debug("blocks", freeBlocks.size());
+	debug("block1", freeBlocks.get(0)->size);
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
@@ -63,6 +64,8 @@ void* allocateMemory(size_t size) {
 			}
 
 			memset((uint8*) location, 0, size);
+
+			debug("block size after", block->size);
 
 			return location;
 		}

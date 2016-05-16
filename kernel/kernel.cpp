@@ -60,9 +60,15 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 
 	log("Welcome to Aura!");
 
+	for(uint64 i = 0; i < 1000; i++){
+		log("iteration");
+		debug("iteration", i);
+		getMemory(10);
+	}
+
 	//implementation();
 
-	for (int i = 0; i < 1000; i++) {
+	/*for (uint64 i = 0; i < 1000; i++) {
 		String x = dynamicString("0123456789");
 		char* y = (char*) x;
 		debug(y);
@@ -75,7 +81,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd) {
 
 		// ---------------------- when this is commented out, the thing "runs of of memory" after a few allocations, works fine when it is freed --------------
 		//free((void*) x, strlen(x) + 1);
-	}
+	}*/
 
 // returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
 	crash("We have just returned from the implmentation :(");

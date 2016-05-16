@@ -16,9 +16,7 @@ compile-os: $(SOURCES)
 		$(AS) -f elf boot/boot.s -o build/boot.o
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
 		$(AS) -f elf kernel/idt.s -o build/idt.o
-		@echo -- compiling or something --
 		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -O2 -nostdlib $(INCLUDE)
-		@echo -- Linking or something --
 		$(CC) -T utils/linker.ld $(CFLAGS) -O2 -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS)
 		@echo
 		@echo Compiation of Asura succeeded, boot with \"make run-os\"
@@ -26,16 +24,15 @@ compile-os: $(SOURCES)
 run-os: build/aura.bin
 		qemu-system-i386 -serial stdio -kernel build/aura.bin
 debug-os: $(SOURCES)
-		$(AS) boot/boot.s -o build/boot.o
-		$(AS) kernel/interrupt.s -o build/interrupt.o
+		$(AS) -f elf boot/boot.s -o build/boot.o
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
 		$(AS) -f elf kernel/idt.s -o build/idt.o
-		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -g -std=gnu99 -O0 $(INCLUDE)
-		$(CC) -T utils/linker.ld -o build/aura.bin $(CFLAGS) -g -O0 -nostdlib $(OUT) $(INCLUDE) $(LIBS)
+		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -g -O0 -nostdlib $(INCLUDE)
+		$(CC) -T utils/linker.ld $(CFLAGS) -g -O0 -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS)
 		@echo
 		@echo Compilation of Asiago with debugging symbols and \-O0 succeeded, booting QEMU with debugging flags, connect with gdb.
 		@echo
-		qemu-system-i386 -d int,pcall -s -S -kernel build/aura.bin
+		qemu-system-i386 -serial stdio -d int,pcall -s -S -kernel build/aura.bin
 	
 build/kernel.elf: elf	
 elf: $(OUT)
