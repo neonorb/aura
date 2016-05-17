@@ -26,26 +26,30 @@ void* allocateMemory(size_t size);
 void free(void* location, size_t size);
 
 void* allocateMemory(size_t size) {
-	debug("-----allocating", size);
-	debug("blocks", freeBlocks.size());
-	debug("block1", freeBlocks.get(0)->size);
+	//debug("-----allocating", size);
+	//debug("blocks", freeBlocks.size());
+	//debug("block1", freeBlocks.get(0)->size);
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
 		Block* block = freeBlocks.get(i);
 
-		debug("block size", block->size);
+		debug("block pointer", (uint64) block);
+
+		debug("block size", (*block).size);
+
+		//uint64 blockSize = block->size;
 
 		if (size == block->size) { // if block matches in size
 			// remove this block and return it's location
-			debug("block same size, removing");
+			//debug("block same size, removing");
 			free((uint8*) freeBlocks.remove(i), sizeof(Block*));
 
 			memset((uint8*) block->location, 0, size);
 
 			return block->location;
 		} else if (size < block->size) {
-			debug("splitting block");
+			//debug("splitting block");
 			// "split" block
 
 			// we must copy the location to a local so that the block
@@ -55,17 +59,18 @@ void* allocateMemory(size_t size) {
 			block->location += size;
 			block->size -= size;
 
-			debug("new block size", block->size);
+			debug("block pointer", (uint64) &block);
+			//debug("new block size", block->size);
 
 			if (block->size == 0) {
-				debug("block size == 0, removing");
+				//debug("block size == 0, removing");
 				// the block is empty, delete it
 				free((uint8*) freeBlocks.remove(i), sizeof(Block*));
 			}
 
 			memset((uint8*) location, 0, size);
 
-			debug("block size after", block->size);
+			//debug("block size after", block->size);
 
 			return location;
 		}
@@ -80,19 +85,22 @@ void* allocateMemory(size_t size) {
 }
 
 void free(void* location, size_t size) {
-	debug("freeing", size);
-
 	bool didFree = false;
 
 	if (freeBlocks.isEmpty()) {
 		// we must manually allocate memory since we have no available blocks
 
+		size_t blockSize = sizeof(Block);
+		size_t elementSize = sizeof(Element<Block*> );
+
+		size_t metadataSize = blockSize + elementSize;
+
 		Block* block = (Block*) location;
-		block->location = location + sizeof(Block) + sizeof(Element<Block*> );
-		block->size = size - sizeof(Block) - sizeof(Element<Block*> );
+		block->location = location + metadataSize;
+		block->size = size - metadataSize;
 
-		Element<Block*>* element = (Element<Block*>*) location + sizeof(Block);
-
+		Element<Block*>* element = (Element<Block*>*) ((uint64) location
+				+ blockSize);
 		element->value = block;
 
 		freeBlocks.add(element);
@@ -149,7 +157,8 @@ void free(void* location, size_t size) {
 						free((uint8*) futureBlock, sizeof(Block));
 					}
 				}
-			} else if (block->location + block->size < location + size && freeBlocks.isLast(i)) {
+			} else if (block->location + block->size < location + size
+					&& freeBlocks.isLast(i)) {
 				// we need a new block
 				Block* newBlock = (Block*) allocateMemory(sizeof(Block));
 

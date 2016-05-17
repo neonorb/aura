@@ -298,7 +298,6 @@ void irq_install() {
 }
 ///Handles IRQ's
 extern "C" void irq_handler(struct regs *r) {
-	debug("interrupt!");
 	/* This is a blank function pointer */
 	if (interrupt_handlers[r->int_no] != 0) {
 		interrupt_handlers[r->int_no](r);

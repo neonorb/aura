@@ -32,7 +32,7 @@ debug-os: $(SOURCES)
 		@echo
 		@echo Compilation of Asiago with debugging symbols and \-O0 succeeded, booting QEMU with debugging flags, connect with gdb.
 		@echo
-		qemu-system-i386 -serial stdio -d int,pcall -s -S -kernel build/aura.bin
+		qemu-system-i386 -serial stdio -s -S -kernel build/aura.bin
 	
 build/kernel.elf: elf	
 elf: $(OUT)
