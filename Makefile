@@ -16,13 +16,16 @@ compile-os: $(SOURCES)
 		$(AS) -f elf boot/boot.s -o build/boot.o
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
 		$(AS) -f elf kernel/idt.s -o build/idt.o
-		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -O2 -nostdlib $(INCLUDE)
-		$(CC) -T utils/linker.ld $(CFLAGS) -O2 -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS)
+		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -O2 -nostdlib $(INCLUDE) $(TESTING)
+		$(CC) -T utils/linker.ld $(CFLAGS) -O2 -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS) $(TESTING)
 		@echo
 		@echo Compiation of Asura succeeded, boot with \"make run-os\"
 		@echo
 run-os: build/aura.bin
 		qemu-system-i386 -serial stdio -kernel build/aura.bin
+test-os:
+		TESTING="-D TESTING" make compile
+		make run-os
 debug-os: $(SOURCES)
 		$(AS) -f elf boot/boot.s -o build/boot.o
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
