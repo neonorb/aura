@@ -11,31 +11,38 @@ INCLUDE=-I"../mish/include" -I"../feta/include"
 LIBS=-L"../feta/Debug" -lfeta #../feta/Debug/libfeta.a #-L"../feta/Debug" -L"../mish/Debug" -lmish -lfeta
 
 all: compile
-compile: compile-os
-compile-os: $(SOURCES)
+compile: $(SOURCES)
+		ifeq ($(TESTING),true)
+			TFLAGS="-D TESTING"
+		
+		endif
+		ifeq ($(DEBUGGING),true)
+			DFLAGS="-g -00"
+		else
+			DFLAGS="-02"
+		endif
 		$(AS) -f elf boot/boot.s -o build/boot.o
 		$(AS) -f elf kernel/gdt.s -o build/gdt.o
 		$(AS) -f elf kernel/idt.s -o build/idt.o
-		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -O2 -nostdlib $(INCLUDE) $(TESTING)
-		$(CC) -T utils/linker.ld $(CFLAGS) -O2 -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS) $(TESTING)
+		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -nostdlib $(INCLUDE) $(TFLAGS) $(DFLAGS)
+		$(CC) -T utils/linker.ld $(CFLAGS) -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS) $(TFLAGS) $(DFLAGS)
 		@echo
-		@echo Compiation of Asura succeeded, boot with \"make run-os\"
+		@echo Compiation of Aura succeeded, boot with \"make run\"
 		@echo
-run-os: build/aura.bin
-		qemu-system-i386 -serial stdio -kernel build/aura.bin
-test-os:
-		TESTING="-D TESTING" make compile
-		make run-os
-debug-os: $(SOURCES)
-		$(AS) -f elf boot/boot.s -o build/boot.o
-		$(AS) -f elf kernel/gdt.s -o build/gdt.o
-		$(AS) -f elf kernel/idt.s -o build/idt.o
-		$(CC) -c kernel/kernel.cpp -o build/kernel.o $(CFLAGS) -g -O0 -nostdlib $(INCLUDE)
-		$(CC) -T utils/linker.ld $(CFLAGS) -g -O0 -nostdlib $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS)
-		@echo
-		@echo Compilation of Asiago with debugging symbols and \-O0 succeeded, booting QEMU with debugging flags, connect with gdb.
-		@echo
-		qemu-system-i386 -serial stdio -s -S -kernel build/aura.bin
+run: build/aura.bin
+		ifeq ($(DEBUGGING),true)
+			DFLAGS="-s -S"
+		endif
+		qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin
+test:
+		TESTING=true make compile
+		TESTING=true make run
+test-debug:
+		TESTING=true DEBUGGING=true make compile
+		TESTING=true DEBUGGING=true make run
+debug: $(SOURCES)
+		DEBUGGING=true make compile
+		DEBUGGINS=true make run 
 	
 build/kernel.elf: elf	
 elf: $(OUT)

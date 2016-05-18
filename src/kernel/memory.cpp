@@ -16,40 +16,56 @@ typedef struct {
 	size_t size;
 } Block;
 
-List<Block*> freeBlocks;
+// the list of fre blocks
+static List<Block*> freeBlocks;
 
 /* these values are set by the linker; don't use the values*/
 extern uint8 kernelStart; // &kernelStart - start of the kernel
 extern uint8 kernelEnd; // &kernelEnd - end of the kernel
 
-void* allocateMemory(size_t size);
-void free(void* location, size_t size);
+void memory_init(multiboot_info_t* mbd) {
+	if (!getBit(mbd->flags, 6)) {
+		crash("6th bit in mbd is not set, cannot get memory map");
+	}
 
-void* allocateMemory(size_t size) {
-	//debug("-----allocating", size);
-	//debug("blocks", freeBlocks.size());
-	//debug("block1", freeBlocks.get(0)->size);
+	uint64 kernelSize = &kernelEnd - &kernelStart;
+
+	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
+	while ((uint32) mmap < mbd->mmap_addr + mbd->mmap_length) {
+		mmap = (memory_map_t*) ((unsigned int) mmap + mmap->size
+				+ sizeof(unsigned int));
+
+		if (mmap->type == 1) { // memory is useable
+			uint64 memoryLocation = merge(mmap->base_addr_high,
+					mmap->base_addr_low);
+			uint64 memorySize = merge(mmap->length_high, mmap->length_low);
+			if (memoryLocation == (uint64) &kernelStart) {
+				memoryLocation += kernelSize;
+				memorySize -= kernelSize;
+			}
+
+			free((void*) memoryLocation // + 0x1b
+					, memorySize);
+		}
+	}
+}
+
+// ----- memory management -----
+
+void* malloc(size_t size) {
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
-		// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
+		// NOTE: after mutating the list, the index can no longer be used, use freeBlocks.indexOf(block) instead
 
 		Block* block = freeBlocks.get(i);
 
-		debug("block pointer", (uint64) block);
-
-		debug("block size", (*block).size);
-
-		//uint64 blockSize = block->size;
-
 		if (size == block->size) { // if block matches in size
 			// remove this block and return it's location
-			//debug("block same size, removing");
-			free((uint8*) freeBlocks.remove(i), sizeof(Block*));
+			free(freeBlocks.remove(i), sizeof(Block*));
 
 			memset((uint8*) block->location, 0, size);
 
 			return block->location;
 		} else if (size < block->size) {
-			//debug("splitting block");
 			// "split" block
 
 			// we must copy the location to a local so that the block
@@ -59,18 +75,12 @@ void* allocateMemory(size_t size) {
 			block->location += size;
 			block->size -= size;
 
-			debug("block pointer", (uint64) &block);
-			//debug("new block size", block->size);
-
 			if (block->size == 0) {
-				//debug("block size == 0, removing");
 				// the block is empty, delete it
-				free((uint8*) freeBlocks.remove(i), sizeof(Block*));
+				free(freeBlocks.remove(i), sizeof(Block*));
 			}
 
 			memset((uint8*) location, 0, size);
-
-			//debug("block size after", block->size);
 
 			return location;
 		}
@@ -82,6 +92,27 @@ void* allocateMemory(size_t size) {
 	crash(ALLOCATE_FAILED);
 
 	return 0;
+}
+
+bool canAllocate(size_t size){
+	for(uint64 i = 0; i < freeBlocks.size(); i++){
+		if(freeBlocks.get(i)->size >= size){
+			return true;
+		}
+	}
+
+	// could not find a suitable block
+	return false;
+}
+
+uint64 availableMemory(){
+	uint64 availableMemory = 0;
+
+	for(uint64 i = 0; i < freeBlocks.size(); i++){
+		availableMemory += freeBlocks.get(i)->size;
+	}
+
+	return availableMemory;
 }
 
 void free(void* location, size_t size) {
@@ -114,7 +145,7 @@ void free(void* location, size_t size) {
 
 			if (location + size < block->location) { // create new block below
 				// we need a new block
-				Block* newBlock = (Block*) allocateMemory(sizeof(Block));
+				Block* newBlock = (Block*) malloc(sizeof(Block));
 
 				newBlock->location = location;
 				newBlock->size = size;
@@ -137,7 +168,7 @@ void free(void* location, size_t size) {
 						block->size += previousBlock->size;
 						block->location -= previousBlock->size;
 
-						free((uint8*) previousBlock, sizeof(Block));
+						free(freeBlocks.remove(freeBlocks.indexOf(previousBlock)), sizeof(Block));
 					}
 				}
 			} else if (block->location + block->size == location) { // memory is at the top of this block
@@ -145,7 +176,7 @@ void free(void* location, size_t size) {
 				didFree = true;
 
 				// attempt to merge blocks
-				if (i < freeBlocks.size()) {
+				if (!freeBlocks.isLast(i)) {
 					Block* futureBlock = freeBlocks.get(
 							freeBlocks.indexOf(block) + 1);
 
@@ -160,11 +191,11 @@ void free(void* location, size_t size) {
 			} else if (block->location + block->size < location + size
 					&& freeBlocks.isLast(i)) {
 				// we need a new block
-				Block* newBlock = (Block*) allocateMemory(sizeof(Block));
+				Block* newBlock = (Block*) malloc(sizeof(Block));
 
 				newBlock->location = location;
 				newBlock->size = size;
-				freeBlocks.add(newBlock, freeBlocks.indexOf(block) + 1);
+				freeBlocks.add(newBlock);
 				didFree = true;
 			}
 		}
@@ -174,34 +205,4 @@ void free(void* location, size_t size) {
 		// could not free memory
 		crash(FREE_FAILED);
 	}
-}
-
-void memory_init(multiboot_info_t* mbd) {
-	if (!getBit(mbd->flags, 6)) {
-		crash("6th bit in mbd is not set, cannot get memory map");
-	}
-
-	uint64 kernelSize = &kernelEnd - &kernelStart;
-
-	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
-	while ((uint32) mmap < mbd->mmap_addr + mbd->mmap_length) {
-		mmap = (memory_map_t*) ((unsigned int) mmap + mmap->size
-				+ sizeof(unsigned int));
-
-		if (mmap->type == 1) { // memory is useable
-			uint64 memoryLocation = merge(mmap->base_addr_high,
-					mmap->base_addr_low);
-			uint64 memorySize = merge(mmap->length_high, mmap->length_low);
-			if (memoryLocation == (uint64) &kernelStart) {
-				memoryLocation += kernelSize;
-				memorySize -= kernelSize;
-			}
-
-			free((void*) memoryLocation // + 0x1b
-					, memorySize);
-		}
-	}
-
-	MemoryManager memoryManager = { &allocateMemory };
-	setMemoryManager(memoryManager);
 }

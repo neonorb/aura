@@ -160,7 +160,7 @@ void* memcpy(uint8* dst, const uint8* src, size_t len) {
 }
 
 String dynamicString(String string) {
-	String retString = (String) getMemory(strlen(string) + 1);
+	String retString = (String) malloc(strlen(string) + 1);
 	memcpy((uint8*) retString, (uint8*) string, strlen(string) + 1);
 	return retString;
 }

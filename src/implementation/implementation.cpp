@@ -1,5 +1,4 @@
 #include "pong.cpp"
-#include "../kernel/log.h"
 
 #ifdef TESTING
 #include "test.cpp"
@@ -7,7 +6,6 @@
 
 void implementation() {
 #ifdef TESTING
-	log(" -- TESTING -- ");
 	test();
 #endif
 }
