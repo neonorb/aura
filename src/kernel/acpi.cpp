@@ -15,10 +15,10 @@
     /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 
+#include <log.h>
 #include <stddef.h>
 #include "ports.h"
 #include "../utils/utils.h"
-#include "log.h"
 
 
 uint32_t *SMI_CMD;

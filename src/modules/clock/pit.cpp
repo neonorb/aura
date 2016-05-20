@@ -1,7 +1,7 @@
 #include <int.h>
 
 #include "../../kernel/ports.h"
-#include "../../kernel/log.h"
+#include <log.h>
 
 #define CLOCK_FREQUENCY 60
 

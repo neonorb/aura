@@ -6,10 +6,10 @@
  */
 
 #include "../utils/utils.h"
-#include "log.h"
 #include <memory.h>
 #include <list.h>
 #include <errors.h>
+#include <log.h>
 
 typedef struct {
 	void* location;
@@ -17,7 +17,7 @@ typedef struct {
 } Block;
 
 // the list of fre blocks
-static List<Block*> freeBlocks;
+List<Block*> freeBlocks;
 
 /* these values are set by the linker; don't use the values*/
 extern uint8 kernelStart; // &kernelStart - start of the kernel
@@ -54,18 +54,17 @@ void memory_init(multiboot_info_t* mbd) {
 
 void* malloc(size_t size) {
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
-		// NOTE: after mutating the list, the index can no longer be used, use freeBlocks.indexOf(block) instead
-
 		Block* block = freeBlocks.get(i);
 
 		if (size == block->size) { // if block matches in size
 			// remove this block and return it's location
 			free(freeBlocks.remove(i), sizeof(Block*));
 
+			// wipe memory
 			memset((uint8*) block->location, 0, size);
 
 			return block->location;
-		} else if (size < block->size) {
+		} else if (block->size > size) {
 			// "split" block
 
 			// we must copy the location to a local so that the block
@@ -78,8 +77,22 @@ void* malloc(size_t size) {
 			if (block->size == 0) {
 				// the block is empty, delete it
 				free(freeBlocks.remove(i), sizeof(Block*));
+			} else if (freeBlocks.size() > 1) {
+				// update the blocks position in the list
+				freeBlocks.remove(i);
+
+				for (uint64 j = i; j - 1 < j && j >= 0; j--) {
+					Block* thisBlock = freeBlocks.get(j);
+
+					if (block->size >= thisBlock->size) {
+						// update position of moving block
+						freeBlocks.add(block, j + 1);
+						break;
+					}
+				}
 			}
 
+			// wipe memory
 			memset((uint8*) location, 0, size);
 
 			return location;
@@ -94,9 +107,9 @@ void* malloc(size_t size) {
 	return 0;
 }
 
-bool canAllocate(size_t size){
-	for(uint64 i = 0; i < freeBlocks.size(); i++){
-		if(freeBlocks.get(i)->size >= size){
+bool canAllocate(size_t size) {
+	for (uint64 i = 0; i < freeBlocks.size(); i++) {
+		if (freeBlocks.get(i)->size >= size) {
 			return true;
 		}
 	}
@@ -105,10 +118,10 @@ bool canAllocate(size_t size){
 	return false;
 }
 
-uint64 availableMemory(){
+uint64 availableMemory() {
 	uint64 availableMemory = 0;
 
-	for(uint64 i = 0; i < freeBlocks.size(); i++){
+	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		availableMemory += freeBlocks.get(i)->size;
 	}
 
@@ -116,8 +129,6 @@ uint64 availableMemory(){
 }
 
 void free(void* location, size_t size) {
-	bool didFree = false;
-
 	if (freeBlocks.isEmpty()) {
 		// we must manually allocate memory since we have no available blocks
 
@@ -135,74 +146,65 @@ void free(void* location, size_t size) {
 		element->value = block;
 
 		freeBlocks.add(element);
-
-		didFree = true;
 	} else {
-		for (uint64 i = 0; i < freeBlocks.size() && !didFree; i++) {
-			// NOTE: after mutating memory, the index can no longer be used, use freeBlocks.indexOf(block) instead
+		uint64 potentialSizeIndex = 0;
 
+		Block* alreadyMergedBlock = 0;
+
+		for (uint64 i = 0; i - 1 < i && i >= 0; i--) {
 			Block* block = freeBlocks.get(i);
 
-			if (location + size < block->location) { // create new block below
-				// we need a new block
-				Block* newBlock = (Block*) malloc(sizeof(Block));
+			debug("location", (uint64) location);
+			debug("size", size);
+			debug("block location", (uint64) block->location);
 
-				newBlock->location = location;
-				newBlock->size = size;
-				freeBlocks.add(newBlock, freeBlocks.indexOf(block));
-				didFree = true;
-			} else if (location + size == block->location) { // memory is at bottom of this block
+			if (location + size == block->location) { // memory is at bottom of this block
+				// attempt to merge blocks
+				if (alreadyMergedBlock->location + alreadyMergedBlock->size
+						== block->location) {
+					block->size += alreadyMergedBlock->size;
+					block->location -= alreadyMergedBlock->size;
+
+					free((void*) freeBlocks.remove(alreadyMergedBlock),
+							sizeof(Block));
+
+					break;
+				}
+
 				// grow this block downwards to fill space
 				block->location -= size;
 				block->size += size;
-				didFree = true;
 
-				// attempt to merge blocks
-				if (i > 0) {
-					Block* previousBlock = freeBlocks.get(
-							freeBlocks.indexOf(block) - 1);
-
-					if (previousBlock->location + previousBlock->size
-							== block->location) { // if ajacient to block on left
-						// grow this block downwards
-						block->size += previousBlock->size;
-						block->location -= previousBlock->size;
-
-						free(freeBlocks.remove(freeBlocks.indexOf(previousBlock)), sizeof(Block));
-					}
-				}
+				alreadyMergedBlock = block;
 			} else if (block->location + block->size == location) { // memory is at the top of this block
-				block->size += size;
-				didFree = true;
-
 				// attempt to merge blocks
-				if (!freeBlocks.isLast(i)) {
-					Block* futureBlock = freeBlocks.get(
-							freeBlocks.indexOf(block) + 1);
+				if (block->location + block->size
+						== alreadyMergedBlock->location) {
+					block->size += alreadyMergedBlock->size;
 
-					if (block->location + block->size
-							== futureBlock->location) { // if ajacient to block on left
-						// grow this block downwards
-						block->size += futureBlock->size;
+					free((void*) freeBlocks.remove(alreadyMergedBlock),
+							sizeof(Block));
 
-						free((uint8*) futureBlock, sizeof(Block));
-					}
+					break;
 				}
-			} else if (block->location + block->size < location + size
-					&& freeBlocks.isLast(i)) {
-				// we need a new block
-				Block* newBlock = (Block*) malloc(sizeof(Block));
 
-				newBlock->location = location;
-				newBlock->size = size;
-				freeBlocks.add(newBlock);
-				didFree = true;
+				block->size += size;
+
+				alreadyMergedBlock = block;
+			} else {
+				// store potential size position
+
+				if (size > block->size) {
+					potentialSizeIndex = i + 1; // after this block
+				}
 			}
 		}
-	}
 
-	if (!didFree) {
-		// could not free memory
-		crash(FREE_FAILED);
+		// could not align to another block, we need another block
+		Block* newBlock = (Block*) malloc(sizeof(Block));
+
+		newBlock->location = location;
+		newBlock->size = size;
+		freeBlocks.add(newBlock, potentialSizeIndex);
 	}
 }

@@ -2,9 +2,9 @@
 #define UTILS_H_
 
 #include <int.h>
+#include <log.h>
 #include <string.h>
 #include <memory.h>
-#include "../kernel/log.h"
 
 void cli() {
 	asm("cli");

@@ -1,7 +1,7 @@
 #include "clock.h"
 
 #include "../../kernel/ports.h"
-#include "../../kernel/log.h"
+#include <log.h>
 #include "pit.cpp"
 
 #include "rtc.cpp"

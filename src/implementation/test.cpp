@@ -12,7 +12,7 @@ static void memory() {
 	log("  - memory");
 
 	// test merging of free blocks
-	const uint32 blockSize = 10000;
+	const uint32 blockSize = 1000000;
 
 	uint64 maxBlockCount = 0;
 	uint32 initialAvailableMemory = availableMemory();
@@ -23,26 +23,25 @@ static void memory() {
 		blocks.add(malloc(blockSize));
 		maxBlockCount++;
 		usedMemory += blockSize;
-
-		//debug("used memmory", usedMemory);
-		//debug("availableMemory", initialAvailableMemory);
-		debug("memory taken", ((uint32) usedMemory * 100) / ((uint32) initialAvailableMemory));
 	}
 
+	debug("free blocks", freeBlocks.size());
+
 	// free every other
-	for(uint64 i = blocks.size() - 1; i > 0; i-=2) {
-		free(blocks.get(i), blockSize);
-		blocks.remove(i);
+	for(uint64 i = blocks.size() - 1; i -2 < i && i >= 0; i -= 2) {
+		free(blocks.remove(i), blockSize);
+
+		if(i - 2 > i) break; // check for underflow
 	}
 
 	// free the rest
-	for(uint64 i = blocks.size() - 1; i > 0; i--) {
-		free(blocks.get(i), blockSize);
-		blocks.remove(i);
+	for(uint64 i = blocks.size() - 1; i - 1 < i && i >= 0; i--) {
+		free(blocks.remove(i), blockSize);
 	}
 
 	if(!canAllocate(maxBlockCount * blockSize)) {
 		// our blocks didn't merge correctly
+		debug("free blocks", freeBlocks.size());
 		crash("cannot allocate the whole memory");
 	}
 

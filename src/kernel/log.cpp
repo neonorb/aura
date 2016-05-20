@@ -14,9 +14,9 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <log.h>
 #include <string.h>
 
-#include "log.h"
 #include "../modules/screen/screen.h"
 
 #include "ports.h"
