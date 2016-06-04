@@ -1,5 +1,5 @@
 /*
- * memory.c
+ * memory.cpp
  *
  *  Created on: May 8, 2016
  *      Author: chris
@@ -16,14 +16,14 @@ typedef struct {
 	size_t size;
 } Block;
 
-// the list of fre blocks
+// the list of free blocks
 List<Block*> freeBlocks;
 
-/* these values are set by the linker; don't use the values*/
+/* these pointers are set by the linker; don't use the values */
 extern uint8 kernelStart; // &kernelStart - start of the kernel
 extern uint8 kernelEnd; // &kernelEnd - end of the kernel
 
-void memory_init(multiboot_info_t* mbd) {
+void amemory_init(multiboot_info_t* mbd) {
 	if (!getBit(mbd->flags, 6)) {
 		crash("6th bit in mbd is not set, cannot get memory map");
 	}
@@ -52,7 +52,7 @@ void memory_init(multiboot_info_t* mbd) {
 
 // ----- memory management -----
 
-void* malloc(size_t size) {
+void* amalloc(size_t size) {
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		Block* block = freeBlocks.get(i);
 
@@ -79,14 +79,14 @@ void* malloc(size_t size) {
 				free(freeBlocks.remove(i), sizeof(Block*));
 			} else if (freeBlocks.size() > 1) {
 				// update the blocks position in the list
-				freeBlocks.remove(i);
+				Element<Block*>* blockElement = freeBlocks.removeElement(i);
 
 				for (uint64 j = i; j - 1 < j && j >= 0; j--) {
 					Block* thisBlock = freeBlocks.get(j);
 
 					if (block->size >= thisBlock->size) {
 						// update position of moving block
-						freeBlocks.add(block, j + 1);
+						freeBlocks.addElement(blockElement, j + 1);
 						break;
 					}
 				}
@@ -107,7 +107,7 @@ void* malloc(size_t size) {
 	return 0;
 }
 
-bool canAllocate(size_t size) {
+bool acanAllocate(size_t size) {
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
 		if (freeBlocks.get(i)->size >= size) {
 			return true;
@@ -118,7 +118,7 @@ bool canAllocate(size_t size) {
 	return false;
 }
 
-uint64 availableMemory() {
+uint64 aavailableMemory() {
 	uint64 availableMemory = 0;
 
 	for (uint64 i = 0; i < freeBlocks.size(); i++) {
@@ -128,7 +128,7 @@ uint64 availableMemory() {
 	return availableMemory;
 }
 
-void free(void* location, size_t size) {
+void afree(void* location, size_t size) {
 	if (freeBlocks.isEmpty()) {
 		// we must manually allocate memory since we have no available blocks
 
@@ -144,8 +144,9 @@ void free(void* location, size_t size) {
 		Element<Block*>* element = (Element<Block*>*) ((uint64) location
 				+ blockSize);
 		element->value = block;
+		element->next = 0;
 
-		freeBlocks.add(element);
+		freeBlocks.addElement(element);
 	} else {
 		uint64 potentialSizeIndex = 0;
 
@@ -202,9 +203,9 @@ void free(void* location, size_t size) {
 
 		// could not align to another block, we need another block
 		Block* newBlock = (Block*) malloc(sizeof(Block));
-
 		newBlock->location = location;
 		newBlock->size = size;
+
 		freeBlocks.add(newBlock, potentialSizeIndex);
 	}
 }

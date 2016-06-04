@@ -20,8 +20,8 @@
 							<targetPlatform id="org.eclipse.cdt.build.core.prefbase.toolchain.442959347.2053690202" name=""/>
 							<builder id="org.eclipse.cdt.build.core.settings.default.builder.403035188" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.2065259022" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs">
-								<option id="org.eclipse.cdt.build.core.settings.holder.libpaths.1130529618" name="Library Paths" superClass="org.eclipse.cdt.build.core.settings.holder.libpaths" valueType="libPaths"/>
-								<option id="org.eclipse.cdt.build.core.settings.holder.libfiles.1301791660" name="Library Files" superClass="org.eclipse.cdt.build.core.settings.holder.libfiles" valueType="libFiles"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.libpaths.1130529618" name="Library Paths" superClass="org.eclipse.cdt.build.core.settings.holder.libpaths"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.libfiles.1301791660" name="Library Files" superClass="org.eclipse.cdt.build.core.settings.holder.libfiles"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1086322903" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
 								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1263447164" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols"/>
@@ -32,6 +32,7 @@
 								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1468253507" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/feta/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/mish/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/aura/include}&quot;"/>
 								</option>
 								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1840638203" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols"/>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.952297145" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
@@ -40,6 +41,7 @@
 								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1916826255" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/feta/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/mish/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/aura/include}&quot;"/>
 								</option>
 								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.238064336" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols"/>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.582364243" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>

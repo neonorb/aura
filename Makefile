@@ -7,8 +7,8 @@ CFLAGS=-ffreestanding -fno-exceptions -Wall -Wextra -nostdlib #-Werror # Conside
 LDFLAGS=-T utils/linker.ld -melf_i386
 SOURCES=src/kernel/kernel.cpp src/kernel/gdt.s src/kernel/idt.s src/utils/linker.ld src/boot/boot.s # This will likely increase
 OUT=build/kernel.o build/boot.o build/gdt.o build/idt.o
-INCLUDE=-I"../mish/include" -I"../feta/include"
-LIBS=-L"../feta/Debug" -lfeta #../feta/Debug/libfeta.a #-L"../feta/Debug" -L"../mish/Debug" -lmish -lfeta
+INCLUDE=-I "include" -I"../mish/include" -I"../feta/include"
+LIBS=-L"../feta/Debug" -L"../mish/Debug" -lmish -lfeta
 
 all: compile
 compile: private DFLAGS = $(if $(DEBUGGING), -g -Og, -O2)

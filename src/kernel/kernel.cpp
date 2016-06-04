@@ -23,13 +23,12 @@
 #include "gdt.cpp"
 #include "idt.cpp"
 
-#include "memory.cpp"
 #include "../modules/clock/clock.cpp"
 #include "../modules/screen/screen.cpp"
 #include "../modules/keyboard/keyboard.cpp"
 
 #include "../implementation/implementation.cpp"
-
+#include "liballoc.cpp"
 #include "ports.cpp"
 
 extern "C" void kernel_main(multiboot_info_t* mbd) {
