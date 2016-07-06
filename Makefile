@@ -34,8 +34,8 @@ test-debug:
 	DEBUGGING=true make run
 debug: $(SOURCES)
 	DEBUGGING=true make compile
-	DEBUGGING=true make run 
-	
+	DEBUGGING=true make run
+
 build/kernel.elf: elf
 elf: $(OUT)
 	ld $(LDFLAGS) $(OUT) $(LIBS) -o build/kernel.elf
@@ -51,5 +51,5 @@ iso: build/kernel.elf
 			-boot-info-table					\
 			-o build/aura.iso				   \
 			iso
-clean: 
+clean:
 	rm build/*o build/*bin build/*elf build/*iso

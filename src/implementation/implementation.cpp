@@ -9,6 +9,6 @@ void implementation() {
 #ifdef TESTING
 	test();
 #else
-	auramain();
+	auraMain();
 #endif
 }

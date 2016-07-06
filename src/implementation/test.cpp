@@ -8,10 +8,13 @@
 #ifdef TESTING
 #include <memory.h>
 #include <list.h>
+#include <stack.h>
 #include <log.h>
 
-void breakpoint() {
-	log("breakpoint");
+static void assert(bool b, String message) {
+	if(!b) {
+		crash(message);
+	}
 }
 
 static void memory() {
@@ -32,10 +35,6 @@ static void memory() {
 		blocks.add(newLocation);
 		maxBlockCount++;
 		usedMemory += blockSize;
-
-		if(i == 0xa5d) {
-			breakpoint();
-		}
 	}
 
 	// free every other
@@ -52,10 +51,8 @@ static void memory() {
 
 	void* testMemory = malloc(maxBlockCount * blockSize);
 
-	if(testMemory == 0) {
-		// our blocks didn't merge correctly
-		crash("cannot allocate the whole memory");
-	}
+	// our blocks didn't merge correctly
+	assert(testMemory == 0, "cannot allocate the whole memory");
 
 	free(testMemory);
 
@@ -71,9 +68,57 @@ static void memory() {
 	}
 }
 
+static void list() {
+	log("  - list");
+
+	List<int> list = List<int>();
+
+	assert(list.size() == 0, "list size is not 0");
+
+	list.add(5);
+	assert(list.size() == 1, "list size is not 1");
+	assert(list.get(0) == 5, "value @ 0 is not 5");
+
+	assert(list.remove((unsigned long long int) 0) == 5, "removed value is not 5");
+	assert(list.size() == 0, "list size is not 0 (2)");
+
+	list.add(10);
+	list.add(11);
+	list.add(12);
+	assert(list.size() == 3, "list size is not 3");
+	assert(list.get(2) == 12, "value @ 2 is not 12");
+
+	list.destroy();
+}
+
+static void stack() {
+	log("  - stack");
+
+	Stack<int> stack = Stack<int>();
+
+	assert(stack.size() == 0, "stack size is not 0");
+
+	stack.push(5);
+	assert(stack.size() == 1, "stack size is not 1");
+	assert(stack.peek() == 5, "peeked value is not 5");
+
+	assert(stack.pop() == 5, "popped value is not 5");
+	assert(stack.size() == 0, "stack size is not 0 (2)");
+
+	stack.push(10);
+	stack.push(11);
+	stack.push(12);
+	assert(stack.size() == 3, "stack size is not 3");
+	assert(stack.peek() == 12, "peeked value is not 12");
+
+	stack.destroy();
+}
+
 void test() {
 	log(" -- TESTING -- ");
 	memory();
+	list();
+	stack();
 	log(" -- TESTS PASSED --");
 }
 
