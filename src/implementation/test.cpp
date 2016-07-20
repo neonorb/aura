@@ -71,7 +71,7 @@ static void memory() {
 static void list() {
 	log("  - list");
 
-	List<int> list = List<int>();
+	List<char> list = List<char>();
 
 	assert(list.size() == 0, "list size is not 0");
 
@@ -79,14 +79,76 @@ static void list() {
 	assert(list.size() == 1, "list size is not 1");
 	assert(list.get(0) == 5, "value @ 0 is not 5");
 
+	Iterator<char>* iterator = list.iterator();
+	char value;
+	bool didFirst = false;
+	while((value = iterator->next()) != NULL) {
+		didFirst = true;
+		debug("iterator value", value);
+		assert(value == 5, "iterator value is not 5");
+	}
+	assert(didFirst, "iterator didn't do first");
+
 	assert(list.remove((unsigned long long int) 0) == 5, "removed value is not 5");
 	assert(list.size() == 0, "list size is not 0 (2)");
 
-	list.add(10);
-	list.add(11);
-	list.add(12);
-	assert(list.size() == 3, "list size is not 3");
-	assert(list.get(2) == 12, "value @ 2 is not 12");
+	debug("list size", list.size());
+	list.add('a');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	list.add('b');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	list.add('c');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	debug("value @ 2", list.get(2));
+	list.add('d');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	debug("value @ 2", list.get(2));
+	debug("value @ 3", list.get(3));
+	list.add('e');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	debug("value @ 2", list.get(2));
+	debug("value @ 3", list.get(3));
+	debug("value @ 4", list.get(4));
+	list.add('f');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	debug("value @ 2", list.get(2));
+	debug("value @ 3", list.get(3));
+	debug("value @ 4", list.get(4));
+	debug("value @ 5", list.get(5));
+	list.add('g');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	debug("value @ 2", list.get(2));
+	debug("value @ 3", list.get(3));
+	debug("value @ 4", list.get(4));
+	debug("value @ 5", list.get(5));
+	debug("value @ 6", list.get(6));
+	list.add('h');
+	debug("list size", list.size());
+	debug("value @ 0", list.get(0));
+	debug("value @ 1", list.get(1));
+	debug("value @ 2", list.get(2));
+	debug("value @ 3", list.get(3));
+	debug("value @ 4", list.get(4));
+	debug("value @ 5", list.get(5));
+	debug("value @ 6", list.get(6));
+	debug("value @ 7", list.get(7));
+
+	assert(list.size() == 8, "list size is not 3");
+	assert(list.get(2) == 'c', "value @ 2 is not c");
+	assert(list.get(7) == 'h', "value @ 7 is not h");
 
 	list.destroy();
 }
@@ -108,10 +170,23 @@ static void stack() {
 	stack.push(10);
 	stack.push(11);
 	stack.push(12);
+	stack.push(13);
+	assert(stack.size() == 4, "stack size is not 4");
+	assert(stack.peek() == 13, "peeked value is not 13");
+
+	stack.pop();
 	assert(stack.size() == 3, "stack size is not 3");
-	assert(stack.peek() == 12, "peeked value is not 12");
 
 	stack.destroy();
+}
+
+static void string() {
+	log("  - string");
+
+	String first = substring("__print", 2, 7);
+	String second = "print";
+
+	assert(strequ(first, second), "String not equal");
 }
 
 void test() {
@@ -119,6 +194,7 @@ void test() {
 	memory();
 	list();
 	stack();
+	string();
 	log(" -- TESTS PASSED --");
 }
 

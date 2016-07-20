@@ -25,7 +25,7 @@ compile: $(SOURCES)
 
 run: private DFLAGS = $(if $(DEBUGGING),-s -S)
 run: build/aura.bin
-	qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin
+	qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin -m 2
 test:
 	TESTING=true make compile
 	TESTING=true make run

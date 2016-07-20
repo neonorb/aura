@@ -16,17 +16,14 @@ Value* printSyscallFunction(List<Value*>* arguments){
 void auraMain() {
 	log("Starting Aura");
 
-
-	Syscall* printSyscall = new Syscall("print", &printSyscallFunction);
+	Function* printSyscall = new Function("print", printSyscallFunction);
 	mish_addSyscall(printSyscall);
 
-	//while (true) {
-		log("compiling");
-		Code* code = mish_compile("__print('hi')");
-		log("executing");
+	while (true) {
+		Code* code = mish_compile("__print('Hello world!')");
 		code->execute();
 		delete code->destroy();
-	//}
+	}
 
 	delete printSyscall->destroy();
 }

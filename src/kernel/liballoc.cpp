@@ -2,6 +2,7 @@
 #include <liballoc.h>
 #include <int.h>
 #include <string.h>
+#include <log.h>
 
 void crash(String message);
 
@@ -49,7 +50,7 @@ void memory_init(multiboot_info_t* mbd) {
 		}
 	}
 
-	l_pageSize = 1000;//memorySize;
+	l_pageSize = memorySize;
 }
 
 bool allocated = false;
@@ -593,6 +594,11 @@ void* malloc(size_t req_size) {
 	liballoc_dump();
 	FLUSH();
 #endif
+
+	debug("out of memory");
+	debug("needed", req_size);
+	crash("out of memory");
+
 	return NULL;
 }
 
