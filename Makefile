@@ -3,7 +3,7 @@
 
 CC=i686-elf-g++ # Both the compiler and assembler need crosscompiled http://wiki.osdev.org/GCC_Cross-Compiler
 AS=nasm
-CFLAGS=-ffreestanding -fno-exceptions -Wall -Wextra -nostdlib #-Werror # Considering removing Werror as it can be annoying
+CFLAGS=-ffreestanding -fno-exceptions -Wall -Wextra -nostdlib -fno-rtti #-Werror # Considering removing Werror as it can be annoying
 LDFLAGS=-T utils/linker.ld -melf_i386
 SOURCES=src/kernel/kernel.cpp src/kernel/gdt.s src/kernel/idt.s src/utils/linker.ld src/boot/boot.s # This will likely increase
 OUT=build/kernel.o build/boot.o build/gdt.o build/idt.o
@@ -25,7 +25,7 @@ compile: $(SOURCES)
 
 run: private DFLAGS = $(if $(DEBUGGING),-s -S)
 run: build/aura.bin
-	qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin -m 2
+	qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin -m 1161K
 test:
 	TESTING=true make compile
 	TESTING=true make run

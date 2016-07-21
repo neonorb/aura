@@ -5,7 +5,7 @@
 #include <syscall.h>
 #include <value.h>
 
-Value* printSyscallFunction(List<Value*>* arguments){
+Value* printSyscallFunction(List<Value*>* arguments) {
 	String toPrint = ((StringValue*) arguments->get(0))->value;
 
 	log(toPrint);
@@ -16,14 +16,23 @@ Value* printSyscallFunction(List<Value*>* arguments){
 void auraMain() {
 	log("Starting Aura");
 
+	//debug("-----------------------------");
+	//dumpAllocated();
+	//debug("-----------------------------");
+
 	Function* printSyscall = new Function("print", printSyscallFunction);
 	mish_addSyscall(printSyscall);
 
 	while (true) {
 		Code* code = mish_compile("__print('Hello world!')");
 		code->execute();
-		delete code->destroy();
+		delete code;
 	}
 
-	delete printSyscall->destroy();
+	mish_getSyscalls().remove(printSyscall);
+	delete printSyscall;
+
+	//debug("-----------------------------");
+	//dumpAllocated();
+	//debug("-----------------------------");
 }

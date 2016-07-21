@@ -10,6 +10,7 @@
 #include <list.h>
 #include <stack.h>
 #include <log.h>
+#include <functioncallvoid.h>
 
 static void assert(bool b, String message) {
 	if(!b) {
@@ -71,7 +72,7 @@ static void memory() {
 static void list() {
 	log("  - list");
 
-	List<char> list = List<char>();
+	List<char> list;
 
 	assert(list.size() == 0, "list size is not 0");
 
@@ -79,10 +80,10 @@ static void list() {
 	assert(list.size() == 1, "list size is not 1");
 	assert(list.get(0) == 5, "value @ 0 is not 5");
 
-	Iterator<char>* iterator = list.iterator();
+	Iterator<char> iterator = list.iterator();
 	char value;
 	bool didFirst = false;
-	while((value = iterator->next()) != NULL) {
+	while((value = iterator.next()) != NULL) {
 		didFirst = true;
 		debug("iterator value", value);
 		assert(value == 5, "iterator value is not 5");
@@ -149,14 +150,12 @@ static void list() {
 	assert(list.size() == 8, "list size is not 3");
 	assert(list.get(2) == 'c', "value @ 2 is not c");
 	assert(list.get(7) == 'h', "value @ 7 is not h");
-
-	list.destroy();
 }
 
 static void stack() {
 	log("  - stack");
 
-	Stack<int> stack = Stack<int>();
+	Stack<int> stack;
 
 	assert(stack.size() == 0, "stack size is not 0");
 
@@ -176,8 +175,6 @@ static void stack() {
 
 	stack.pop();
 	assert(stack.size() == 3, "stack size is not 3");
-
-	stack.destroy();
 }
 
 static void string() {

@@ -53,19 +53,19 @@ void memory_init(multiboot_info_t* mbd) {
 	l_pageSize = memorySize;
 }
 
-bool allocated = false;
+bool allocatedThings = false;
 
 void* liballoc_alloc(size_t pageCount) {
-	if (allocated) {
+	if (allocatedThings) {
 		return 0;
 	} else {
-		allocated = true;
+		allocatedThings = true;
 		return (void*) memoryLocation;
 	}
 }
 
 int liballoc_free(void* location, size_t size) {
-	allocated = false;
+	allocatedThings = false;
 	return 0;
 }
 
