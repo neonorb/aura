@@ -4,9 +4,8 @@
 CC=i686-elf-g++ # Both the compiler and assembler need crosscompiled http://wiki.osdev.org/GCC_Cross-Compiler
 AS=nasm
 CFLAGS=-ffreestanding -fno-exceptions -Wall -Wextra -nostdlib -fno-rtti #-Werror # Considering removing Werror as it can be annoying
-LDFLAGS=-T utils/linker.ld -melf_i386
-SOURCES=src/kernel/kernel.cpp src/kernel/gdt.s src/kernel/idt.s src/utils/linker.ld src/boot/boot.s # This will likely increase
-OUT=build/kernel.o build/boot.o build/gdt.o build/idt.o
+SOURCES=src/mish/main.mish src/kernel/kernel.cpp src/kernel/gdt.s src/kernel/idt.s src/boot/boot.s # This will likely increase
+OUT=build/mish.o build/kernel.o build/boot.o build/gdt.o build/idt.o
 INCLUDE=-I "include" -I"../mish/include" -I"../feta/include"
 LIBS=-L"../feta/Debug" -L"../mish/Debug" -lmish -lfeta
 
@@ -17,15 +16,16 @@ compile: $(SOURCES)
 	$(AS) -f elf src/boot/boot.s -o build/boot.o
 	$(AS) -f elf src/kernel/gdt.s -o build/gdt.o
 	$(AS) -f elf src/kernel/idt.s -o build/idt.o
+	objcopy -I binary -O elf32-i386 -B i386 --rename-section .data=.mish src/mish/main.mish build/mish.o
 	$(CC) -c src/kernel/kernel.cpp -o build/kernel.o $(CFLAGS) $(DFLAGS) $(INCLUDE) $(TFLAGS)
-	$(CC) -T src/utils/linker.ld $(CFLAGS) $(DFLAGS) $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS) $(TFLAGS)
+	$(CC) -T make/linker.ld $(CFLAGS) $(DFLAGS) $(OUT) $(INCLUDE) -o build/aura.bin $(LIBS) $(TFLAGS)
 	@echo
 	@echo Compiation of Aura succeeded, boot with \"make run\"
 	@echo
 
 run: private DFLAGS = $(if $(DEBUGGING),-s -S)
 run: build/aura.bin
-	qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin -m 1161K
+	qemu-system-i386 -serial stdio $(DFLAGS) -kernel build/aura.bin
 test:
 	TESTING=true make compile
 	TESTING=true make run
@@ -38,7 +38,7 @@ debug: $(SOURCES)
 
 build/kernel.elf: elf
 elf: $(OUT)
-	ld $(LDFLAGS) $(OUT) $(LIBS) -o build/kernel.elf
+	ld -T make/linker.ld -melf_i386 $(OUT) $(LIBS) -o build/kernel.elf
 iso: build/kernel.elf
 	cp build/kernel.elf iso/boot/kernel.elf
 	genisoimage -R							  \
