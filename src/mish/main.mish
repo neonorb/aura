@@ -1,2 +1,1 @@
-  __print  ; (   'Hello world from a .mish file!'   )     
-      __print  ('new line!');__print('another')
+__print('Hello world!' 'second message')

@@ -81,9 +81,9 @@ static void list() {
 	assert(list.get(0) == 5, "value @ 0 is not 5");
 
 	Iterator<char> iterator = list.iterator();
-	char value;
 	bool didFirst = false;
-	while((value = iterator.next()) != NULL) {
+	while(iterator.hasNext()) {
+		char value = iterator.next();
 		didFirst = true;
 		debug("iterator value", value);
 		assert(value == 5, "iterator value is not 5");

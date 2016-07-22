@@ -30,7 +30,6 @@ static void putEntryAt(char c, uint8 color, size_t x, size_t y) {
 static void shiftUp() {
 	for (unsigned int i = VGA_TEXT_WIDTH; i < VGA_TEXT_WIDTH * VGA_TEXT_HEIGHT;
 			i += VGA_TEXT_WIDTH) {
-		// FIXME when shifting up, only the left half of the screen is moved
 		memcpy((uint8*) &terminalBuffer[i - VGA_TEXT_WIDTH],
 				(uint8*) &terminalBuffer[i], VGA_TEXT_WIDTH * 2);
 	}
@@ -59,9 +58,8 @@ static void backup() {
 static void putChar(char c) {
 	if (c == '\n') {
 		// new line
-		for (size_t x = terminalColumn; x < VGA_TEXT_WIDTH; x++) {
-			putChar(' ');
-		}
+		terminalColumn = VGA_TEXT_WIDTH - 1;
+		putChar(' ');
 		return;
 	} else if (c == 8) {
 		// backspace
@@ -73,6 +71,7 @@ static void putChar(char c) {
 		for (int i = 0; i < TAB_SIZE; i++) { // FIXME backspacing will only delete part of the tab, not a real tab
 			putChar(' ');
 		}
+		return;
 	} else {
 		// regular characters
 		putEntryAt(c, terminalColor, terminalColumn, terminalRow);
@@ -105,26 +104,7 @@ void vga_terminal_writeString(const char* data) {
 	size_t datalen = strlen((char*) data);
 	for (size_t i = 0; i < datalen; i++) {
 		char c = data[i];
-		if (c == '\n') {
-			// new line
-			for (size_t x = terminalColumn; x < VGA_TEXT_WIDTH; x++) {
-				putChar(' ');
-			}
-		} else if (c == 8) {
-			// backspace
-			//backup();
-			terminalRow = 0;
-			terminalColumn = 0;
-			putChar(' ');
-		} else if (c == 9) {
-			// tab
-			for (int i = 0; i < TAB_SIZE; i++) { // FIXME backspacing will only delete part of the tab, not a real tab
-				putChar(' ');
-			}
-		} else {
-			// regular characters
-			putChar(c);
-		}
+		putChar(c);
 	}
 }
 
