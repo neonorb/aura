@@ -17,8 +17,9 @@
 
 #include <log.h>
 #include <stddef.h>
+
+#include "../utils/utils.cpp"
 #include "ports.h"
-#include "../utils/utils.h"
 
 
 uint32_t *SMI_CMD;

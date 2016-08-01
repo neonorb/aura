@@ -15,6 +15,7 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <int.h>
+#include <utils/utils.h>
 
 extern "C" void gdt_flush(uint8* gdt);
 extern "C" void tss_flush();

@@ -5,11 +5,11 @@
  *      Author: chris
  */
 
-#include "../utils/utils.h"
 #include <memory.h>
 #include <list.h>
 #include <errors.h>
 #include <log.h>
+#include "../utils/utils.cpp"
 
 typedef struct {
 	void* location;

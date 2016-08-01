@@ -21,7 +21,7 @@ static void assert(bool b, String message) {
 static void memory() {
 	log("  - memory");
 
-	// test merging of free blocks
+	// test merging of destroy blocks
 	const uint32 blockSize = 100000;
 
 	uint64 maxBlockCount = 0;
@@ -29,7 +29,7 @@ static void memory() {
 	List<void*> blocks;
 
 	for(uint64 i = 0; true; i++) {
-		void* newLocation = malloc(blockSize);
+		void* newLocation = create(blockSize);
 		if(newLocation == 0) {
 			break;
 		}
@@ -38,24 +38,24 @@ static void memory() {
 		usedMemory += blockSize;
 	}
 
-	// free every other
+	// destroy every other
 	for(uint64 i = blocks.size() - 1; i -2 < i && i >= 0; i -= 2) {
-		free(blocks.remove(i));
+		destroy(blocks.remove(i));
 
 		if(i - 2 > i) break; // check for underflow
 	}
 
-	// free the rest
+	// destroy the rest
 	for(uint64 i = blocks.size() - 1; i - 1 < i && i >= 0; i--) {
-		free(blocks.remove(i));
+		destroy(blocks.remove(i));
 	}
 
-	void* testMemory = malloc(maxBlockCount * blockSize);
+	void* testMemory = create(maxBlockCount * blockSize);
 
 	// our blocks didn't merge correctly
 	assert(testMemory == 0, "cannot allocate the whole memory");
 
-	free(testMemory);
+	destroy(testMemory);
 
 	for (uint64 i = 0; i < 1000; i++) {
 		String x = dynamicString("0123456789");
@@ -64,8 +64,8 @@ static void memory() {
 			y[i] = 'x';
 		}
 
-		// ---------------------- when this is commented out, the thing "runs of of memory" after a few allocations, works fine when it is freed --------------
-		free((void*) x);
+		// ---------------------- when this is commented out, the thing "runs of of memory" after a few allocations, works fine when it is destroyd --------------
+		destroy((void*) x);
 	}
 }
 

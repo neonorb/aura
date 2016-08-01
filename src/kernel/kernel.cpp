@@ -14,22 +14,20 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include "../boot/multiboot.h"
+#include <memory.h>
+#include <kernel/liballoc.h>
 
-#include "../utils/utils.h"
+#include <utils/utils.h>
 
-#include "log.cpp"
 
-#include "gdt.cpp"
-#include "idt.cpp"
+#include <kernel/gdt.h>
+#include <kernel/idt.h>
 
-#include "../modules/clock/clock.cpp"
-#include "../modules/screen/screen.cpp"
-#include "../modules/keyboard/keyboard.cpp"
+#include <modules/screen/screen.h>
+#include <modules/clock/clock.h>
+#include <modules/keyboard/keyboard.h>
 
-#include "../implementation/implementation.cpp"
-#include "liballoc.cpp"
-#include "ports.cpp"
+#include <implementation/implementation.h>
 
 extern "C" void kernel_main(multiboot_info_t* mbd) {
 	cli();

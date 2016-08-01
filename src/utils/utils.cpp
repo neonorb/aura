@@ -1,10 +1,6 @@
-#ifndef UTILS_H_
-#define UTILS_H_
+#include <utils.h>
 
-#include <int.h>
 #include <log.h>
-#include <string.h>
-#include <memory.h>
 
 void cli() {
 	asm("cli");
@@ -369,5 +365,3 @@ int rand() { // RAND_MAX assumed to be 32767
 int random(int min, int max) {
 	return rand() % (max - min) + min;
 }
-
-#endif /* UTILS_H_ */

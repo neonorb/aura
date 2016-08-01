@@ -1,7 +1,8 @@
 #include <int.h>
 
 #include "keyboard.h"
-#include "../../utils/utils.h"
+
+#include "../../utils/utils.cpp"
 #include "ps2.cpp"
 
 static KeyboardHandler keyboardHandler;

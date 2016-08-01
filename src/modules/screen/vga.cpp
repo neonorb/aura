@@ -3,8 +3,8 @@
 
 #include "vga.h"
 
-#include "../../utils/utils.h"
 #include "../../kernel/ports.h"
+#include "../../utils/utils.cpp"
 
 // TODO externalize this
 static uint8 TAB_SIZE = 2;
