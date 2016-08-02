@@ -1,4 +1,4 @@
-#include <utils.h>
+#include <utils/utils.h>
 
 #include <log.h>
 
@@ -65,7 +65,7 @@ void* memcpy(uint8* dst, const uint8* src, size_t len) {
 	 * the divides and modulos out. Fortunately, it is.
 	 */
 
-	if ((uint32) dst % sizeof(uint32) == 0 && (uint32) src % sizeof(uint32) == 0
+	if ((uint64) dst % sizeof(uint64) == 0 && (uint64) src % sizeof(uint64) == 0
 			&& len % sizeof(long) == 0) {
 
 		uint32* d = (uint32*) dst;

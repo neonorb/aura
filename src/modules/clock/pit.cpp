@@ -1,11 +1,11 @@
-#include <int.h>
+#include <modules/clock/pit.h>
 
-#include "../../kernel/ports.h"
+#include <int.h>
+#include <kernel/ports.h>
+#include <kernel/idt.h>
 #include <log.h>
 
 #define CLOCK_FREQUENCY 60
-
-typedef void (*PITHandler)(void);
 
 static PITHandler pitHandler;
 

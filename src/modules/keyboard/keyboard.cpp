@@ -1,11 +1,14 @@
+#include <modules/keyboard/keyboard.h>
+
 #include <int.h>
+#include <utils/utils.h>
+#include <kernel/idt.h>
 
-#include "keyboard.h"
-
-#include "../../utils/utils.cpp"
-#include "ps2.cpp"
+#include <modules/keyboard/ps2.h>
 
 static KeyboardHandler keyboardHandler;
+
+bool pressedKeys[KEY_COUNT];
 
 uint8 intCount; // FIXME this is a test variable to try to fix the pong moving paddles - remove once fixed
 

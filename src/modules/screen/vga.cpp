@@ -1,10 +1,10 @@
+#include <modules/screen/vga.h>
+
 #include <int.h>
 #include <bool.h>
 
-#include "vga.h"
-
-#include "../../kernel/ports.h"
-#include "../../utils/utils.cpp"
+#include <kernel/ports.h>
+#include <utils/utils.h>
 
 // TODO externalize this
 static uint8 TAB_SIZE = 2;

@@ -14,6 +14,7 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <kernel/gdt.h>
 #include <int.h>
 #include <utils/utils.h>
 
@@ -86,7 +87,7 @@ void gdtSetGate(signed int num, uint32 base, uint32 limit, uint8 access,
 }
 
 static void writeTss(int32 num, uint32 ss0, uint32 esp0) {
-	uint32 base = (uint32) &tssEntry;
+	uint32 base = (uint64) &tssEntry;
 	uint32 limit = base + sizeof(tssEntry);
 
 	gdtSetGate(num, base, limit, 0xE9, 0x00);
@@ -102,7 +103,7 @@ static void writeTss(int32 num, uint32 ss0, uint32 esp0) {
 
 void gdt_init() {
 	gdtPointer.limit = (sizeof(GDTEntry) * 6) - 1;
-	gdtPointer.base = (uint32) &gdtEntries;
+	gdtPointer.base = (uint64) &gdtEntries;
 
 	gdtSetGate(0, 0, 0, 0, 0);                // Null segment
 	gdtSetGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment

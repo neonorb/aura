@@ -1,8 +1,9 @@
 #include <memory.h>
-#include <liballoc.h>
+#include <kernel/liballoc.h>
 #include <int.h>
 #include <string.h>
 #include <log.h>
+#include <utils/utils.h>
 
 void crash(String message);
 
@@ -32,8 +33,8 @@ void memory_init(multiboot_info_t* mbd) {
 	uint64 kernelSize = &kernelEnd - &kernelStart;
 
 	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
-	while ((uint32) mmap < mbd->mmap_addr + mbd->mmap_length) {
-		mmap = (memory_map_t*) ((unsigned int) mmap + mmap->size
+	while ((uint64) mmap < mbd->mmap_addr + mbd->mmap_length) {
+		mmap = (memory_map_t*) ((uint64) mmap + mmap->size
 				+ sizeof(unsigned int));
 
 		if (mmap->type == 1) { // memory is useable

@@ -1,10 +1,10 @@
-#include "clock.h"
+#include <modules/clock/clock.h>
 
-#include "../../kernel/ports.h"
+#include <kernel/ports.h>
 #include <log.h>
-#include "pit.cpp"
 
-#include "rtc.cpp"
+#include <modules/clock/pit.h>
+#include <modules/clock/rtc.h>
 
 static ClockHandler clockHandler;
 

@@ -1,10 +1,10 @@
+#include <modules/clock/rtc.h>
+
 #include <int.h>
 
-#include "../../kernel/ports.h"
+#include <kernel/ports.h>
 #include <log.h>
-#include "../../kernel/idt.h"
-
-typedef void (*RTCHandler)(void);
+#include <kernel/idt.h>
 
 static RTCHandler rtcHandler;
 

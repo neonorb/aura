@@ -14,9 +14,12 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <kernel/idt.h>
+
 #include <int.h>
 #include <kernel/ports.h>
-#include <kernel/idt.h>
+#include <log.h>
+#include <utils/utils.h>
 
 /*********** ------------------------- THIS CRAP WILL BE REMOVED LATER ---------------------------- *********************/
 
@@ -74,42 +77,18 @@ void printk(int severity, char* type, const char* fmt, ...) {
 
 /********************** ------------------------- END TO REMOVE CRAP ------------------- **********************/
 
-#define IRQ0 32
-#define IRQ1 33
-#define IRQ2 34
-#define IRQ3 35
-#define IRQ4 36
-#define IRQ5 37
-#define IRQ6 38
-#define IRQ7 39
-#define IRQ8 40
-#define IRQ9 41
-#define IRQ10 42
-#define IRQ11 43
-#define IRQ12 44
-#define IRQ13 45
-#define IRQ14 46
-#define IRQ15 47
-
 struct idt_entry {
-	unsigned short base_lo;
-	unsigned short sel; /* Our kernel segment goes here! */
-	unsigned char always0; /* This will ALWAYS be set to 0! */
-	unsigned char flags; /* Set using the above table! */
-	unsigned short base_hi;
+	uint16 base_lo;
+	uint16 sel; /* Our kernel segment goes here! */
+	uint8 always0; /* This will ALWAYS be set to 0! */
+	uint8 flags; /* Set using the above table! */
+	uint16 base_hi;
 }__attribute__((packed));
 
 struct idt_ptr {
-	unsigned short limit;
-	unsigned int base;
+	uint16 limit;
+	uint32 base;
 }__attribute__((packed));
-
-typedef struct regs {
-	unsigned int gs, fs, es, ds; /* pushed the segs last */
-	unsigned int edi, esi, ebp, useless_value, ebx, edx, ecx, eax; /* pushed by pusha. useless value is esp */
-	unsigned int int_no, err_code; /* our 'push byte #' and ecodes do this */
-	unsigned int eip, cs, eflags, useresp, ss; /* pushed by the processor automatically */
-} registers_t;
 
 ///Installs all irqs
 void irq_install();
@@ -168,52 +147,49 @@ extern "C" void irq15();
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
 		unsigned char flags);
 extern "C" void idt_flush();
-typedef void (*interrupt_handler_t)(registers_t *);
-void register_interrupt_handler(uint8 n, interrupt_handler_t h); //TODO: Rename to a more x86 specific name
-void deregister_interrupt_handler(uint8 n);
 
 struct idt_entry idt_entries[256];
 struct idt_ptr idt_ptr;
 
 ///Inits interrupt services
 void idt_init_isrs() {
-	idt_set_gate(0, (unsigned) isr0, 0x08, 0x8E);
-	idt_set_gate(1, (unsigned) isr1, 0x08, 0x8E);
-	idt_set_gate(2, (unsigned) isr2, 0x08, 0x8E);
-	idt_set_gate(3, (unsigned) isr3, 0x08, 0x8E);
-	idt_set_gate(4, (unsigned) isr4, 0x08, 0x8E);
-	idt_set_gate(5, (unsigned) isr5, 0x08, 0x8E);
-	idt_set_gate(6, (unsigned) isr6, 0x08, 0x8E);
-	idt_set_gate(7, (unsigned) isr7, 0x08, 0x8E);
+	idt_set_gate(0, (uint64) isr0, 0x08, 0x8E);
+	idt_set_gate(1, (uint64) isr1, 0x08, 0x8E);
+	idt_set_gate(2, (uint64) isr2, 0x08, 0x8E);
+	idt_set_gate(3, (uint64) isr3, 0x08, 0x8E);
+	idt_set_gate(4, (uint64) isr4, 0x08, 0x8E);
+	idt_set_gate(5, (uint64) isr5, 0x08, 0x8E);
+	idt_set_gate(6, (uint64) isr6, 0x08, 0x8E);
+	idt_set_gate(7, (uint64) isr7, 0x08, 0x8E);
 
-	idt_set_gate(8, (unsigned) isr8, 0x08, 0x8E);
-	idt_set_gate(9, (unsigned) isr9, 0x08, 0x8E);
-	idt_set_gate(10, (unsigned) isr10, 0x08, 0x8E);
-	idt_set_gate(11, (unsigned) isr11, 0x08, 0x8E);
-	idt_set_gate(12, (unsigned) isr12, 0x08, 0x8E);
-	idt_set_gate(13, (unsigned) isr13, 0x08, 0x8E);
-	idt_set_gate(14, (unsigned) isr14, 0x08, 0x8E);
-	idt_set_gate(15, (unsigned) isr15, 0x08, 0x8E);
+	idt_set_gate(8, (uint64) isr8, 0x08, 0x8E);
+	idt_set_gate(9, (uint64) isr9, 0x08, 0x8E);
+	idt_set_gate(10, (uint64) isr10, 0x08, 0x8E);
+	idt_set_gate(11, (uint64) isr11, 0x08, 0x8E);
+	idt_set_gate(12, (uint64) isr12, 0x08, 0x8E);
+	idt_set_gate(13, (uint64) isr13, 0x08, 0x8E);
+	idt_set_gate(14, (uint64) isr14, 0x08, 0x8E);
+	idt_set_gate(15, (uint64) isr15, 0x08, 0x8E);
 
-	idt_set_gate(16, (unsigned) isr16, 0x08, 0x8E);
-	idt_set_gate(17, (unsigned) isr17, 0x08, 0x8E);
-	idt_set_gate(18, (unsigned) isr18, 0x08, 0x8E);
-	idt_set_gate(19, (unsigned) isr19, 0x08, 0x8E);
-	idt_set_gate(20, (unsigned) isr20, 0x08, 0x8E);
-	idt_set_gate(21, (unsigned) isr21, 0x08, 0x8E);
-	idt_set_gate(22, (unsigned) isr22, 0x08, 0x8E);
-	idt_set_gate(23, (unsigned) isr23, 0x08, 0x8E);
+	idt_set_gate(16, (uint64) isr16, 0x08, 0x8E);
+	idt_set_gate(17, (uint64) isr17, 0x08, 0x8E);
+	idt_set_gate(18, (uint64) isr18, 0x08, 0x8E);
+	idt_set_gate(19, (uint64) isr19, 0x08, 0x8E);
+	idt_set_gate(20, (uint64) isr20, 0x08, 0x8E);
+	idt_set_gate(21, (uint64) isr21, 0x08, 0x8E);
+	idt_set_gate(22, (uint64) isr22, 0x08, 0x8E);
+	idt_set_gate(23, (uint64) isr23, 0x08, 0x8E);
 
-	idt_set_gate(24, (unsigned) isr24, 0x08, 0x8E);
-	idt_set_gate(25, (unsigned) isr25, 0x08, 0x8E);
-	idt_set_gate(26, (unsigned) isr26, 0x08, 0x8E);
-	idt_set_gate(27, (unsigned) isr27, 0x08, 0x8E);
-	idt_set_gate(28, (unsigned) isr28, 0x08, 0x8E);
-	idt_set_gate(29, (unsigned) isr29, 0x08, 0x8E);
-	idt_set_gate(30, (unsigned) isr30, 0x08, 0x8E);
-	idt_set_gate(31, (unsigned) isr31, 0x08, 0x8E);
+	idt_set_gate(24, (uint64) isr24, 0x08, 0x8E);
+	idt_set_gate(25, (uint64) isr25, 0x08, 0x8E);
+	idt_set_gate(26, (uint64) isr26, 0x08, 0x8E);
+	idt_set_gate(27, (uint64) isr27, 0x08, 0x8E);
+	idt_set_gate(28, (uint64) isr28, 0x08, 0x8E);
+	idt_set_gate(29, (uint64) isr29, 0x08, 0x8E);
+	idt_set_gate(30, (uint64) isr30, 0x08, 0x8E);
+	idt_set_gate(31, (uint64) isr31, 0x08, 0x8E);
 	//Syscall
-	idt_set_gate(0x64, (unsigned) isr100, 0x08, 0x8E);
+	idt_set_gate(0x64, (uint64) isr100, 0x08, 0x8E);
 }
 
 ///Sets a gate in the IDT
@@ -315,22 +291,22 @@ void irq_remap(void) {
 
 void irq_install() {
 	irq_remap();
-	idt_set_gate(32, (unsigned) irq0, 0x08, 0x8E);
-	idt_set_gate(33, (unsigned) irq1, 0x08, 0x8E);
-	idt_set_gate(34, (unsigned) irq2, 0x08, 0x8E);
-	idt_set_gate(35, (unsigned) irq3, 0x08, 0x8E);
-	idt_set_gate(36, (unsigned) irq4, 0x08, 0x8E);
-	idt_set_gate(37, (unsigned) irq5, 0x08, 0x8E);
-	idt_set_gate(38, (unsigned) irq6, 0x08, 0x8E);
-	idt_set_gate(39, (unsigned) irq7, 0x08, 0x8E);
-	idt_set_gate(40, (unsigned) irq8, 0x08, 0x8E);
-	idt_set_gate(41, (unsigned) irq9, 0x08, 0x8E);
-	idt_set_gate(42, (unsigned) irq10, 0x08, 0x8E);
-	idt_set_gate(43, (unsigned) irq11, 0x08, 0x8E);
-	idt_set_gate(44, (unsigned) irq12, 0x08, 0x8E);
-	idt_set_gate(45, (unsigned) irq13, 0x08, 0x8E);
-	idt_set_gate(46, (unsigned) irq14, 0x08, 0x8E);
-	idt_set_gate(47, (unsigned) irq15, 0x08, 0x8E);
+	idt_set_gate(32, (uint64) irq0, 0x08, 0x8E);
+	idt_set_gate(33, (uint64) irq1, 0x08, 0x8E);
+	idt_set_gate(34, (uint64) irq2, 0x08, 0x8E);
+	idt_set_gate(35, (uint64) irq3, 0x08, 0x8E);
+	idt_set_gate(36, (uint64) irq4, 0x08, 0x8E);
+	idt_set_gate(37, (uint64) irq5, 0x08, 0x8E);
+	idt_set_gate(38, (uint64) irq6, 0x08, 0x8E);
+	idt_set_gate(39, (uint64) irq7, 0x08, 0x8E);
+	idt_set_gate(40, (uint64) irq8, 0x08, 0x8E);
+	idt_set_gate(41, (uint64) irq9, 0x08, 0x8E);
+	idt_set_gate(42, (uint64) irq10, 0x08, 0x8E);
+	idt_set_gate(43, (uint64) irq11, 0x08, 0x8E);
+	idt_set_gate(44, (uint64) irq12, 0x08, 0x8E);
+	idt_set_gate(45, (uint64) irq13, 0x08, 0x8E);
+	idt_set_gate(46, (uint64) irq14, 0x08, 0x8E);
+	idt_set_gate(47, (uint64) irq15, 0x08, 0x8E);
 	return;
 }
 ///Handles IRQ's
@@ -356,7 +332,7 @@ extern "C" void irq_handler(struct regs *r) {
 
 void init_idt() {
 	idt_ptr.limit = sizeof(struct idt_entry) * 256 - 1;
-	idt_ptr.base = (uint32) &idt_entries;
+	idt_ptr.base = (uint64) &idt_entries;
 
 	memset((uint8*) &idt_entries, 0, sizeof(struct idt_entry) * 256);
 

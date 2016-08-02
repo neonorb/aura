@@ -157,8 +157,6 @@ typedef struct {
 	bool capsLock;
 } KeyEvent;
 
-bool pressedKeys[KEY_COUNT];
-
 void keyboard_keyUpdate(KeyMapping);
 typedef void (*KeyboardHandler)(KeyEvent);
 

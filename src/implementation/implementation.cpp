@@ -1,4 +1,4 @@
-#include "pong.cpp"
+//#include "pong.cpp"
 #include "system/auramain.cpp"
 
 #ifdef TESTING

@@ -1,8 +1,7 @@
+#include <modules/screen/screen.h>
+
 #include <int.h>
-
-#include "screen.h"
-
-#include "vga.cpp"
+#include <modules/screen/vga.h>
 
 // ---- terminal ----
 

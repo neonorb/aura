@@ -17,11 +17,12 @@
 #include <log.h>
 #include <string.h>
 
-#include "../modules/screen/screen.h"
+#include <modules/screen/screen.h>
 
-#include "ports.h"
+#include <kernel/ports.h>
 
-#include "../modules/screen/vga.h" // TODO remove this include
+#include <modules/screen/vga.h> // TODO remove this include
+#include <utils/utils.h>
 
 void log(String message) {
 	log_write(NORMAL, message);
