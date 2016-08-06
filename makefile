@@ -46,7 +46,7 @@ build/uefi.so: build/boot/uefi.o | build/.dirstamp
 		-l:libefi.a                   \
 		-o build/uefi.so
 
-build/uefi.efi: build/uefi.so | build/.dirstamp
+build/aura.efi: build/uefi.so | build/.dirstamp
 	objcopy -j .text            \
 		-j .sdata               \
 		-j .data                \
@@ -57,24 +57,32 @@ build/uefi.efi: build/uefi.so | build/.dirstamp
 		-j .reloc               \
 		--target=efi-app-x86_64 \
 		build/uefi.so           \
-		build/uefi.efi
+		build/aura.efi
 
 .PHONY:
 img: build/aura.img
-build/aura.img: build/uefi.efi | build/.dirstamp
-	dd if=/dev/zero of=build/aura.img bs=512 count=93750
-	parted build/aura.img -s -a minimal mklabel gpt
-	parted build/aura.img -s -a minimal mkpart EFI FAT16 2048s 93716s
-	parted build/aura.img -s -a minimal toggle 1 boot
-	dd if=/dev/zero of=/tmp/part.img bs=512 count=91669
-	mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1
-	mcopy -i /tmp/part.img build/uefi.efi ::uefi.efi
-	dd if=/tmp/part.img of=build/aura.img bs=512 count=91669 seek=2048 conv=notrunc
+build/aura.img: build/aura.efi | build/.dirstamp
+	dd if=/dev/zero of=build/aura.img bs=512 count=93750 # allocate disk
+	parted build/aura.img -s -a minimal mklabel gpt # make gpt table
+	parted build/aura.img -s -a minimal mkpart EFI FAT16 2048s 93716s # make EFI partition
+	parted build/aura.img -s -a minimal toggle 1 boot # make it bootable
+	dd if=/dev/zero of=/tmp/part.img bs=512 count=91669 # allocate partition
+	mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1 # format partition
+	
+	# build FS structure
+	mkdir build/img_root
+	mkdir build/img_root/EFI
+	mkdir build/img_root/EFI/BOOT
+	cp build/aura.efi build/img_root/EFI/BOOT/BOOTX64.efi
+	
+	mcopy -s -i /tmp/part.img build/img_root/* :: # copy FS to partition
+	dd if=/tmp/part.img of=build/aura.img bs=512 count=91669 seek=2048 conv=notrunc # copy parition to disk
+	rm /tmp/part.img # remove tmp partition file
 
-#.PHONY:
-#elf: build/aura.elf
-#build/aura.elf: $(OBJECTS)
-#	ld -T make/linker.ld $(INCLUDE_FLAGS) $(OBJECTS) $(LIBS_FLAGS)
+.PHONY:
+vdi: build/aura.vdi
+build/aura.vdi: build/aura.img
+	vboxmanage convertfromraw --format VDI build/aura.img build/aura.vdi
 
 .PHONY:
 run: private DFLAGS = $(if $(DEBUGGING),-s -S)
