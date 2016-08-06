@@ -73,7 +73,7 @@ build/aura.img: build/aura.efi | build/.dirstamp
 	mkdir build/img_root
 	mkdir build/img_root/EFI
 	mkdir build/img_root/EFI/BOOT
-	cp build/aura.efi build/img_root/EFI/BOOT/BOOTX64.efi
+	cp build/aura.efi build/img_root/EFI/BOOT/BOOTX64.efi # hard coded file name and path
 	
 	mcopy -s -i /tmp/part.img build/img_root/* :: # copy FS to partition
 	dd if=/tmp/part.img of=build/aura.img bs=512 count=91669 seek=2048 conv=notrunc # copy parition to disk
