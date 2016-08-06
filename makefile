@@ -14,7 +14,7 @@ LIBS=feta mish
 -include ../make-base/make-base.mk
 
 MOBJECTS=$(patsubst %, build/%.o, $(MSOURCES))
-OBJECTS:=$(OBJECTS) $(MOBJECTS)
+OBJECTS:=$(OBJECTS) $(MOBJECTS) build/boot/uefi.o
 
 all: $(OBJECTS)
 
@@ -70,6 +70,8 @@ build/aura.img: build/aura.efi | build/.dirstamp
 	parted build/aura.img -s -a minimal toggle 1 boot # make it bootable
 	dd if=/dev/zero of=/tmp/part.img bs=512 count=91669 # allocate partition
 	mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1 # format partition
+	
+	if [ -d "build/img_root" ]; then rm -r build/img_root; fi
 	
 	# build FS structure
 	mkdir build/img_root

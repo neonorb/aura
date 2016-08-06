@@ -29,7 +29,7 @@
 
 #include <implementation/implementation.h>
 
-extern "C" void kernel_main(multiboot_info_t* mbd) {
+extern "C" void kernel_main() {
 	cli();
 
 	screen_terminal_initialize();
