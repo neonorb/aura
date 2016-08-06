@@ -17,9 +17,9 @@
 #include <int.h>
 #include <bool.h>
 
-#include "../modules/screen/screen.h"
-#include "../modules/keyboard/keyboard.h"
-#include "../modules/clock/clock.h"
+#include <modules/screen/screen.h>
+#include <modules/keyboard/keyboard.h>
+#include <modules/clock/clock.h>
 #include <log.h>
 
 #define WIDTH 320

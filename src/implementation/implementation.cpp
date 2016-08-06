@@ -10,5 +10,6 @@ void implementation() {
 	test();
 #else
 	auraMain();
+	//pong();
 #endif
 }
