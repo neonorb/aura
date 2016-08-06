@@ -37,6 +37,6 @@ Refer to the [GNU Coding Standards.](https://www.gnu.org/prep/standards/standard
 View [this](https://rogerdudler.github.io/git-guide/) if you're unfarmilar with using git.
   
 # License
-GPL V3.0 or later (See LICENSE file for details.)
+GPL v3.0 or later (See LICENSE file for details.)
 
 *This document is subject to change*
