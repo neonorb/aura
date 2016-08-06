@@ -58,6 +58,8 @@ build/aura.efi: build/uefi.so | build/.dirstamp
 		--target=efi-app-x86_64 \
 		build/uefi.so           \
 		build/aura.efi
+		
+# ---- output files ----
 
 .PHONY:
 img: build/aura.img
@@ -84,22 +86,24 @@ vdi: build/aura.vdi
 build/aura.vdi: build/aura.img
 	vboxmanage convertfromraw --format VDI build/aura.img build/aura.vdi
 
+#.PHONY:
+#iso: build/aura.iso
+#build/aura.iso: build/aura.elf
+#	cp build/aura.elf iso/boot/aura.elf
+#	genisoimage -R                        \
+#		-b boot/grub/stage2_eltorito      \
+#		-no-emul-boot                     \
+#		-boot-load-size 4                 \
+#		-A os                             \
+#		-input-charset utf8               \
+#		-quiet                            \
+#		-boot-info-table                  \
+#		-o build/aura.iso                 \
+#		iso
+	
+# ---- running ----
+
 .PHONY:
 run: private DFLAGS = $(if $(DEBUGGING),-s -S)
 run: img
 	qemu-system-x86_64 -serial stdio $(DFLAGS) -cpu qemu64 -bios OVMF.fd -drive file=build/aura.img,if=ide
-
-.PHONY:
-iso: build/aura.iso
-build/aura.iso: build/aura.elf
-	cp build/aura.elf iso/boot/aura.elf
-	genisoimage -R                        \
-		-b boot/grub/stage2_eltorito      \
-		-no-emul-boot                     \
-		-boot-load-size 4                 \
-		-A os                             \
-		-input-charset utf8               \
-		-quiet                            \
-		-boot-info-table                  \
-		-o build/aura.iso                 \
-		iso

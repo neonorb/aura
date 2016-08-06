@@ -22,9 +22,20 @@ See the [wiki](http://neonorb.com/wiki/Project_Asiago) for more information.
 + UEFI Support
 
 # Depends
-GNU Toolchain
++ GNU Toolchain (gcc, make)
++ qemu-system-x86_64
 
 Later to use the Mish toolchain.
+
+# Building
+Run `make`.
+
+To get a bootable `.img`, run `make img`.
+
+To get a bootable VDI file, run `make vdi`.
+
+# Running
+If you want to use QEMU, run `make run`.
 
 # Docs
 [OS Dev Wiki](http://wiki.osdev.org/Main_Page)
@@ -39,4 +50,4 @@ View [this](https://rogerdudler.github.io/git-guide/) if you're unfarmilar with 
 # License
 GPL v3.0 or later (See LICENSE file for details.)
 
-*This document is subject to change*
+*This document is subject to change.*
