@@ -21,7 +21,7 @@
 
 #include <kernel/ports.h>
 
-//#include <modules/screen/vga.h> // TODO remove this include
+#include <modules/screen/uefi.h> // TODO remove this include
 #include <utils/utils.h>
 
 void log(String message) {
@@ -38,21 +38,21 @@ void fault(String message) {
 
 void log_write(LogType logType, String message) {
 	switch (logType) {
-	case NORMAL: // TODO change vga color change to screen
-		//vga_terminal_backgroundColor(COLOR_GREEN);
+	case NORMAL: // TODO change uefi color change to screen
+		uefi_terminal_setForegroundColor(EFI_GREEN);
 		screen_terminal_writeString(L"[NORMAL] ");
 		break;
 	case WARNING:
-		//vga_terminal_backgroundColor(COLOR_LIGHT_RED);
+		uefi_terminal_setForegroundColor(EFI_LIGHTRED);
 		screen_terminal_writeString(L"[WARNING] ");
 		break;
 	case FAULT:
-		//vga_terminal_backgroundColor(COLOR_RED);
+		uefi_terminal_setForegroundColor(EFI_RED);
 		screen_terminal_writeString(L"[FAULT] ");
 		break;
 	}
 
-	//vga_terminal_backgroundColor(COLOR_LIGHT_GREY);
+	uefi_terminal_setForegroundColor(EFI_LIGHTGRAY);
 	screen_terminal_writeString(message);
 	screen_terminal_writeString(L"\n\r");
 }
