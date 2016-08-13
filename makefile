@@ -1,12 +1,13 @@
 # Makefile for Aura
 
-CSOURCES=kernel/gdt kernel/idt kernel/kernel kernel/liballoc kernel/log kernel/ports kernel/acpi \
-implementation/implementation \
+CSOURCES=boot/uefi \
+kernel/kernel kernel/liballoc kernel/log kernel/ports \
+implementation/implementation implementation/system/auramain implementation/system/syscalls \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
 modules/keyboard/keyboard modules/keyboard/ps2 \
-modules/screen/screen modules/screen/vga \
+modules/screen/screen modules/screen/uefi \
 utils/utils
-ASOURCES=kernel/gdtasm kernel/idtasm boot/boot
+ASOURCES=#kernel/gdtasm kernel/idtasm boot/boot
 MSOURCES=mish/main
 
 LIBS=feta mish
@@ -14,27 +15,16 @@ LIBS=feta mish
 -include ../make-base/make-base.mk
 
 MOBJECTS=$(patsubst %, build/%.o, $(MSOURCES))
-OBJECTS:=$(OBJECTS) $(MOBJECTS) build/boot/uefi.o
+OBJECTS:=$(OBJECTS) $(MOBJECTS)
+INCLUDE_FLAGS:=$(INCLUDE_FLAGS) -I gnu-efi/headers -I gnu-efi/headers/x86_64
 
 all: $(OBJECTS)
 
 build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
-	objcopy -I binary -O elf32-i386 -B i386 --rename-section .data=.mish $^ $@
+	objcopy -I binary -O elf64-x86-64 -B i386 --rename-section .data=.mish $^ $@
 
-build/boot/uefi.o: src/boot/uefi.c | build/boot/.dirstamp
-	gcc src/boot/uefi.c           \
-		-c                        \
-		-fno-stack-protector      \
-		-fpic                     \
-		-fshort-wchar             \
-		-mno-red-zone             \
-		-I gnu-efi/headers        \
-		-I gnu-efi/headers/x86_64 \
-		-DEFI_FUNCTION_WRAPPER    \
-		-o build/boot/uefi.o
-
-build/uefi.so: build/boot/uefi.o | build/.dirstamp
-	ld build/boot/uefi.o              \
+build/aura.so: $(OBJECTS) | build/.dirstamp
+	ld $(OBJECTS)              \
 		gnu-efi/crt0-efi-x86_64.o     \
 		-nostdlib                     \
 		-znocombreloc                 \
@@ -44,9 +34,10 @@ build/uefi.so: build/boot/uefi.o | build/.dirstamp
 		-L gnu-efi/libs               \
 		-l:libgnuefi.a                \
 		-l:libefi.a                   \
-		-o build/uefi.so
+		$(LIBS_FLAGS)                 \
+		-o build/aura.so
 
-build/aura.efi: build/uefi.so | build/.dirstamp
+build/aura.efi: build/aura.so | build/.dirstamp
 	objcopy -j .text            \
 		-j .sdata               \
 		-j .data                \
@@ -55,8 +46,9 @@ build/aura.efi: build/uefi.so | build/.dirstamp
 		-j .rel                 \
 		-j .rela                \
 		-j .reloc               \
+		-j .mish                \
 		--target=efi-app-x86_64 \
-		build/uefi.so           \
+		build/aura.so           \
 		build/aura.efi
 		
 # ---- output files ----

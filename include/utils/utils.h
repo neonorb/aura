@@ -17,7 +17,7 @@ void sti();
 
 int array_length_char(char a[]);
 
-String toString(int value, char* str, int base);
+String toString(int value, wchar_t* str, int base);
 
 void* memcpy(uint8* dst, const uint8* src, size_t len);
 

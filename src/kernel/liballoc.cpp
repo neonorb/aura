@@ -4,16 +4,10 @@
 #include <string.h>
 #include <log.h>
 #include <utils/utils.h>
+#include <kernel/kernel.h>
+#include <boot/uefi.h>
 
-void crash(String message);
-
-unsigned int l_pageSize; ///< The size of an individual page. Set up in liballoc_init.
-
-extern uint8 kernelStart; // &kernelStart - start of the kernel
-extern uint8 kernelEnd; // &kernelEnd - end of the kernel
-
-static uint64 memoryLocation;
-static uint64 memorySize;
+// ---- system functions ----
 
 int liballoc_lock() {
 	asm("cli");
@@ -25,52 +19,32 @@ int liballoc_unlock() {
 	return 0;
 }
 
-void memory_init(multiboot_info_t* mbd) {
-	if (!getBit(mbd->flags, 6)) {
-		crash("6th bit in mbd is not set, cannot get memory map");
-	}
-
-	uint64 kernelSize = &kernelEnd - &kernelStart;
-
-	memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
-	while ((uint64) mmap < mbd->mmap_addr + mbd->mmap_length) {
-		mmap = (memory_map_t*) ((uint64) mmap + mmap->size
-				+ sizeof(unsigned int));
-
-		if (mmap->type == 1) { // memory is useable
-			uint64 thisMemoryLocation = merge(mmap->base_addr_high,
-					mmap->base_addr_low);
-			uint64 thisMemorySize = merge(mmap->length_high, mmap->length_low);
-			if (thisMemoryLocation == (uint64) &kernelStart) {
-				thisMemoryLocation += kernelSize;
-				thisMemorySize -= kernelSize;
-			}
-
-			memoryLocation = thisMemoryLocation;
-			memorySize = thisMemorySize;
-		}
-	}
-
-	l_pageSize = memorySize;
-}
-
-bool allocatedThings = false;
+static unsigned int l_pageSize = 4096; ///< The size of an individual page. Set up in liballoc_init.
 
 void* liballoc_alloc(size_t pageCount) {
-	if (allocatedThings) {
-		return 0;
-	} else {
-		allocatedThings = true;
-		return (void*) memoryLocation;
+	EFI_PHYSICAL_ADDRESS location;
+	EFI_STATUS status = uefi_call_wrapper(
+			(void* )systemTable->BootServices->AllocatePages, 4,
+			AllocateAnyPages, EfiLoaderData, pageCount, &location);
+	if (status != EFI_SUCCESS) {
+		debug(L"EFI_STATUS", status);
+		crash(L"failed to allocate page");
 	}
+	return (void*) location;
 }
 
-int liballoc_free(void* location, size_t size) {
-	allocatedThings = false;
+int liballoc_free(void* location, size_t pageCount) {
+	EFI_STATUS status = uefi_call_wrapper(
+			(void* ) systemTable->BootServices->FreePages, 2,
+			(EFI_PHYSICAL_ADDRESS ) location, pageCount);
+	if (status != EFI_SUCCESS) {
+		debug(L"EFI_STATUS", status);
+		crash(L"failed to free page");
+	}
 	return 0;
 }
 
-// https://github.com/blanham/liballoc
+// ---- begin liballoc ----
 
 /**  Durand's Amazing Super Duper Memory functions.  */
 
@@ -115,12 +89,6 @@ int liballoc_free(void* location, size_t size) {
 #define LIBALLOC_MAGIC	0xc001c0de
 #define LIBALLOC_DEAD	0xdeaddead
 
-#if defined DEBUG || defined INFO
-
-#define FLUSH()		fflush( stdout )
-
-#endif
-
 /** A structure found at the top of all system allocated
  * memory blocks. It details the usage of the memory block.
  */
@@ -145,11 +113,12 @@ struct liballoc_minor {
 	unsigned int size; ///< The size of the memory allocated. Could be 1 byte or more.
 	unsigned int req_size;				///< The size of memory requested.
 };
+#define PREFIX(func) k ## func
 
 static struct liballoc_major *l_memRoot = NULL;	///< The root memory block acquired from the system.
 static struct liballoc_major *l_bestBet = NULL; ///< The major with the most free memory.
 
-static unsigned int l_pageCount = 1; ///< The number of pages to request per chunk. Set up in liballoc_init.
+static unsigned int l_pageCount = 16; ///< The number of pages to request per chunk. Set up in liballoc_init.
 static unsigned long long l_allocated = 0; ///< Running total of allocated memory.
 static unsigned long long l_inuse = 0;		///< Running total of used memory.
 
@@ -188,46 +157,6 @@ static void* liballoc_memcpy(void* s1, const void* s2, size_t n) {
 	return s1;
 }
 
-#if defined DEBUG || defined INFO
-static void liballoc_dump()
-{
-#ifdef DEBUG
-	struct liballoc_major *maj = l_memRoot;
-	struct liballoc_minor *min = NULL;
-#endif
-
-	printf( "liballoc: ------ Memory data ---------------\n");
-	printf( "liballoc: System memory allocated: %i bytes\n", l_allocated );
-	printf( "liballoc: Memory in used (malloc'ed): %i bytes\n", l_inuse );
-	printf( "liballoc: Warning count: %i\n", l_warningCount );
-	printf( "liballoc: Error count: %i\n", l_errorCount );
-	printf( "liballoc: Possible overruns: %i\n", l_possibleOverruns );
-
-#ifdef DEBUG
-	while ( maj != NULL )
-	{
-		printf( "liballoc: %x: total = %i, used = %i\n",
-				maj,
-				maj->size,
-				maj->usage );
-
-		min = maj->first;
-		while ( min != NULL )
-		{
-			printf( "liballoc:    %x: %i bytes\n",
-					min,
-					min->size );
-			min = min->next;
-		}
-
-		maj = maj->next;
-	}
-#endif
-
-	FLUSH();
-}
-#endif
-
 // ***************************************************************
 
 static struct liballoc_major *allocate_new_page(unsigned int size) {
@@ -253,10 +182,6 @@ static struct liballoc_major *allocate_new_page(unsigned int size) {
 
 	if (maj == NULL) {
 		l_warningCount += 1;
-#if defined DEBUG || defined INFO
-		printf( "liballoc: WARNING: liballoc_alloc( %i ) return NULL\n", st );
-		FLUSH();
-#endif
 		return NULL;	// uh oh, we ran out of memory.
 	}
 
@@ -268,13 +193,6 @@ static struct liballoc_major *allocate_new_page(unsigned int size) {
 	maj->first = NULL;
 
 	l_allocated += maj->size;
-
-#ifdef DEBUG
-	printf( "liballoc: Resource allocated %x of %i pages (%i bytes) for %i size.\n", maj, st, maj->size, size );
-
-	printf( "liballoc: Total memory usage = %i KB\n", (int)((l_allocated / (1024))) );
-	FLUSH();
-#endif
 
 	return maj;
 }
@@ -300,47 +218,20 @@ void* malloc(size_t req_size) {
 
 	if (size == 0) {
 		l_warningCount += 1;
-#if defined DEBUG || defined INFO
-		printf( "liballoc: WARNING: alloc( 0 ) called from %x\n",
-				__builtin_return_address(0) );
-		FLUSH();
-#endif
 		liballoc_unlock();
 		return malloc(1);
 	}
 
 	if (l_memRoot == NULL) {
-#if defined DEBUG || defined INFO
-#ifdef DEBUG
-		printf( "liballoc: initialization of liballoc " VERSION "\n" );
-#endif
-		atexit( liballoc_dump );
-		FLUSH();
-#endif
 
 		// This is the first time we are being used.
 		l_memRoot = allocate_new_page(size);
 		if (l_memRoot == NULL) {
 			liballoc_unlock();
-#ifdef DEBUG
-			printf( "liballoc: initial l_memRoot initialization failed\n", p);
-			FLUSH();
-#endif
+
 			return NULL;
 		}
-
-#ifdef DEBUG
-		printf( "liballoc: set up first memory major %x\n", l_memRoot );
-		FLUSH();
-#endif
 	}
-
-#ifdef DEBUG
-	printf( "liballoc: %x malloc( %i ): ",
-			__builtin_return_address(0),
-			size );
-	FLUSH();
-#endif
 
 	// Now we need to bounce through every major and find enough space....
 
@@ -371,10 +262,6 @@ void* malloc(size_t req_size) {
 
 		// CASE 1:  There is not enough space in this major block.
 		if (diff < (size + sizeof(struct liballoc_minor))) {
-#ifdef DEBUG
-			printf( "CASE 1: Insufficient space in block %x\n", maj);
-			FLUSH();
-#endif
 
 			// Another major block next to this one?
 			if (maj->next != NULL) {
@@ -422,10 +309,6 @@ void* malloc(size_t req_size) {
 
 			ALIGN(p);
 
-#ifdef DEBUG
-			printf( "CASE 2: returning %x\n", p);
-			FLUSH();
-#endif
 			liballoc_unlock();		// release the lock
 			return p;
 		}
@@ -458,10 +341,6 @@ void* malloc(size_t req_size) {
 			p = (void*) ((uint64) (maj->first) + sizeof(struct liballoc_minor));
 			ALIGN(p);
 
-#ifdef DEBUG
-			printf( "CASE 3: returning %x\n", p);
-			FLUSH();
-#endif
 			liballoc_unlock();		// release the lock
 			return p;
 		}
@@ -502,10 +381,6 @@ void* malloc(size_t req_size) {
 					p = (void*) ((uint64) min + sizeof(struct liballoc_minor));
 					ALIGN(p);
 
-#ifdef DEBUG
-					printf( "CASE 4.1: returning %x\n", p);
-					FLUSH();
-#endif
 					liballoc_unlock();		// release the lock
 					return p;
 				}
@@ -541,11 +416,6 @@ void* malloc(size_t req_size) {
 							+ sizeof(struct liballoc_minor));
 					ALIGN(p);
 
-#ifdef DEBUG
-					printf( "CASE 4.2: returning %x\n", p);
-					FLUSH();
-#endif
-
 					liballoc_unlock();		// release the lock
 					return p;
 				}
@@ -560,10 +430,6 @@ void* malloc(size_t req_size) {
 
 		// CASE 5: Block full! Ensure next block and loop.
 		if (maj->next == NULL) {
-#ifdef DEBUG
-			printf( "CASE 5: block full\n");
-			FLUSH();
-#endif
 
 			if (startedBet == 1) {
 				maj = l_memRoot;
@@ -574,7 +440,7 @@ void* malloc(size_t req_size) {
 			// we've run out. we need more...
 			maj->next = allocate_new_page(size); // next one guaranteed to be okay
 			if (maj->next == NULL)
-				break;			//  uh oh,  no more memory.....
+				break; //  uh oh,  no more memory.....
 			maj->next->prev = maj;
 
 		}
@@ -584,21 +450,9 @@ void* malloc(size_t req_size) {
 		maj = maj->next;
 	} // while (maj != NULL)
 
-	liballoc_unlock();		// release the lock
+	liballoc_unlock(); // release the lock
 
-#ifdef DEBUG
-	printf( "All cases exhausted. No memory available.\n");
-	FLUSH();
-#endif
-#if defined DEBUG || defined INFO
-	printf( "liballoc: WARNING: malloc( %i ) returning NULL.\n", size);
-	liballoc_dump();
-	FLUSH();
-#endif
-
-	debug("out of memory");
-	debug("needed", req_size);
-	crash("out of memory");
+	crash(L"out of memory");
 
 	return NULL;
 }
@@ -609,11 +463,6 @@ void free(void *ptr) {
 
 	if (ptr == NULL) {
 		l_warningCount += 1;
-#if defined DEBUG || defined INFO
-		printf( "liballoc: WARNING: free( NULL ) called from %x\n",
-				__builtin_return_address(0) );
-		FLUSH();
-#endif
 		return;
 	}
 
@@ -633,41 +482,16 @@ void free(void *ptr) {
 				|| ((min->magic & 0xFFFF) == (LIBALLOC_MAGIC & 0xFFFF))
 				|| ((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF))) {
 			l_possibleOverruns += 1;
-#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: Possible 1-3 byte overrun for magic %x != %x\n",
-					min->magic,
-					LIBALLOC_MAGIC );
-			FLUSH();
-#endif
 		}
 
 		if (min->magic == LIBALLOC_DEAD) {
-#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: multiple free() attempt on %x from %x.\n",
-					ptr,
-					__builtin_return_address(0) );
-			FLUSH();
-#endif
 		} else {
-#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: Bad free( %x ) called from %x\n",
-					ptr,
-					__builtin_return_address(0) );
-			FLUSH();
-#endif
 		}
 
 		// being lied to...
 		liballoc_unlock();		// release the lock
 		return;
 	}
-
-#ifdef DEBUG
-	printf( "liballoc: %x free( %x ): ",
-			__builtin_return_address( 0 ),
-			ptr );
-	FLUSH();
-#endif
 
 	maj = min->block;
 
@@ -712,11 +536,6 @@ void free(void *ptr) {
 
 	}
 
-#ifdef DEBUG
-	printf( "OK\n");
-	FLUSH();
-#endif
-
 	liballoc_unlock();		// release the lock
 }
 
@@ -738,17 +557,17 @@ void* realloc(void *p, size_t size) {
 	struct liballoc_minor *min;
 	unsigned int real_size;
 
-// Honour the case of size == 0 => free old and return NULL
+	// Honour the case of size == 0 => free old and return NULL
 	if (size == 0) {
 		free(p);
 		return NULL;
 	}
 
-// In the case of a NULL pointer, return a simple malloc.
+	// In the case of a NULL pointer, return a simple malloc.
 	if (p == NULL)
 		return malloc(size);
 
-// Unalign the pointer if required.
+	// Unalign the pointer if required.
 	ptr = p;
 	UNALIGN(ptr);
 
@@ -767,28 +586,10 @@ void* realloc(void *p, size_t size) {
 				|| ((min->magic & 0xFFFF) == (LIBALLOC_MAGIC & 0xFFFF))
 				|| ((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF))) {
 			l_possibleOverruns += 1;
-#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: Possible 1-3 byte overrun for magic %x != %x\n",
-					min->magic,
-					LIBALLOC_MAGIC );
-			FLUSH();
-#endif
 		}
 
 		if (min->magic == LIBALLOC_DEAD) {
-#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: multiple free() attempt on %x from %x.\n",
-					ptr,
-					__builtin_return_address(0) );
-			FLUSH();
-#endif
 		} else {
-#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: Bad free( %x ) called from %x\n",
-					ptr,
-					__builtin_return_address(0) );
-			FLUSH();
-#endif
 		}
 
 		// being lied to...
@@ -796,7 +597,7 @@ void* realloc(void *p, size_t size) {
 		return NULL;
 	}
 
-// Definitely a memory block.
+	// Definitely a memory block.
 
 	real_size = min->req_size;
 
@@ -808,11 +609,10 @@ void* realloc(void *p, size_t size) {
 
 	liballoc_unlock();
 
-// If we got here then we're reallocating to a block bigger than us.
+	// If we got here then we're reallocating to a block bigger than us.
 	ptr = malloc(size);		// We need to allocate new memory
 	liballoc_memcpy(ptr, p, real_size);
 	free(p);
 
 	return ptr;
 }
-

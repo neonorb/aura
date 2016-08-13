@@ -1,5 +1,5 @@
 //#include "pong.cpp"
-#include "system/auramain.cpp"
+#include <implementation/system/auramain.h>
 
 #ifdef TESTING
 #include "test.cpp"

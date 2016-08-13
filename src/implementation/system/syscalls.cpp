@@ -1,5 +1,6 @@
 #include <mish.h>
 #include <log.h>
+#include <icxxabi.h>
 
 // ----- syscalls -----
 
@@ -8,7 +9,6 @@ Value* printSyscallFunction(List<Value*>* arguments) {
 	String second = ((StringValue*) arguments->get(1))->value;
 
 	log(toPrint);
-	log("second");
 	log(second);
 
 	return NULL;
@@ -22,7 +22,7 @@ void registerSyscalls() {
 	List<ValueType>* parameterTypes = new List<ValueType>();
 	parameterTypes->add(STRING_VALUE);
 	parameterTypes->add(STRING_VALUE);
-	Function* print = new Function("print", printSyscallFunction,
+	Function* print = new Function(L"print", printSyscallFunction,
 			parameterTypes, VOID_VALUE);
 	syscalls.add(print);
 	mish_syscalls.add(print);

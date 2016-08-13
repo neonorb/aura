@@ -19,6 +19,9 @@ SECTIONS
    *(.text)
    *(.text.*)
    *(.gnu.linkonce.t.*)
+   mishStart = .;
+   *(.mish)
+   mishEnd = .;
    . = ALIGN(16);
   }
   _etext = .;

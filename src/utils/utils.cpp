@@ -14,10 +14,10 @@ int array_length_char(char a[]) {
 	return sizeof(&a) / sizeof(char);
 }
 
-String toString(int value, char* str, int base) {
-	char * rc;
-	char * ptr;
-	char * low;
+String toString(int value, wchar_t* str, int base) {
+	wchar_t* rc;
+	wchar_t* ptr;
+	wchar_t* low;
 	// Check for supported base.
 	if (base < 2 || base > 36) {
 		*str = '\0';

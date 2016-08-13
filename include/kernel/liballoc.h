@@ -10,6 +10,4 @@
 
 #include <boot/multiboot.h>
 
-void memory_init(multiboot_info_t* mbd);
-
 #endif /* INCLUDE_KERNEL_LIBALLOC_H_ */

@@ -4,19 +4,27 @@
 #include <mish.h>
 #include <syscall.h>
 #include <value.h>
-#include "syscalls.cpp"
+#include <implementation/system/syscalls.h>
 
 extern uint8 mishStart; // &mishStart - start of Mish code
 extern uint8 mishEnd; // &mishEnd - end of Mish code
 
 void auraMain() {
-	log("Starting Aura");
+	log(L"Starting Aura");
 
 	//dumpAllocated();
 
 	registerSyscalls();
 
-	Code* code = mish_compile((String) &mishStart, &mishEnd);
+	// convert to 16-bit string
+	uint64 charCount = &mishEnd - &mishStart;
+	wchar_t* sourceCode = (wchar_t*) create(charCount * 2 + 1);
+	for (uint64 i = 0; i < charCount; i++) {
+		sourceCode[i] = (wchar_t) ((&mishStart)[i]);
+	}
+	sourceCode[charCount] = 0; // NULL terminate
+
+	Code* code = mish_compile(sourceCode);
 	code->execute();
 	delete code;
 

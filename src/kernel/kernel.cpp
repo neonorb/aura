@@ -14,14 +14,17 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <kernel/kernel.h>
+
 #include <memory.h>
 #include <kernel/liballoc.h>
 
+#include <boot/uefi.h>
+
 #include <utils/utils.h>
 
-
-#include <kernel/gdt.h>
-#include <kernel/idt.h>
+//#include <kernel/gdt.h>
+//#include <kernel/idt.h>
 
 #include <modules/screen/screen.h>
 #include <modules/clock/clock.h>
@@ -29,41 +32,41 @@
 
 #include <implementation/implementation.h>
 
-extern "C" void kernel_main() {
+void kernel_main() {
 	cli();
 
 	screen_terminal_initialize();
 
-	memory_init(mbd);
+	//log(L"Setting up GDT");
+	//gdt_init();
 
-	log("Setting up GDT");
-	gdt_init();
+	//log(L"Setting up IDT");
+	//init_idt();
 
-	log("Setting up IDT");
-	init_idt();
+	//log(L"Setting up clock");
+	//clock_initialize();
 
-	log("Setting up clock");
-	clock_initialize();
+	//log(L"Setting up keyboard");
+	//keyboard_initialize();
 
-	log("Setting up keyboard");
-	keyboard_initialize();
-
-	// log("Initializing ACPI");
+	// log(L"Initializing ACPI");
 	// initAcpi();
 
 	sti();
 
-	log("Welcome to Aura!");
+	log(L"Welcome to Aura!");
 
 	implementation();
 
-	// returning from here will clear interrupts, halt the system, and enter a jmp loop (boot.s)
-	crash("We have just returned from the implementation :(");
+	// returning from here will clear interrupts, halt the system
+	crash(L"We have just returned from the implementation :(");
 }
 
 void crash(String message) {
 	fault(message);
 	cli();
-	fault("Halting system!");
+	fault(L"Halting system!");
+	//uefi_call_wrapper((void*) systemTable->BootServices->Stall, 1, 10000);
 	asm("hlt");
+	while(true){}
 }
