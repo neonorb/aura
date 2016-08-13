@@ -23,6 +23,7 @@ If you want to use QEMU (recommended), run `make run`.
 
 # Docs
 [OS Dev Wiki](http://wiki.osdev.org/Main_Page)
+
 [UEFI Specification](http://www.uefi.org/sites/default/files/resources/UEFI%20Spec%202_6.pdf)
 
 Also check the Google Drive folder.
