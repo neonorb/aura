@@ -4,7 +4,7 @@ CSOURCES=boot/uefi \
 kernel/kernel kernel/liballoc kernel/log kernel/ports \
 implementation/implementation implementation/system/auramain implementation/system/syscalls \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
-modules/keyboard/keyboard modules/keyboard/ps2 \
+modules/keyboard/keyboard modules/keyboard/uefi \
 modules/screen/screen modules/screen/uefi \
 utils/utils
 ASOURCES=#kernel/gdtasm kernel/idtasm boot/boot
@@ -20,9 +20,11 @@ INCLUDE_FLAGS:=$(INCLUDE_FLAGS) -I gnu-efi/headers -I gnu-efi/headers/x86_64
 
 all: $(OBJECTS)
 
+# Mish "compiling"
 build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
 	objcopy -I binary -O elf64-x86-64 -B i386 --rename-section .data=.mish $^ $@
 
+# building binaries
 build/aura.so: $(OBJECTS) | build/.dirstamp
 	ld $(OBJECTS)              \
 		gnu-efi/crt0-efi-x86_64.o     \
@@ -79,21 +81,6 @@ build/aura.img: build/aura.efi | build/.dirstamp
 vdi: build/aura.vdi
 build/aura.vdi: build/aura.img
 	vboxmanage convertfromraw --format VDI build/aura.img build/aura.vdi
-
-#.PHONY:
-#iso: build/aura.iso
-#build/aura.iso: build/aura.elf
-#	cp build/aura.elf iso/boot/aura.elf
-#	genisoimage -R                        \
-#		-b boot/grub/stage2_eltorito      \
-#		-no-emul-boot                     \
-#		-boot-load-size 4                 \
-#		-A os                             \
-#		-input-charset utf8               \
-#		-quiet                            \
-#		-boot-info-table                  \
-#		-o build/aura.iso                 \
-#		iso
 	
 # ---- running ----
 
