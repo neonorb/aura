@@ -5,12 +5,19 @@
 #include <syscall.h>
 #include <value.h>
 #include <implementation/system/syscalls.h>
+#include <modules/keyboard/keyboard.h>
 
 extern uint8 mishStart; // &mishStart - start of Mish code
 extern uint8 mishEnd; // &mishEnd - end of Mish code
 
+void keyboardHandler(KeyEvent keyEvent) {
+	log(L"key!");
+}
+
 void auraMain() {
 	log(L"Starting Aura");
+
+	keyboard_handler(keyboardHandler);
 
 	//dumpAllocated();
 

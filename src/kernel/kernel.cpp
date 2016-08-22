@@ -24,7 +24,7 @@
 #include <utils/utils.h>
 
 //#include <kernel/gdt.h>
-//#include <kernel/idt.h>
+#include <kernel/idt.h>
 
 #include <modules/screen/screen.h>
 #include <modules/clock/clock.h>
@@ -40,14 +40,14 @@ void kernel_main() {
 	//log(L"Setting up GDT");
 	//gdt_init();
 
-	//log(L"Setting up IDT");
-	//init_idt();
+	log(L"Setting up IDT");
+	init_idt();
 
 	//log(L"Setting up clock");
 	//clock_initialize();
 
-	//log(L"Setting up keyboard");
-	//keyboard_initialize();
+	log(L"Setting up keyboard");
+	keyboard_initialize();
 
 	// log(L"Initializing ACPI");
 	// initAcpi();

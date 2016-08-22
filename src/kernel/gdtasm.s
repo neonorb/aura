@@ -31,12 +31,6 @@ gdt_flush:
 .flush:
    ret
 
-[global idt_flush]
-[extern idt_ptr]
-idt_flush:
-    lidt [idt_ptr]
-    ret
-
 [GLOBAL tss_flush]    ; Allows our C code to call tss_flush().
 tss_flush:
    mov eax, 0x2B      ; Load the index of our TSS structure - The index is

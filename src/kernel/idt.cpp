@@ -71,23 +71,24 @@ void printk(int severity, char* type, const char* fmt, ...) {
 	 va_start(args, fmt);
 	 vprintf(fmt,args);
 	 va_end(args);*/
-	log(fmt);
-
+	//log(fmt);
 }
 
 /********************** ------------------------- END TO REMOVE CRAP ------------------- **********************/
 
 struct idt_entry {
-	uint16 base_lo;
-	uint16 sel; /* Our kernel segment goes here! */
-	uint8 always0; /* This will ALWAYS be set to 0! */
-	uint8 flags; /* Set using the above table! */
-	uint16 base_hi;
+	uint16 baseLow;
+	uint16 selector;
+	uint8 reservedIst;
+	uint8 flags;
+	uint16 baseMid;
+	uint32 baseHigh;
+	uint32 reserved;
 }__attribute__((packed));
 
 struct idt_ptr {
 	uint16 limit;
-	uint32 base;
+	uint64 base;
 }__attribute__((packed));
 
 ///Installs all irqs
@@ -195,12 +196,15 @@ void idt_init_isrs() {
 ///Sets a gate in the IDT
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
 		unsigned char flags) {
-	idt_entries[num].base_lo = (base & 0xFFFF);
-	idt_entries[num].base_hi = (base >> 16) & 0xFFFF;
+	idt_entries[num].baseLow = base & 0xFFFF;
+	idt_entries[num].baseMid = (base >> 16) & 0xFFFF;
+	idt_entries[num].baseHigh = (base >> 32) & 0xFFFFFFFF;
 
-	idt_entries[num].sel = sel;
-	idt_entries[num].always0 = 0;
+	idt_entries[num].selector = sel;
 	idt_entries[num].flags = flags;
+
+	idt_entries[num].reservedIst = 0;
+	idt_entries[num].reserved = 0;
 }
 
 ///Table of all exception messages
@@ -245,7 +249,7 @@ extern "C" void fault_handler(struct regs *r) {
 		printk(LOG_FAIL, "fault",
 				".......  | esi: 0x%x edi: 0x%x eip: 0x%x eflags: 0x%x \n",
 				r->esi, r->edi, r->eip, r->eflags);
-		log("Unassigned interrupt!\n");
+		log(L"Unassigned interrupt!\n");
 	}
 	if (r->int_no < 32) {
 		printk(LOG_FAIL, "fault", "code     | %d (error %d),(%s)\n", r->int_no,
@@ -261,7 +265,7 @@ extern "C" void fault_handler(struct regs *r) {
 		printk(LOG_FAIL, "fault",
 				".......  | esi: 0x%x edi: 0x%x eip: 0x%x eflags: 0x%x \n",
 				r->esi, r->edi, r->eip, r->eflags);
-		log("Interrupt fault");
+		log(L"Interrupt fault");
 	}
 }
 
@@ -277,6 +281,7 @@ void deregister_interrupt_handler(uint8 n) {
 }
 ///Remaps the irq's in the PIC
 void irq_remap(void) {
+	uint8 always0; /* This will ALWAYS be set to 0! */
 	outb(0x20, 0x11);
 	outb(0xA0, 0x11);
 	outb(0x21, 0x20);

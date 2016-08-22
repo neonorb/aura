@@ -4,16 +4,16 @@
 #include <utils/utils.h>
 #include <kernel/idt.h>
 
-#include <modules/keyboard/uefi.h>
+#include <modules/keyboard/ps2.h>
 
 static KeyboardHandler keyboardHandler;
 
 bool pressedKeys[KEY_COUNT];
 
-/*static void keyboardInterrupt(registers_t* regs) {
-	intCount++;
+static void keyboardInterrupt(registers_t* regs) {
+	//intCount++;
 	ps2_interrupt();
-}*/
+}
 
 // callback from driver
 void keyboard_keyUpdate(KeyMapping keyMapping) {
@@ -155,6 +155,6 @@ char keyboard_eventToChar(KeyEvent keyEvent) {
 }
 
 void keyboard_initialize() {
-	uefi_keyboard_initialize();
-	//register_interrupt_handler(IRQ1, &keyboardInterrupt);
+	//uefi_keyboard_initialize();
+	register_interrupt_handler(IRQ1, &keyboardInterrupt);
 }

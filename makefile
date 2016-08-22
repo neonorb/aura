@@ -1,13 +1,13 @@
 # Makefile for Aura
 
 CSOURCES=boot/uefi \
-kernel/kernel kernel/liballoc kernel/log kernel/ports \
+kernel/kernel kernel/liballoc kernel/log kernel/ports kernel/idt \
 implementation/implementation implementation/system/auramain implementation/system/syscalls \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
-modules/keyboard/keyboard modules/keyboard/uefi \
+modules/keyboard/keyboard modules/keyboard/ps2 \
 modules/screen/screen modules/screen/uefi \
 utils/utils
-ASOURCES=#kernel/gdtasm kernel/idtasm boot/boot
+ASOURCES=kernel/idtasm #kernel/gdtasm boot/boot
 MSOURCES=mish/main
 
 LIBS=feta mish
@@ -26,7 +26,7 @@ build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
 
 # building binaries
 build/aura.so: $(OBJECTS) | build/.dirstamp
-	ld $(OBJECTS)              \
+	ld $(OBJECTS)                     \
 		gnu-efi/crt0-efi-x86_64.o     \
 		-nostdlib                     \
 		-znocombreloc                 \
