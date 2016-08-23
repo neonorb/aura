@@ -326,8 +326,8 @@ isr_common_stub:
     sti
     iretq
 
-[global idt_flush]
-[extern idt_ptr]
+global idt_flush
+extern idt_ptr
 idt_flush:
     lidt [idt_ptr]
     ret
