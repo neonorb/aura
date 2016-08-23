@@ -20,6 +20,7 @@
 #include <kernel/ports.h>
 #include <log.h>
 #include <utils/utils.h>
+#include <memory.h>
 
 /*********** ------------------------- THIS CRAP WILL BE REMOVED LATER ---------------------------- *********************/
 
@@ -145,7 +146,7 @@ extern "C" void irq13();
 extern "C" void irq14();
 extern "C" void irq15();
 
-void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
+void idt_set_gate(unsigned char num, uint64 base, unsigned short sel,
 		unsigned char flags);
 extern "C" void idt_flush();
 
@@ -194,7 +195,7 @@ void idt_init_isrs() {
 }
 
 ///Sets a gate in the IDT
-void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
+void idt_set_gate(unsigned char num, uint64 base, unsigned short sel,
 		unsigned char flags) {
 	idt_entries[num].baseLow = base & 0xFFFF;
 	idt_entries[num].baseMid = (base >> 16) & 0xFFFF;
@@ -227,46 +228,12 @@ interrupt_handler_t interrupt_handlers[0xff];
 /*
  unsigned int gs, fs, es, ds;      // pushed the segs last
  unsigned int edi, esi, ebp, useless_value, ebx, edx, ecx, eax;  // pushed by pusha. useless value is esp
- unsigned int int_no, err_code;    // our 'push byte #' and ecodes do this
+ unsigned int intNo, err_code;    // our 'push byte #' and ecodes do this
  unsigned int eip, cs, eflags, useresp, ss; //pushed by the processor automatically
  */
 //Handles interrupts
 extern "C" void fault_handler(struct regs *r) {
-	if (interrupt_handlers[r->int_no] != 0) {
-		interrupt_handlers[r->int_no](r);
-		return;
-	} else {
-		printk(LOG_FAIL, "fault", "code     | %d (error %d),(%s)\n", r->int_no,
-				r->err_code, exception_messages[r->int_no]);
-		printk(LOG_FAIL, "fault",
-				"segment  | gs:0x%x fs:0x%x es:0x%x ds:0x%x cs:0x%x ss:0x%x\n",
-				r->gs, r->fs, r->es, r->ds, r->cs, r->ss);
-		printk(LOG_FAIL, "fault", "stack    | esp: 0x%x ebp: 0x%x uesp: 0x%x\n",
-				r->useless_value, r->ebp, r->useresp);
-		printk(LOG_FAIL, "fault",
-				"gp regs  | eax: 0x%x ebx: 0x%x ecx: 0x%x edx: 0x%x\n", r->eax,
-				r->ebx, r->ecx, r->edx);
-		printk(LOG_FAIL, "fault",
-				".......  | esi: 0x%x edi: 0x%x eip: 0x%x eflags: 0x%x \n",
-				r->esi, r->edi, r->eip, r->eflags);
-		log(L"Unassigned interrupt!\n");
-	}
-	if (r->int_no < 32) {
-		printk(LOG_FAIL, "fault", "code     | %d (error %d),(%s)\n", r->int_no,
-				r->err_code, exception_messages[r->int_no]);
-		printk(LOG_FAIL, "fault",
-				"segment  | gs:0x%x fs:0x%x es:0x%x ds:0x%x cs:0x%x ss:0x%x\n",
-				r->gs, r->fs, r->es, r->ds, r->cs, r->ss);
-		printk(LOG_FAIL, "fault", "stack    | esp: 0x%x ebp: 0x%x uesp: 0x%x\n",
-				r->useless_value, r->ebp, r->useresp);
-		printk(LOG_FAIL, "fault",
-				"gp regs  | eax: 0x%x ebx: 0x%x ecx: 0x%x edx: 0x%x\n", r->eax,
-				r->ebx, r->ecx, r->edx);
-		printk(LOG_FAIL, "fault",
-				".......  | esi: 0x%x edi: 0x%x eip: 0x%x eflags: 0x%x \n",
-				r->esi, r->edi, r->eip, r->eflags);
 		log(L"Interrupt fault");
-	}
 }
 
 /** This installs a custom IRQ handler for the given IRQ **/
@@ -281,7 +248,6 @@ void deregister_interrupt_handler(uint8 n) {
 }
 ///Remaps the irq's in the PIC
 void irq_remap(void) {
-	uint8 always0; /* This will ALWAYS be set to 0! */
 	outb(0x20, 0x11);
 	outb(0xA0, 0x11);
 	outb(0x21, 0x20);
@@ -317,16 +283,16 @@ void irq_install() {
 ///Handles IRQ's
 extern "C" void irq_handler(struct regs *r) {
 	/* This is a blank function pointer */
-	if (interrupt_handlers[r->int_no] != 0) {
-		interrupt_handlers[r->int_no](r);
+	if (interrupt_handlers[r->intNo] != 0) {
+		interrupt_handlers[r->intNo](r);
 	} else {
-		//printk(LOG_WARN, "irq", "Recieved unhandled interrupt %d (IRQ%d)\n",r->int_no, r->int_no - 32);
-		//log("Unhandled interrupt");
+		//printk(LOG_WARN, "irq", "Recieved unhandled interrupt %d (IRQ%d)\n",r->intNo, r->intNo - 32);
+		log(L"Unhandled interrupt");
 	}
 	/* If the IDT entry that was invoked was greater than 40
 	 *  (meaning IRQ8 - 15), then we need to send an EOI to
 	 *  the slave controller */
-	if (r->int_no >= 40) {
+	if (r->intNo >= 40) {
 		outb(0xA0, 0x20);
 	}
 

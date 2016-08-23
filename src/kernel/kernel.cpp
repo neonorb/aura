@@ -37,8 +37,8 @@ void kernel_main() {
 
 	screen_terminal_initialize();
 
-	//log(L"Setting up GDT");
-	//gdt_init();
+	log(L"Setting up GDT");
+	gdt_init();
 
 	log(L"Setting up IDT");
 	init_idt();

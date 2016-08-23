@@ -14,6 +14,8 @@
 	    ;; You should have received a copy of the GNU General Public License
 	    ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+DEFAULT REL
+
 %macro pushAll 0
       push   rax
       push   rcx
@@ -326,8 +328,8 @@ isr_common_stub:
     sti
     iretq
 
-global idt_flush
-extern idt_ptr
+[global idt_flush]
+[extern idt_ptr]
 idt_flush:
     lidt [idt_ptr]
     ret
