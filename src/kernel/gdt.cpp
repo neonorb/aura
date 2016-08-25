@@ -112,7 +112,11 @@ void gdt_init() {
 	gdtSetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
 	writeTss(5, 0x10, 0x0);
 
+	log(L"flushing gdt");
+
 	gdt_flush((uint8*) &gdtPointer);
 
+	log(L"flusing tss");
 	tss_flush();
+	log(L"done");
 }

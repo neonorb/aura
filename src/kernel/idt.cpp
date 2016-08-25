@@ -282,6 +282,7 @@ void irq_install() {
 }
 ///Handles IRQ's
 extern "C" void irq_handler(struct regs *r) {
+	debugPrint(L"interrupt!");
 	/* This is a blank function pointer */
 	if (interrupt_handlers[r->intNo] != 0) {
 		interrupt_handlers[r->intNo](r);
@@ -310,4 +311,6 @@ void init_idt() {
 	idt_init_isrs();
 	idt_flush();
 	irq_install();
+
+	debugPrint(L"idt finished");
 }

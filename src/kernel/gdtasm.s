@@ -14,26 +14,31 @@
 	    ;; You should have received a copy of the GNU General Public License
 	    ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-BITS 32
+BITS 64
+DEFAULT REL
 
 [GLOBAL gdt_flush]
 gdt_flush:
-   mov eax, [esp+4]
-   lgdt [eax]
+   mov rax, [rcx]
+   lgdt [rax]
 
-   mov ax, 0x10
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
-   mov ss, ax
-   jmp 0x08:.flush
+   mov rax, 0x10
+   mov ds, rax
+   mov es, rax
+   mov fs, rax
+   mov gs, rax
+   mov ss, rax
+
+   lea rax, [rel .flush]
+   push 0x08
+   push rax
+   retf
 .flush:
    ret
 
 [GLOBAL tss_flush]    ; Allows our C code to call tss_flush().
 tss_flush:
-   mov eax, 0x2B      ; Load the index of our TSS structure - The index is
+   mov rax, 0x2B      ; Load the index of our TSS structure - The index is
                      ; 0x28, as it is the 5th selector and each is 8 bytes
                      ; long, but we set the bottom two bits (making 0x2B)
                      ; so that it has an RPL of 3, not zero.
