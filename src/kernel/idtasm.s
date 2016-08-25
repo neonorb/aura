@@ -307,7 +307,7 @@ isr_common_stub:
     pushAll
 
     mov      ax, ds
-    push   rax
+    push     rax
 
     mov      ax, 0x10
     mov      ds, ax

@@ -222,7 +222,7 @@ const char *exception_messages[] = { "Division By Zero", "Debug",
 
 		"Reserved", "Reserved", "Reserved", "Reserved", "Reserved", "Reserved",
 		"Reserved", "Reserved" };
-/// Function pointer array of interrupt handlers
+// Function pointer array of interrupt handlers
 interrupt_handler_t interrupt_handlers[0xff];
 
 /*
