@@ -19,7 +19,7 @@ DEFAULT REL
 
 [GLOBAL gdt_flush]
 gdt_flush:
-   mov rax, [rcx]
+   mov rax, [rdi]
    lgdt [rax]
 
    mov rax, 0x10
