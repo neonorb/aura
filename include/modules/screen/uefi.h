@@ -11,6 +11,8 @@
 #include <string.h>
 #include <boot/uefi.h>
 
+void uefi_terminal_init();
+void uefi_terminal_setCursorVisibility(bool cursorVisibility);
 void uefi_terminal_clear();
 void uefi_terminal_writeString(String message);
 void uefi_terminal_setForegroundColor(UINTN color);

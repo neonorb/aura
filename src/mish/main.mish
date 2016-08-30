@@ -1,2 +1,2 @@
- __print('Hello, World!', 'LOOK I"M EXECUTING A PROGRAMMING LANGUAGE')
- __print('hi', 'hi again')
+__print('m1', 'm2')
+__print('m3', 'm4')

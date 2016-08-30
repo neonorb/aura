@@ -6,11 +6,26 @@
  */
 
 #include <string.h>
-#include <boot/uefi.h>
+#include <modules/screen/uefi.h>
 #include <log.h>
 
 static UINTN foreground;
 static UINTN background;
+
+void uefi_terminal_init() {
+	uefi_terminal_clear();
+	uefi_terminal_setCursorVisibility(true);
+}
+
+void uefi_terminal_setCursorVisibility(bool cursorVisibility) {
+	EFI_STATUS status = uefi_call_wrapper(
+			(void* ) systemTable->ConOut->EnableCursor, 2, systemTable->ConOut,
+			cursorVisibility);
+	if (status != EFI_SUCCESS) {
+		debug(L"EFI_STATUS", status);
+		crash(L"failed to set cursor visibility");
+	}
+}
 
 void uefi_terminal_clear() {
 	EFI_STATUS status = uefi_call_wrapper(

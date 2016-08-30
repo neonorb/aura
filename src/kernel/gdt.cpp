@@ -18,7 +18,7 @@
 #include <int.h>
 #include <utils/utils.h>
 
-extern "C" void gdt_flush(uint8* gdt);
+extern "C" void gdt_flush();
 extern "C" void tss_flush();
 
 typedef struct {
@@ -114,9 +114,9 @@ void gdt_init() {
 
 	log(L"flushing gdt");
 
-	gdt_flush((uint8*) &gdtPointer);
+	gdt_flush();
 
-	log(L"flusing tss");
-	tss_flush();
+	//log(L"flusing tss");
+	//tss_flush();
 	log(L"done");
 }

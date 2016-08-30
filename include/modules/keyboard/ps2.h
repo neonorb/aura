@@ -5,10 +5,7 @@
 
 #include <modules/keyboard/keyboard.h>
 
-static uint8 getScancode();
-
-static void readKeyboard();
-
-void ps2_interrupt();
+void ps2_keyboard_init();
+void ps2_keyboard_probe();
 
 #endif /* PS2_H_ */

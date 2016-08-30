@@ -23,50 +23,28 @@
 
 #include <utils/utils.h>
 
-#include <kernel/gdt.h>
-#include <kernel/idt.h>
-
-#include <modules/screen/screen.h>
-#include <modules/clock/clock.h>
-#include <modules/keyboard/keyboard.h>
+#include <modules/modules.h>
 
 #include <implementation/implementation.h>
 
 void kernel_main() {
 	cli();
 
-	screen_terminal_initialize();
+	modules_init();
 
-	log(L"Setting up GDT");
-	gdt_init();
-
-	log(L"Setting up IDT");
-	init_idt();
-
-	//log(L"Setting up clock");
-	//clock_initialize();
-
-	log(L"Setting up keyboard");
-	keyboard_initialize();
-
-	// log(L"Initializing ACPI");
-	// initAcpi();
-
-	sti();
-
-	log(L"Welcome to Aura!");
+	log(L"boot complete");
 
 	implementation();
 
 	// returning from here will clear interrupts, halt the system
-	crash(L"We have just returned from the implementation :(");
+	crash(L"we have just returned from the implementation :(");
 }
 
 void crash(String message) {
 	fault(message);
-	cli();
-	fault(L"Halting system!");
+	//cli();
+	fault(L"halting system!");
 	//uefi_call_wrapper((void*) systemTable->BootServices->Stall, 1, 10000);
-	asm("hlt");
-	while(true){}
+	while (true) {
+	}
 }

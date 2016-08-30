@@ -22,232 +22,100 @@
 #include <utils/utils.h>
 #include <memory.h>
 
-/*********** ------------------------- THIS CRAP WILL BE REMOVED LATER ---------------------------- *********************/
+/** IDT gates stored in this table */
+idt_gate_t idt_entries[256] __attribute__((aligned(16)));
+/** ISR function vectors stored in this table */
+isr_t interrupt_handlers[256] __attribute__((aligned(16)));
+/** IDT PTR stored here */
+idt_ptr_t idt_ptr __attribute__((aligned(16)));
 
-#define DO_DEBUG_LOGGING 1
+extern "C" void idt_flush(idt_ptr_t* ptr);
 
-#define LOG_COMPLETE	1
-#define LOG_FAIL		2
-#define LOG_WARN		3
-#define LOG_INFO		4
-#define LOG_DEBUG		5
-#define LOG_INTERNALS	6
-#define LOG_UNKN		0
-// Low level
-void log_low(const char * str);
-void low_printname();
-void text_console_init();
-// High level
-void printk(int severity, char * type, const char *fmt, ...);
-void logging_printbestunit(uint32 bytes, uint8 newline);
-
-void printk(int severity, char* type, const char* fmt, ...) {
-	/*switch(severity) {
-	 case LOG_COMPLETE:
-	 text_console_change_color(0xA);
-	 break;
-	 case LOG_FAIL:
-	 text_console_change_color(0x4);
-	 break;
-	 case LOG_WARN:
-	 text_console_change_color(0xE);
-	 break;
-	 case LOG_INFO:
-	 text_console_change_color(0xB);
-	 break;
-	 case LOG_DEBUG:
-	 text_console_change_color(0xD);
-	 break;
-	 case LOG_INTERNALS:
-	 text_console_change_color(0xD);
-	 break;
-	 case LOG_UNKN:
-	 default: // LOG_UNKN
-	 text_console_change_color(0x8);
-	 break;
-	 }
-	 printf("%s: ",type);
-	 text_console_reset_color();
-	 va_list args;
-	 va_start(args, fmt);
-	 vprintf(fmt,args);
-	 va_end(args);*/
-	//log(fmt);
-}
-
-/********************** ------------------------- END TO REMOVE CRAP ------------------- **********************/
-
-struct idt_entry {
-	uint16 baseLow;
-	uint16 selector;
-	uint8 reservedIst;
-	uint8 flags;
-	uint16 baseMid;
-	uint32 baseHigh;
-	uint32 reserved;
-}__attribute__((packed));
-
-struct idt_ptr {
-	uint16 limit;
-	uint64 base;
-}__attribute__((packed));
-
-///Installs all irqs
-void irq_install();
-
-extern "C" void isr0();
-extern "C" void isr1();
-extern "C" void isr2();
-extern "C" void isr3();
-extern "C" void isr4();
-extern "C" void isr5();
-extern "C" void isr6();
-extern "C" void isr7();
-extern "C" void isr8();
-extern "C" void isr9();
-extern "C" void isr10();
-extern "C" void isr11();
-extern "C" void isr12();
-extern "C" void isr13();
-extern "C" void isr14();
-extern "C" void isr15();
-extern "C" void isr16();
-extern "C" void isr17();
-extern "C" void isr18();
-extern "C" void isr19();
-extern "C" void isr20();
-extern "C" void isr21();
-extern "C" void isr22();
-extern "C" void isr23();
-extern "C" void isr24();
-extern "C" void isr25();
-extern "C" void isr26();
-extern "C" void isr27();
-extern "C" void isr28();
-extern "C" void isr29();
-extern "C" void isr30();
-extern "C" void isr31();
-extern "C" void isr100();
-
-extern "C" void irq0();
-extern "C" void irq1();
-extern "C" void irq2();
-extern "C" void irq3();
-extern "C" void irq4();
-extern "C" void irq5();
-extern "C" void irq6();
-extern "C" void irq7();
-extern "C" void irq8();
-extern "C" void irq9();
-extern "C" void irq10();
-extern "C" void irq11();
-extern "C" void irq12();
-extern "C" void irq13();
-extern "C" void irq14();
-extern "C" void irq15();
-
-void idt_set_gate(unsigned char num, uint64 base, unsigned short sel,
-		unsigned char flags);
-extern "C" void idt_flush();
-
-struct idt_entry idt_entries[256];
-struct idt_ptr idt_ptr;
-
-///Inits interrupt services
-void idt_init_isrs() {
-	idt_set_gate(0, (uint64) isr0, 0x08, 0x8E);
-	idt_set_gate(1, (uint64) isr1, 0x08, 0x8E);
-	idt_set_gate(2, (uint64) isr2, 0x08, 0x8E);
-	idt_set_gate(3, (uint64) isr3, 0x08, 0x8E);
-	idt_set_gate(4, (uint64) isr4, 0x08, 0x8E);
-	idt_set_gate(5, (uint64) isr5, 0x08, 0x8E);
-	idt_set_gate(6, (uint64) isr6, 0x08, 0x8E);
-	idt_set_gate(7, (uint64) isr7, 0x08, 0x8E);
-
-	idt_set_gate(8, (uint64) isr8, 0x08, 0x8E);
-	idt_set_gate(9, (uint64) isr9, 0x08, 0x8E);
-	idt_set_gate(10, (uint64) isr10, 0x08, 0x8E);
-	idt_set_gate(11, (uint64) isr11, 0x08, 0x8E);
-	idt_set_gate(12, (uint64) isr12, 0x08, 0x8E);
-	idt_set_gate(13, (uint64) isr13, 0x08, 0x8E);
-	idt_set_gate(14, (uint64) isr14, 0x08, 0x8E);
-	idt_set_gate(15, (uint64) isr15, 0x08, 0x8E);
-
-	idt_set_gate(16, (uint64) isr16, 0x08, 0x8E);
-	idt_set_gate(17, (uint64) isr17, 0x08, 0x8E);
-	idt_set_gate(18, (uint64) isr18, 0x08, 0x8E);
-	idt_set_gate(19, (uint64) isr19, 0x08, 0x8E);
-	idt_set_gate(20, (uint64) isr20, 0x08, 0x8E);
-	idt_set_gate(21, (uint64) isr21, 0x08, 0x8E);
-	idt_set_gate(22, (uint64) isr22, 0x08, 0x8E);
-	idt_set_gate(23, (uint64) isr23, 0x08, 0x8E);
-
-	idt_set_gate(24, (uint64) isr24, 0x08, 0x8E);
-	idt_set_gate(25, (uint64) isr25, 0x08, 0x8E);
-	idt_set_gate(26, (uint64) isr26, 0x08, 0x8E);
-	idt_set_gate(27, (uint64) isr27, 0x08, 0x8E);
-	idt_set_gate(28, (uint64) isr28, 0x08, 0x8E);
-	idt_set_gate(29, (uint64) isr29, 0x08, 0x8E);
-	idt_set_gate(30, (uint64) isr30, 0x08, 0x8E);
-	idt_set_gate(31, (uint64) isr31, 0x08, 0x8E);
-	//Syscall
-	idt_set_gate(0x64, (uint64) isr100, 0x08, 0x8E);
-}
-
-///Sets a gate in the IDT
-void idt_set_gate(unsigned char num, uint64 base, unsigned short sel,
-		unsigned char flags) {
-	idt_entries[num].baseLow = base & 0xFFFF;
-	idt_entries[num].baseMid = (base >> 16) & 0xFFFF;
-	idt_entries[num].baseHigh = (base >> 32) & 0xFFFFFFFF;
-
-	idt_entries[num].selector = sel;
-	idt_entries[num].flags = flags;
-
-	idt_entries[num].reservedIst = 0;
-	idt_entries[num].reserved = 0;
-}
-
-///Table of all exception messages
-const char *exception_messages[] = { "Division By Zero", "Debug",
-		"Non Maskable Interrupt", "Breakpoint", "Into Detected Overflow",
-		"Out of Bounds", "Invalid Opcode", "No Coprocessor",
-
-		"Double Fault", "Coprocessor Segment Overrun", "Bad TSS",
-		"Segment Not Present", "Stack Fault", "General Protection Fault",
-		"Page Fault", "Unknown Interrupt",
-
-		"Coprocessor Fault", "Alignment Check", "Machine Check", "Reserved",
-		"Reserved", "Reserved", "Reserved", "Reserved",
-
-		"Reserved", "Reserved", "Reserved", "Reserved", "Reserved", "Reserved",
-		"Reserved", "Reserved" };
-// Function pointer array of interrupt handlers
-interrupt_handler_t interrupt_handlers[0xff];
-
-/*
- unsigned int gs, fs, es, ds;      // pushed the segs last
- unsigned int edi, esi, ebp, useless_value, ebx, edx, ecx, eax;  // pushed by pusha. useless value is esp
- unsigned int intNo, err_code;    // our 'push byte #' and ecodes do this
- unsigned int eip, cs, eflags, useresp, ss; //pushed by the processor automatically
+/**
+ * Sets the IDT gate to function vector.
+ *
+ * gn supplies numbered interrupt, while funcall is
+ * function to be called when that interrupt happens.
  */
-//Handles interrupts
-extern "C" void fault_handler(struct regs *r) {
-		log(L"Interrupt fault");
+void idt_set_gate(uint8 gn, uint64 funcall) {
+	idt_gate_t* gate = &idt_entries[gn];
+	gate->offset015 = funcall & 0xFFFF;
+	gate->offset1631 = (funcall >> 16) & 0xFFFF;
+	gate->offset3263 = (funcall >> 32) & 0xFFFFFFFF;
+	gate->selector = 8; // CODE descriptor, see GDT64.Code
+	gate->flags.p = 1;
+	gate->flags.ist = 0;
+	gate->flags.type = 14 & 0b1111;
+	gate->flags.dpl = 0;
+
+	if (gn == 14) // page fault
+		gate->flags.ist = 1;
+	if (gn == 8) // double fault
+		gate->flags.ist = 2;
+	if (gn == 255) // ipi fault
+		gate->flags.ist = 3;
 }
 
-/** This installs a custom IRQ handler for the given IRQ **/
-void register_interrupt_handler(uint8 n, interrupt_handler_t h) {
-	interrupt_handlers[n] = h;
+/**
+ * Initializes base interrupt vectors.
+ *
+ * Creates IDT pointer and then fills it up with generated
+ * asm functions. These functions, by default, call ISR vector,
+ * or kernel panics if ISR vector is unavailable.
+ *
+ * Also remaps IRQ to use interrupts.
+ */
+void initialize_interrupts() {
 
-}
+	memset((uint8*) idt_entries, 0, sizeof(idt_entries));
+	memset((uint8*) interrupt_handlers, 0, sizeof(interrupt_handlers));
 
-/** This clears the handler for a given IRQ **/
-void deregister_interrupt_handler(uint8 n) {
-	interrupt_handlers[n] = 0;
-}
-///Remaps the irq's in the PIC
-void irq_remap(void) {
+	idt_ptr.limit = (sizeof(idt_entries)) - 1;
+	idt_ptr.base = (uint64) &idt_entries;
+
+	// GENERAL CPU INTERRUPTS
+	idt_set_gate(0, (uint64) isr0);
+	idt_set_gate(1, (uint64) isr1);
+	idt_set_gate(2, (uint64) isr2);
+	idt_set_gate(3, (uint64) isr3);
+	idt_set_gate(4, (uint64) isr4);
+	idt_set_gate(5, (uint64) isr5);
+	idt_set_gate(6, (uint64) isr6);
+	idt_set_gate(7, (uint64) isr7);
+	idt_set_gate(8, (uint64) isr8);
+	idt_set_gate(9, (uint64) isr9);
+
+	idt_set_gate(10, (uint64) isr10);
+	idt_set_gate(11, (uint64) isr11);
+	idt_set_gate(12, (uint64) isr12);
+	idt_set_gate(13, (uint64) isr13);
+	idt_set_gate(14, (uint64) isr14);
+	idt_set_gate(15, (uint64) isr15);
+	idt_set_gate(16, (uint64) isr16);
+	idt_set_gate(17, (uint64) isr17);
+	idt_set_gate(18, (uint64) isr18);
+	idt_set_gate(19, (uint64) isr19);
+
+	idt_set_gate(20, (uint64) isr20);
+	idt_set_gate(21, (uint64) isr21);
+	idt_set_gate(22, (uint64) isr22);
+	idt_set_gate(23, (uint64) isr23);
+	idt_set_gate(24, (uint64) isr24);
+	idt_set_gate(25, (uint64) isr25);
+	idt_set_gate(26, (uint64) isr26);
+	idt_set_gate(27, (uint64) isr27);
+	idt_set_gate(28, (uint64) isr28);
+	idt_set_gate(29, (uint64) isr29);
+
+	idt_set_gate(30, (uint64) isr30);
+	idt_set_gate(31, (uint64) isr31);
+	idt_set_gate(255, (uint64) isr255);
+
+	for (unsigned int i = 32; i < 47; i++)
+		IRQ_set_mask(i);
+
+	// INTERRUPTS FROM THE BOARD
+	// remapping interrupts from irq
 	outb(0x20, 0x11);
 	outb(0xA0, 0x11);
 	outb(0x21, 0x20);
@@ -258,59 +126,116 @@ void irq_remap(void) {
 	outb(0xA1, 0x01);
 	outb(0x21, 0x0);
 	outb(0xA1, 0x0);
+
+	idt_set_gate(32, (uint64) isr32);
+	idt_set_gate(33, (uint64) isr33);
+	idt_set_gate(34, (uint64) isr34);
+	idt_set_gate(35, (uint64) isr35);
+	idt_set_gate(36, (uint64) isr36);
+	idt_set_gate(37, (uint64) isr37);
+	idt_set_gate(38, (uint64) isr38);
+	idt_set_gate(39, (uint64) isr39);
+	idt_set_gate(40, (uint64) isr40);
+	idt_set_gate(41, (uint64) isr41);
+	idt_set_gate(42, (uint64) isr42);
+	idt_set_gate(43, (uint64) isr43);
+	idt_set_gate(44, (uint64) isr44);
+	idt_set_gate(45, (uint64) isr45);
+	idt_set_gate(46, (uint64) isr46);
+	idt_set_gate(47, (uint64) isr47);
+
+	idt_flush(&idt_ptr);
+
+	IRQ_clear_mask(32);
 }
 
-void irq_install() {
-	irq_remap();
-	idt_set_gate(32, (uint64) irq0, 0x08, 0x8E);
-	idt_set_gate(33, (uint64) irq1, 0x08, 0x8E);
-	idt_set_gate(34, (uint64) irq2, 0x08, 0x8E);
-	idt_set_gate(35, (uint64) irq3, 0x08, 0x8E);
-	idt_set_gate(36, (uint64) irq4, 0x08, 0x8E);
-	idt_set_gate(37, (uint64) irq5, 0x08, 0x8E);
-	idt_set_gate(38, (uint64) irq6, 0x08, 0x8E);
-	idt_set_gate(39, (uint64) irq7, 0x08, 0x8E);
-	idt_set_gate(40, (uint64) irq8, 0x08, 0x8E);
-	idt_set_gate(41, (uint64) irq9, 0x08, 0x8E);
-	idt_set_gate(42, (uint64) irq10, 0x08, 0x8E);
-	idt_set_gate(43, (uint64) irq11, 0x08, 0x8E);
-	idt_set_gate(44, (uint64) irq12, 0x08, 0x8E);
-	idt_set_gate(45, (uint64) irq13, 0x08, 0x8E);
-	idt_set_gate(46, (uint64) irq14, 0x08, 0x8E);
-	idt_set_gate(47, (uint64) irq15, 0x08, 0x8E);
-	return;
+/**
+ * Clears interrupt state after interrupt was handled.
+ */
+void pic_sendeoi(int irq) {
+	switch (irq) {
+	case PIC_EOI_MASTER: {
+		outb(PIC1_COMMAND, 0x20);
+		break;
+	}
+	case PIC_EOI_SLAVE: {
+		outb(PIC2_COMMAND, 0x20);
+		break;
+	}
+	case PIC_EOI_ALL: {
+		pic_sendeoi(PIC_EOI_MASTER);
+		pic_sendeoi(PIC_EOI_SLAVE);
+		break;
+	}
+	default: {
+		if (irq >= 8)
+			outb(PIC2_COMMAND, 0x20);
+		outb(PIC1_COMMAND, 0x20);
+		break;
+	}
+	}
 }
-///Handles IRQ's
-extern "C" void irq_handler(struct regs *r) {
-	debugPrint(L"interrupt!");
-	/* This is a blank function pointer */
-	if (interrupt_handlers[r->intNo] != 0) {
-		interrupt_handlers[r->intNo](r);
+
+/**
+ * ISR common handler.
+ *
+ * Called by interrupt vector. Registers are editable state of
+ * CPU before interrupt.
+ */
+extern "C" void isr_handler(registers_t* r) {
+	log(L"interrupt!");
+	if (interrupt_handlers[r->type] == 0) {
+		log(L"not interrupt handler");
+		//error(ERROR_NO_IV_FOR_INTERRUPT, r->type, r->ecode, &r);
 	} else {
-		//printk(LOG_WARN, "irq", "Recieved unhandled interrupt %d (IRQ%d)\n",r->intNo, r->intNo - 32);
-		log(L"Unhandled interrupt");
-	}
-	/* If the IDT entry that was invoked was greater than 40
-	 *  (meaning IRQ8 - 15), then we need to send an EOI to
-	 *  the slave controller */
-	if (r->intNo >= 40) {
-		outb(0xA0, 0x20);
+		interrupt_handlers[r->type](r->ecode, r);
 	}
 
-	/* In either case, we need to send an EOI to the master
-	 *  interrupt controller too */
-	outb(0x20, 0x20);
+	if (r->type > 31 && r->type < 48) {
+		if (r->type >= 40 && r->type != 47)
+			pic_sendeoi(PIC_EOI_SLAVE);
+		if (r->type != 39)
+			pic_sendeoi(PIC_EOI_MASTER);
+	} else if (r->type == 255) {
+		// ipi interrupt
+		//volatile uint32* eoi = (uint32*) physical_to_virtual(apicaddr + 0xB0);
+		//*eoi = 0;
+	}
 }
 
-void init_idt() {
-	idt_ptr.limit = sizeof(struct idt_entry) * 256 - 1;
-	idt_ptr.base = (uint64) &idt_entries;
+/**
+ * Registers ISR vector for interrupt.
+ *
+ * Will overwrite interrupt handler set up before.
+ */
+void register_interrupt_handler(uint8 interrupt_id, isr_t handler_func) {
+	interrupt_handlers[interrupt_id] = handler_func;
+}
 
-	memset((uint8*) &idt_entries, 0, sizeof(struct idt_entry) * 256);
+void IRQ_set_mask(unsigned char IRQline) {
+	uint16 port;
+	uint8 value;
 
-	idt_init_isrs();
-	idt_flush();
-	irq_install();
+	if (IRQline < 8) {
+		port = PIC1_DATA;
+	} else {
+		port = PIC2_DATA;
+		IRQline -= 8;
+	}
+	value = inb(port) | (1 << IRQline);
+	outb(port, value);
+}
 
-	debugPrint(L"idt finished");
+void IRQ_clear_mask(unsigned char IRQline) {
+	uint16 port;
+	uint8 value;
+
+	if (IRQline < 8) {
+		port = PIC1_DATA;
+	} else {
+		port = PIC2_DATA;
+		IRQline -= 8;
+	}
+	value = inb(port) & ~(1 << IRQline);
+	outb(port, value);
 }

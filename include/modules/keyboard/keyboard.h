@@ -1,9 +1,10 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 
+#include <boot/uefi.h>
 #include <bool.h>
 
-typedef enum {
+/*typedef enum {
 	KEY_UNDEFINED,
 
 	// letters
@@ -129,8 +130,8 @@ typedef enum {
 
 	LEFT_GUI,
 	RIGHT_GUI,
-	/* if this end marker is changed, update KEY_COUNT macro */APPS
-} Key;
+	/* if this end marker is changed, update KEY_COUNT macro *///APPS
+/*} Key;
 
 #define KEY_COUNT APPS - KEY_UNDEFINED
 
@@ -155,15 +156,14 @@ typedef struct {
 	bool meta;
 	bool numLock;
 	bool capsLock;
-} KeyEvent;
+} KeyEvent;*/
 
-void keyboard_keyUpdate(KeyMapping);
-typedef void (*KeyboardHandler)(KeyEvent);
+void keyboard_keyUpdate(EFI_INPUT_KEY);
 
 //public API
 
-void keyboard_handler(KeyboardHandler handler);
-char keyboard_eventToChar(KeyEvent keyEvent);
-void keyboard_initialize();
+//char keyboard_eventToChar(KeyEvent keyEvent);
+void keyboard_init();
+void keyboard_probe();
 
 #endif /* KEYBOARD_H_ */

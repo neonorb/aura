@@ -7,6 +7,7 @@
 
 #include <modules/keyboard/uefi.h>
 
+#include <modules/keyboard/keyboard.h>
 #include <boot/uefi.h>
 
 #include <log.h>
@@ -21,7 +22,7 @@ static EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL* stip;
  return EFI_SUCCESS;
  }*/
 
-void uefi_keyboard_initialize() {
+void uefi_keyboard_init() {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->BootServices->LocateProtocol, 3, &stip_guid,
 			NULL, &stip);
@@ -38,10 +39,10 @@ void uefi_keyboard_initialize() {
 	 crash(L"failed to register keyboard notify");
 	 }*/
 
-	EFI_STATUS setStateStatus = uefi_call_wrapper((void*) stip->SetState, 2, &stip, &EFI_KEY_STATE_EXPOSED);
+	//EFI_STATUS setStateStatus = uefi_call_wrapper((void* ) stip->SetState, 2, &stip, EFI_KEY_STATE_EXPOSED);
 }
 
-void uefi_keyboard_tick() {
+void uefi_keyboard_probe() {
 	EFI_INPUT_KEY key;
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->ConIn->ReadKeyStroke, 2, systemTable->ConIn,
@@ -52,8 +53,8 @@ void uefi_keyboard_tick() {
 	}
 
 	if (status == EFI_SUCCESS) {
-
+		keyboard_keyUpdate(key);
 	}
 
-	// no keystroke
+// no keystroke
 }

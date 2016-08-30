@@ -6,17 +6,30 @@
 
 // ---- terminal ----
 
-void screen_terminal_initialize() {
-	uefi_terminal_clear();
+void screen_terminal_init() {
+	uefi_terminal_init();
 }
 
 void screen_terminal_writeString(String data) {
 	uefi_terminal_writeString(data);
 }
 
+void screen_terminal_writeString(CHAR16 data) {
+	wchar_t string[2] = {data, 0};
+	screen_terminal_writeString((String) string);
+}
+
+void screen_terminal_setForegroundColor(UINTN color) {
+	uefi_terminal_setForegroundColor(color);
+}
+
+void screen_terminal_setBackgroundColor(UINTN color) {
+	uefi_terminal_setBackgroundColor(color);
+}
+
 // ---- graphics ----
 
-void screen_graphics_initialize() {
+void screen_graphics_init() {
 	//vga_graphics_initialize();
 }
 void screen_graphics_rectangle(uint32 x, uint32 y, uint32 width, uint32 height,
@@ -33,4 +46,11 @@ void screen_graphics_flip() {
 
 void screen_graphicsMode() {
 	//vga_graphicsMode();
+}
+
+// ---- general ----
+
+void screen_init() {
+	screen_terminal_init();
+	screen_graphics_init();
 }

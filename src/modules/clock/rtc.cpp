@@ -8,7 +8,7 @@
 
 static RTCHandler rtcHandler;
 
-static void rtcInterrupt(registers_t* regs) {
+static void rtcInterrupt(uint64 errorCode, registers_t* regs) {
 	if (rtcHandler != 0) {
 		rtcHandler();
 	}

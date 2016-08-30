@@ -94,6 +94,7 @@ typedef struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
 	EFI_UNREGISTER_KEYSTROKE_NOTIFY UnregisterKeyNotify;
 } EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL;
 
-void uefi_keyboard_initialize();
+void uefi_keyboard_init();
+void uefi_keyboard_probe();
 
 #endif /* INCLUDE_MODULES_KEYBOARD_UEFI_H_ */

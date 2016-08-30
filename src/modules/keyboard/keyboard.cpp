@@ -5,20 +5,16 @@
 #include <kernel/idt.h>
 
 #include <modules/keyboard/ps2.h>
+#include <modules/keyboard/uefi.h>
 
-static KeyboardHandler keyboardHandler;
+#include <kernel/events.h>
 
-bool pressedKeys[KEY_COUNT];
-
-static void keyboardInterrupt(registers_t* regs) {
-	//intCount++;
-	ps2_interrupt();
-}
+//bool pressedKeys[KEY_COUNT];
 
 // callback from driver
-void keyboard_keyUpdate(KeyMapping keyMapping) {
+void keyboard_keyUpdate(EFI_INPUT_KEY keyMapping) {
 // determine pressure and update pressed keys map
-	if (keyMapping.pressure == PRESSED) {
+	/*if (keyMapping.pressure == PRESSED) {
 		if (!pressedKeys[keyMapping.key]) { // if key is not pressed
 			// key is now pressed
 			pressedKeys[keyMapping.key] = true;
@@ -41,24 +37,16 @@ void keyboard_keyUpdate(KeyMapping keyMapping) {
 	keyEvent.shift = pressedKeys[LEFT_SHIFT] || pressedKeys[RIGHT_SHIFT];
 	keyEvent.ctrl = pressedKeys[LEFT_CONTROL] || pressedKeys[RIGHT_CONTROL];
 	keyEvent.alt = pressedKeys[LEFT_ALT] || pressedKeys[RIGHT_ALT];
-// keyEvent.meta = pressedKeys[META or LEFT_GUI];
+// keyEvent.meta = pressedKeys[META or LEFT_GUI];*/
 
 //keyEvent.numLock = numLock;
 //keyEvent.capsLock = capsLock;
 
 // fire event
-	if (keyboardHandler != 0) {
-		keyboardHandler(keyEvent);
-	}
+	fireKeyboardEvent(keyMapping);
 }
 
-// public API
-
-void keyboard_handler(KeyboardHandler handler) {
-	keyboardHandler = handler;
-}
-
-char keyboard_eventToChar(KeyEvent keyEvent) {
+/*char keyboard_eventToChar(KeyEvent keyEvent) {
 	if (keyEvent.pressure == RELEASED) {
 		// no char for released
 		return 0;
@@ -152,9 +140,15 @@ char keyboard_eventToChar(KeyEvent keyEvent) {
 		return 0;
 		break;
 	}
+}*/
+
+void keyboard_init() {
+	//ps2_keyboard_init();
+	uefi_keyboard_init();
+	//register_interrupt_handler(IRQ1, &keyboardInterrupt);
 }
 
-void keyboard_initialize() {
-	//uefi_keyboard_initialize();
-	register_interrupt_handler(IRQ1, &keyboardInterrupt);
+void keyboard_probe() {
+	//ps2_keyboard_probe();
+	uefi_keyboard_probe();
 }

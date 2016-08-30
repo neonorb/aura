@@ -9,7 +9,7 @@
 
 static PITHandler pitHandler;
 
-static void pitInterrupt(registers_t* regs) {
+static void pitInterrupt(uint64 errorCode, registers_t* regs) {
 	if (pitHandler != 0) {
 		pitHandler();
 	}

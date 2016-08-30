@@ -18,9 +18,9 @@ BITS 64
 DEFAULT REL
 
 [GLOBAL gdt_flush]
+extern gdtPointer
 gdt_flush:
-   mov rax, [rdi]
-   lgdt [rax]
+   lgdt [gdtPointer]
 
    mov rax, 0x10
    mov ds, rax
@@ -30,6 +30,7 @@ gdt_flush:
    mov ss, rax
 
    lea rax, [rel .flush]
+   ret
    push 0x08
    push rax
    retf

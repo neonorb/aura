@@ -1,13 +1,14 @@
 # Makefile for Aura
 
 CSOURCES=boot/uefi \
-kernel/kernel kernel/liballoc kernel/log kernel/ports kernel/idt kernel/gdt \
+kernel/kernel kernel/liballoc kernel/log kernel/ports kernel/events \
 implementation/implementation implementation/system/auramain implementation/system/syscalls \
+modules/modules \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
-modules/keyboard/keyboard modules/keyboard/ps2 \
+modules/keyboard/keyboard modules/keyboard/uefi \
 modules/screen/screen modules/screen/uefi \
 utils/utils
-ASOURCES=kernel/idtasm kernel/gdtasm
+ASOURCES=
 MSOURCES=mish/main
 
 LIBS=feta mish

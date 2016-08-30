@@ -38,23 +38,43 @@ void fault(String message) {
 
 void log_write(LogType logType, String message) {
 	switch (logType) {
-	case NORMAL: // TODO change uefi color change to screen
-		uefi_terminal_setForegroundColor(EFI_GREEN);
+	case NORMAL:
+		screen_terminal_setForegroundColor(EFI_GREEN);
 		screen_terminal_writeString(L"[NORMAL] ");
 		break;
 	case WARNING:
-		uefi_terminal_setForegroundColor(EFI_LIGHTRED);
+		screen_terminal_setForegroundColor(EFI_LIGHTRED);
 		screen_terminal_writeString(L"[WARNING] ");
 		break;
 	case FAULT:
-		uefi_terminal_setForegroundColor(EFI_RED);
+		screen_terminal_setForegroundColor(EFI_RED);
 		screen_terminal_writeString(L"[FAULT] ");
 		break;
 	}
 
-	uefi_terminal_setForegroundColor(EFI_LIGHTGRAY);
+	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
 	screen_terminal_writeString(message);
 	screen_terminal_writeString(L"\n\r");
+}
+
+void status(String message) {
+	screen_terminal_setForegroundColor(EFI_BLUE);
+	screen_terminal_writeString(L"[STATUS] ");
+	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
+	screen_terminal_writeString(message);
+	screen_terminal_writeString(L"...");
+}
+
+void statusDone() {
+	screen_terminal_setForegroundColor(EFI_GREEN);
+	screen_terminal_writeString(L"done\n\r");
+	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
+}
+
+void statusFail() {
+	screen_terminal_setForegroundColor(EFI_RED);
+	screen_terminal_writeString(L"failed");
+	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
 }
 
 /****** serial debugging ********/
