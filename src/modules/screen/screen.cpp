@@ -10,6 +10,10 @@ void screen_terminal_init() {
 	uefi_terminal_init();
 }
 
+void screen_terminal_clear() {
+	uefi_terminal_clear();
+}
+
 void screen_terminal_writeString(String data) {
 	uefi_terminal_writeString(data);
 }

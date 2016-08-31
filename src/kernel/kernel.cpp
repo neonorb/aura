@@ -29,8 +29,8 @@
 
 void kernel_main() {
 	cli();
-
 	modules_init();
+	sti();
 
 	log(L"boot complete");
 
@@ -42,9 +42,8 @@ void kernel_main() {
 
 void crash(String message) {
 	fault(message);
-	//cli();
 	fault(L"halting system!");
-	//uefi_call_wrapper((void*) systemTable->BootServices->Stall, 1, 10000);
-	while (true) {
-	}
+
+	cli();
+	asm("hlt");
 }

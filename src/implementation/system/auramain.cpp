@@ -9,13 +9,40 @@
 #include <implementation/system/syscalls.h>
 #include <modules/modules.h>
 #include <kernel/events.h>
+#include <memory.h>
+#include <boot/uefi.h>
 
 extern uint8 mishStart; // &mishStart - start of Mish code
 extern uint8 mishEnd; // &mishEnd - end of Mish code
 
+List<wchar_t> line;
+
 void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 	if (keyEvent.UnicodeChar > 0) {
-		screen_terminal_writeString(keyEvent.UnicodeChar);
+		if (keyEvent.UnicodeChar == 0xD) { // carriage return
+			screen_terminal_writeString(L"\n\r");
+			wchar_t* str = (wchar_t*) create(line.size() * 2 + 1);
+
+			Iterator<wchar_t> stringIterator = line.iterator();
+			uint64 strIndex = 0;
+			while (stringIterator.hasNext()) {
+				str[strIndex] = stringIterator.next();
+				strIndex++;
+			}
+			str[strIndex] = NULL; // null terminate
+			line.clear();
+
+			Code* code = mish_compile(str);
+			delete str;
+
+			if (code != NULL) {
+				code->execute();
+				delete code;
+			}
+		} else {
+			screen_terminal_writeString(keyEvent.UnicodeChar);
+			line.add(keyEvent.UnicodeChar);
+		}
 	} else {
 	}
 }
@@ -38,14 +65,20 @@ void auraMain() {
 	status(L"compiling");
 	Code* code = mish_compile(sourceCode);
 	statusDone();
-	code->execute();
-	delete code;
 
-	unregisterSyscalls();
+	if (code != NULL) {
+		code->execute();
+		delete code;
+	}
 
 	while (true) {
+		//uefi_call_wrapper((void*) systemTable->BootServices->Stall, 1, 100000);
+		//log(L"hi");
+		asm("hlt");
 		modules_probe();
 	}
+
+	unregisterSyscalls();
 
 	//dumpAllocated();
 }

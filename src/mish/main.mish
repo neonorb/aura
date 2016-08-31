@@ -1,2 +1,1 @@
-__print('m1', 'm2')
-__print('m3', 'm4')
+__println('type a command')

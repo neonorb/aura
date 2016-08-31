@@ -17,15 +17,5 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 
 	kernel_main();
 
-	EFI_PHYSICAL_ADDRESS location;
-	EFI_STATUS status = uefi_call_wrapper(
-			(void* ) systemTable->BootServices->AllocatePages, 4,
-			AllocateAnyPages, EfiLoaderData, 16, &location);
-
-	if (status == EFI_SUCCESS) {
-		while (true) {
-		}
-	}
-
-	return status;
+	return EFI_SUCCESS;
 }

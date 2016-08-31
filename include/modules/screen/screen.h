@@ -7,6 +7,7 @@
 
 void screen_init();
 
+void screen_terminal_clear();
 void screen_terminal_setForegroundColor(UINTN color);
 void screen_terminal_setBackgroundColor(UINTN color);
 void screen_terminal_writeString(String data);
