@@ -1,1 +1,1 @@
-__println(__getTime())
+__println(__getTime(), 'hi')

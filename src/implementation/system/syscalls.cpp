@@ -6,8 +6,10 @@
 
 Value* printSyscallFunction(List<Value*>* arguments) {
 	String message = ((StringValue*) arguments->get(0))->value;
+	String message1 = ((StringValue*) arguments->get(1))->value;
 
 	screen_terminal_writeString(message);
+	screen_terminal_writeString(message1);
 
 	return NULL;
 }
@@ -38,6 +40,7 @@ void registerSyscalls() {
 	// print
 	List<ValueType>* printParameterTypes = new List<ValueType>();
 	printParameterTypes->add(STRING_VALUE);
+	printParameterTypes->add(STRING_VALUE);
 	Function* print = new Function(L"print", printSyscallFunction,
 			printParameterTypes, VOID_VALUE);
 	syscalls.add(print);
@@ -45,6 +48,7 @@ void registerSyscalls() {
 
 	// println
 	List<ValueType>* printlnParameterTypes = new List<ValueType>();
+	printlnParameterTypes->add(STRING_VALUE);
 	printlnParameterTypes->add(STRING_VALUE);
 	Function* println = new Function(L"println", printlnSyscallFunction, printlnParameterTypes, VOID_VALUE);
 	syscalls.add(println);
