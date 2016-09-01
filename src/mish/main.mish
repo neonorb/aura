@@ -1,1 +1,1 @@
-__println('type a command')
+__println(__getTime())

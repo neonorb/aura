@@ -42,6 +42,9 @@ void uefi_keyboard_init() {
 	//EFI_STATUS setStateStatus = uefi_call_wrapper((void* ) stip->SetState, 2, &stip, EFI_KEY_STATE_EXPOSED);
 }
 
+static String code = L"__println(__getTime())";
+static int position = 0;
+
 void uefi_keyboard_probe() {
 	EFI_INPUT_KEY key;
 	EFI_STATUS status = uefi_call_wrapper(
@@ -54,7 +57,16 @@ void uefi_keyboard_probe() {
 
 	if (status == EFI_SUCCESS) {
 		keyboard_keyUpdate(key);
-	}
+	}/* else {
+		if (position >= strlen(code)) {
+			position = -1;
+			key.UnicodeChar = 0xD;
+		} else {
+			key.UnicodeChar = code[position];
+		}
+		keyboard_keyUpdate(key);
+		position++;
+	}*/
 
-// no keystroke
+	// no keystroke
 }

@@ -26,6 +26,10 @@ Value* clearSyscallFunction(List<Value*>* arguments) {
 	return NULL;
 }
 
+Value* getTimeSyscallFunction(List<Value*>* arguments) {
+	return (Value*) new StringValue(L"10 AM");
+}
+
 // ----- register & unregister -----
 
 List<Function*> syscalls;
@@ -51,6 +55,12 @@ void registerSyscalls() {
 	Function* clear = new Function(L"clear", clearSyscallFunction, clearParameterTypes, VOID_VALUE);
 	syscalls.add(clear);
 	mish_syscalls.add(clear);
+
+	// getTime
+	List<ValueType>* getTimeParameterTypes = new List<ValueType>();
+	Function* getTime = new Function(L"getTime", getTimeSyscallFunction, getTimeParameterTypes, STRING_VALUE);
+	syscalls.add(getTime);
+	mish_syscalls.add(getTime);
 }
 
 void unregisterSyscalls() {

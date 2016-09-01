@@ -39,11 +39,16 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				code->execute();
 				delete code;
 			}
+		} else if (keyEvent.UnicodeChar == 0x8) { // backspace
+			if (line.size() == 0) {
+				return;
+			}
+			screen_terminal_writeString(keyEvent.UnicodeChar);
+			line.remove(line.size() - 1);
 		} else {
 			screen_terminal_writeString(keyEvent.UnicodeChar);
 			line.add(keyEvent.UnicodeChar);
 		}
-	} else {
 	}
 }
 
@@ -64,11 +69,13 @@ void auraMain() {
 
 	status(L"compiling");
 	Code* code = mish_compile(sourceCode);
-	statusDone();
 
 	if (code != NULL) {
+		statusDone();
 		code->execute();
 		delete code;
+	} else {
+		statusFail();
 	}
 
 	while (true) {
