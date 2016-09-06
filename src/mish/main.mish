@@ -1,1 +1,6 @@
-__println(__getTime(), 'hi')
+__println('Hello!')
+
+__println('1')
+__println('1', '2')
+__print('p1')
+__print('p1', 'p2')

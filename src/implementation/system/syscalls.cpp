@@ -6,10 +6,12 @@
 
 Value* printSyscallFunction(List<Value*>* arguments) {
 	String message = ((StringValue*) arguments->get(0))->value;
-	String message1 = ((StringValue*) arguments->get(1))->value;
-
 	screen_terminal_writeString(message);
-	screen_terminal_writeString(message1);
+
+	if (arguments->size() == 2) {
+		String message2 = ((StringValue*) arguments->get(1))->value;
+		screen_terminal_writeString(message2);
+	}
 
 	return NULL;
 }
@@ -40,29 +42,46 @@ void registerSyscalls() {
 	// print
 	List<ValueType>* printParameterTypes = new List<ValueType>();
 	printParameterTypes->add(STRING_VALUE);
-	printParameterTypes->add(STRING_VALUE);
-	Function* print = new Function(L"print", printSyscallFunction,
+	Function* print = new Function(L"__print", printSyscallFunction,
 			printParameterTypes, VOID_VALUE);
 	syscalls.add(print);
 	mish_syscalls.add(print);
+	// print2
+	List<ValueType>* print2ParameterTypes = new List<ValueType>();
+	print2ParameterTypes->add(STRING_VALUE);
+	print2ParameterTypes->add(STRING_VALUE);
+	Function* print2 = new Function(L"__print", printSyscallFunction,
+			print2ParameterTypes, VOID_VALUE);
+	syscalls.add(print2);
+	mish_syscalls.add(print2);
 
 	// println
 	List<ValueType>* printlnParameterTypes = new List<ValueType>();
 	printlnParameterTypes->add(STRING_VALUE);
-	printlnParameterTypes->add(STRING_VALUE);
-	Function* println = new Function(L"println", printlnSyscallFunction, printlnParameterTypes, VOID_VALUE);
+	Function* println = new Function(L"__println", printlnSyscallFunction,
+			printlnParameterTypes, VOID_VALUE);
 	syscalls.add(println);
 	mish_syscalls.add(println);
+	// println2
+	List<ValueType>* println2ParameterTypes = new List<ValueType>();
+	println2ParameterTypes->add(STRING_VALUE);
+	println2ParameterTypes->add(STRING_VALUE);
+	Function* println2 = new Function(L"__println", printlnSyscallFunction,
+			println2ParameterTypes, VOID_VALUE);
+	syscalls.add(println2);
+	mish_syscalls.add(println2);
 
 	// clear
 	List<ValueType>* clearParameterTypes = new List<ValueType>();
-	Function* clear = new Function(L"clear", clearSyscallFunction, clearParameterTypes, VOID_VALUE);
+	Function* clear = new Function(L"__clear", clearSyscallFunction,
+			clearParameterTypes, VOID_VALUE);
 	syscalls.add(clear);
 	mish_syscalls.add(clear);
 
 	// getTime
 	List<ValueType>* getTimeParameterTypes = new List<ValueType>();
-	Function* getTime = new Function(L"getTime", getTimeSyscallFunction, getTimeParameterTypes, STRING_VALUE);
+	Function* getTime = new Function(L"__getTime", getTimeSyscallFunction,
+			getTimeParameterTypes, STRING_VALUE);
 	syscalls.add(getTime);
 	mish_syscalls.add(getTime);
 }
