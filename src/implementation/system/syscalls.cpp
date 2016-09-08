@@ -34,6 +34,16 @@ Value* getTimeSyscallFunction(List<Value*>* arguments) {
 	return (Value*) new StringValue(L"10 AM");
 }
 
+Value* compileAndExecuteFunction(List<Value*>* arguments) {
+	String sourceCode = ((StringValue*) arguments->get(0))->value;
+
+	Code* code = mish_compile(sourceCode);
+	mish_execute(code);
+	delete code;
+
+	return NULL;
+}
+
 // ----- register & unregister -----
 
 List<Function*> syscalls;
@@ -84,6 +94,13 @@ void registerSyscalls() {
 			getTimeParameterTypes, STRING_VALUE);
 	syscalls.add(getTime);
 	mish_syscalls.add(getTime);
+
+	// compileAndExecute
+	List<ValueType>* compileAndExecuteParameterTypes = new List<ValueType>();
+	compileAndExecuteParameterTypes->add(STRING_VALUE);
+	Function* compileAndExecute = new Function(L"__compileAndExecute", compileAndExecuteFunction, compileAndExecuteParameterTypes, VOID_VALUE);
+	syscalls.add(compileAndExecute);
+	mish_syscalls.add(compileAndExecute);
 }
 
 void unregisterSyscalls() {
