@@ -52,7 +52,7 @@ void log_write(LogType logType, String message) {
 		break;
 	}
 
-	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
+	screen_terminal_resetForegroundColor();
 	screen_terminal_writeString(message);
 	screen_terminal_writeString(L"\n\r");
 }
@@ -60,7 +60,7 @@ void log_write(LogType logType, String message) {
 void status(String message) {
 	screen_terminal_setForegroundColor(EFI_BLUE);
 	screen_terminal_writeString(L"[STATUS] ");
-	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
+	screen_terminal_resetForegroundColor();
 	screen_terminal_writeString(message);
 	screen_terminal_writeString(L"...");
 }
@@ -68,13 +68,13 @@ void status(String message) {
 void statusDone() {
 	screen_terminal_setForegroundColor(EFI_GREEN);
 	screen_terminal_writeString(L"done\n\r");
-	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
+	screen_terminal_resetForegroundColor();
 }
 
 void statusFail() {
 	screen_terminal_setForegroundColor(EFI_RED);
 	screen_terminal_writeString(L"failed");
-	screen_terminal_setForegroundColor(EFI_LIGHTGRAY);
+	screen_terminal_resetForegroundColor();
 }
 
 /****** serial debugging ********/

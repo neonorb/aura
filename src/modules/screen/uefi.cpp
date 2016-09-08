@@ -13,7 +13,6 @@ static UINTN foreground;
 static UINTN background;
 
 void uefi_terminal_init() {
-	uefi_terminal_clear();
 	uefi_terminal_setCursorVisibility(true);
 }
 

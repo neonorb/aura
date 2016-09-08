@@ -2,7 +2,7 @@
 
 CSOURCES=boot/uefi \
 kernel/kernel kernel/liballoc kernel/log kernel/ports kernel/events \
-implementation/implementation implementation/system/auramain implementation/system/syscalls \
+implementation/implementation implementation/system/auramain implementation/system/syscalls implementation/system/console \
 modules/modules \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
 modules/keyboard/keyboard modules/keyboard/uefi \
