@@ -13,21 +13,21 @@
 #include <memory.h>
 #include <boot/uefi.h>
 
+bool probeLoop = true;
+
 void auraMain() {
-	//dumpAllocated();
+	dumpAllocated();
 
 	registerSyscalls();
 
 	console();
 
-	while (true) {
-		//uefi_call_wrapper((void*) systemTable->BootServices->Stall, 1, 100000);
-		//log(L"hi");
-		asm("hlt");
-		modules_probe();
+	while (probeLoop) {
+		asm("hlt"); // wait for an interrupt
+		modules_probe(); // probe modules for input, input will trigger an event
 	}
 
 	unregisterSyscalls();
 
-	//dumpAllocated();
+	dumpAllocated();
 }

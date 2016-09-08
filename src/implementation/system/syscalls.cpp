@@ -44,6 +44,13 @@ Value* compileAndExecuteFunction(List<Value*>* arguments) {
 	return NULL;
 }
 
+extern bool probeLoop;
+Value* exitFunction(List<Value*>* arguments) {
+	probeLoop = false;
+
+	return NULL;
+}
+
 // ----- register & unregister -----
 
 List<Function*> syscalls;
@@ -101,6 +108,12 @@ void registerSyscalls() {
 	Function* compileAndExecute = new Function(L"__compileAndExecute", compileAndExecuteFunction, compileAndExecuteParameterTypes, VOID_VALUE);
 	syscalls.add(compileAndExecute);
 	mish_syscalls.add(compileAndExecute);
+
+	// exit
+	List<ValueType>* exitParameterTypes = new List<ValueType>();
+	Function* exit = new Function(L"__exit", exitFunction, exitParameterTypes, VOID_VALUE);
+	syscalls.add(exit);
+	mish_syscalls.add(exit);
 }
 
 void unregisterSyscalls() {
