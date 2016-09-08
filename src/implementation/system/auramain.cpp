@@ -36,7 +36,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 			delete str;
 
 			if (code != NULL) {
-				code->execute();
+				mish_execute(code);
 				delete code;
 			}
 		} else if (keyEvent.UnicodeChar == 0x8) { // backspace
@@ -72,7 +72,7 @@ void auraMain() {
 
 	if (code != NULL) {
 		statusDone();
-		code->execute();
+		mish_execute(code);
 		delete code;
 	} else {
 		statusFail();

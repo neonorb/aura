@@ -43,7 +43,7 @@ void log_write(LogType logType, String message) {
 		screen_terminal_writeString(L"[NORMAL] ");
 		break;
 	case WARNING:
-		screen_terminal_setForegroundColor(EFI_LIGHTRED);
+		screen_terminal_setForegroundColor(EFI_YELLOW);
 		screen_terminal_writeString(L"[WARNING] ");
 		break;
 	case FAULT:

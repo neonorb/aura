@@ -2,5 +2,16 @@ __println('Hello!')
 
 __println('1')
 __println('1', '2')
+__print('\n')
 __print('p1')
 __print('p1', 'p2')
+
+__println('\\')
+__println('\\_')
+__println('_\\')
+__println('_\\_')
+
+__println('\'')
+__println('\'_')
+__println('_\'')
+__println('_\'_')
