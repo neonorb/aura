@@ -23,7 +23,8 @@ void auraMain() {
 	console();
 
 	while (probeLoop) {
-		asm("hlt"); // wait for an interrupt
+		asm("hlt");
+		// wait for an interrupt
 		modules_probe(); // probe modules for input, input will trigger an event
 	}
 

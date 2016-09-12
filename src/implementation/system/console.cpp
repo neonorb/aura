@@ -74,8 +74,12 @@ void console() {
 	sourceCode[charCount] = 0; // NULL terminate
 
 	Code* code = mish_compile(sourceCode);
-	mish_execute(code);
-	delete code;
+	delete sourceCode;
+
+	if (code != NULL) {
+		mish_execute(code);
+		delete code;
+	}
 
 	printShell();
 }

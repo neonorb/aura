@@ -40,19 +40,35 @@ build/aura.so: $(OBJECTS) | build/.dirstamp
 		$(LIBS_FLAGS)                 \
 		-o build/aura.so
 
+REGULAR_SECTIONS=-j .text    \
+		         -j .sdata   \
+		         -j .data    \
+	        	 -j .dynamic \
+		         -j .dynsym  \
+		         -j .rel     \
+		         -j .rela    \
+		         -j .reloc   \
+		         -j .mish
+DEBUG_SECTIONS=-j .debug_info     \
+		       -j .debug_abbrev   \
+		       -j .debug_loc      \
+		       -j .debug_aranges  \
+		       -j .debug_line     \
+		       -j .debug_macinfo  \
+		       -j .debug_debugstr \
+
+OBJCOPY_FLAGS=--target=efi-app-x86_64
 build/aura.efi: build/aura.so | build/.dirstamp
-	objcopy -j .text            \
-		-j .sdata               \
-		-j .data                \
-		-j .dynamic             \
-		-j .dynsym              \
-		-j .rel                 \
-		-j .rela                \
-		-j .reloc               \
-		-j .mish                \
-		--target=efi-app-x86_64 \
+	objcopy $(REGULAR_SECTIONS) \
+		$(OBJCOPY_FLAGS)        \
 		build/aura.so           \
 		build/aura.efi
+
+build/debug.aura.efi: build/aura.so | build/.dirstamp
+	objcopy $(DEBUG_SECTIONS) \
+		$(OBJCOPY_FLAGS)      \
+		build/aura.so         \
+		build/debug.aura.efi	
 		
 # ---- output files ----
 
@@ -86,6 +102,14 @@ build/aura.vdi: build/aura.img
 # ---- running ----
 
 .PHONY:
-run: private DFLAGS = $(if $(DEBUGGING),-s -S)
+run: private DFLAGS = $(if $(DEBUGGING),-s)
 run: img
 	qemu-system-x86_64 -serial stdio $(DFLAGS) -cpu qemu64 -bios OVMF.fd -drive file=build/aura.img,if=ide
+
+# ---- debugging ----
+
+.PHONY:
+gdb: build/debug.aura.efi
+	
+
+
