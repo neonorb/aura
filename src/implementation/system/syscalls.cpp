@@ -44,6 +44,12 @@ Value* compileAndExecuteFunction(List<Value*>* arguments) {
 	return NULL;
 }
 
+Value* dumpAllocatedFunction(List<Value*>* arguments) {
+	dumpAllocated();
+
+	return NULL;
+}
+
 extern bool probeLoop;
 Value* exitFunction(List<Value*>* arguments) {
 	probeLoop = false;
@@ -56,14 +62,14 @@ Value* exitFunction(List<Value*>* arguments) {
 List<Function*> syscalls;
 
 void registerSyscalls() {
-	// print
+	// __print
 	List<ValueType>* printParameterTypes = new List<ValueType>();
 	printParameterTypes->add(STRING_VALUE);
 	Function* print = new Function(L"__print", printSyscallFunction,
 			printParameterTypes, VOID_VALUE);
 	syscalls.add(print);
 	mish_syscalls.add(print);
-	// print2
+	// 2
 	List<ValueType>* print2ParameterTypes = new List<ValueType>();
 	print2ParameterTypes->add(STRING_VALUE);
 	print2ParameterTypes->add(STRING_VALUE);
@@ -72,14 +78,14 @@ void registerSyscalls() {
 	syscalls.add(print2);
 	mish_syscalls.add(print2);
 
-	// println
+	// __println
 	List<ValueType>* printlnParameterTypes = new List<ValueType>();
 	printlnParameterTypes->add(STRING_VALUE);
 	Function* println = new Function(L"__println", printlnSyscallFunction,
 			printlnParameterTypes, VOID_VALUE);
 	syscalls.add(println);
 	mish_syscalls.add(println);
-	// println2
+	// 2
 	List<ValueType>* println2ParameterTypes = new List<ValueType>();
 	println2ParameterTypes->add(STRING_VALUE);
 	println2ParameterTypes->add(STRING_VALUE);
@@ -88,39 +94,44 @@ void registerSyscalls() {
 	syscalls.add(println2);
 	mish_syscalls.add(println2);
 
-	// clear
+	// __clear
 	List<ValueType>* clearParameterTypes = new List<ValueType>();
 	Function* clear = new Function(L"__clear", clearSyscallFunction,
 			clearParameterTypes, VOID_VALUE);
 	syscalls.add(clear);
 	mish_syscalls.add(clear);
 
-	// getTime
+	// __getTime
 	List<ValueType>* getTimeParameterTypes = new List<ValueType>();
 	Function* getTime = new Function(L"__getTime", getTimeSyscallFunction,
 			getTimeParameterTypes, STRING_VALUE);
 	syscalls.add(getTime);
 	mish_syscalls.add(getTime);
 
-	// compileAndExecute
+	// __compileAndExecute
 	List<ValueType>* compileAndExecuteParameterTypes = new List<ValueType>();
 	compileAndExecuteParameterTypes->add(STRING_VALUE);
 	Function* compileAndExecute = new Function(L"__compileAndExecute", compileAndExecuteFunction, compileAndExecuteParameterTypes, VOID_VALUE);
 	syscalls.add(compileAndExecute);
 	mish_syscalls.add(compileAndExecute);
 
-	// exit
+	// __exit
 	List<ValueType>* exitParameterTypes = new List<ValueType>();
 	Function* exit = new Function(L"__exit", exitFunction, exitParameterTypes, VOID_VALUE);
 	syscalls.add(exit);
 	mish_syscalls.add(exit);
+
+	// __dumpAllocated
+	List<ValueType>* dumpAllocatedParameterTypes = new List<ValueType>();
+	Function* dumpAllocated = new Function(L"__dumpAllocated", dumpAllocatedFunction, dumpAllocatedParameterTypes, VOID_VALUE);
+	syscalls.add(dumpAllocated);
+	mish_syscalls.add(dumpAllocated);
 }
 
 void unregisterSyscalls() {
 	Iterator<Function*> iterator = syscalls.iterator();
 	while (iterator.hasNext()) {
 		Function* function = iterator.next();
-		function->parameterTypes->clear();
 		mish_syscalls.remove(function);
 		delete function;
 	}
