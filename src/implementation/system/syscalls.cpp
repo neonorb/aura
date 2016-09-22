@@ -57,6 +57,16 @@ Value* exitFunction(List<Value*>* arguments) {
 	return NULL;
 }
 
+int booleanCounter = 0;
+Value* getBooleanFunction(List<Value*>* arguments) {
+	if(booleanCounter == 5) {
+		booleanCounter = 0;
+		return (Value*) new BooleanValue(false);
+	}
+	booleanCounter++;
+	return (Value*) new BooleanValue(true);
+}
+
 // ----- register & unregister -----
 
 List<Function*> syscalls;
@@ -117,6 +127,13 @@ void registerSyscalls() {
 	syscalls.add(compileAndExecute);
 	mish_syscalls.add(compileAndExecute);
 
+	// __dumpAllocated
+	List<ValueType>* dumpAllocatedParameterTypes = new List<ValueType>();
+	Function* dumpAllocated = new Function(L"__dumpAllocated",
+			dumpAllocatedParameterTypes, VOID_VALUE, dumpAllocatedFunction);
+	syscalls.add(dumpAllocated);
+	mish_syscalls.add(dumpAllocated);
+
 	// __exit
 	List<ValueType>* exitParameterTypes = new List<ValueType>();
 	Function* exit = new Function(L"__exit", exitParameterTypes, VOID_VALUE,
@@ -124,12 +141,12 @@ void registerSyscalls() {
 	syscalls.add(exit);
 	mish_syscalls.add(exit);
 
-	// __dumpAllocated
-	List<ValueType>* dumpAllocatedParameterTypes = new List<ValueType>();
-	Function* dumpAllocated = new Function(L"__dumpAllocated",
-			dumpAllocatedParameterTypes, VOID_VALUE, dumpAllocatedFunction);
-	syscalls.add(dumpAllocated);
-	mish_syscalls.add(dumpAllocated);
+	// __getBoolean
+	List<ValueType>* getBooleanParameterTypes = new List<ValueType>();
+	Function* getBoolean = new Function(L"__getBoolean",
+			getBooleanParameterTypes, BOOLEAN_VALUE, getBooleanFunction);
+	syscalls.add(getBoolean);
+	mish_syscalls.add(getBoolean);
 }
 
 void unregisterSyscalls() {
