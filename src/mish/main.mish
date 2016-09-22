@@ -17,4 +17,8 @@
 #__println('_\'')
 #__println('_\'_')
 
+while (true) {
+	__println('hi')
+}
+
 __println('Hello! Enter a Mish command to do stuff!')
