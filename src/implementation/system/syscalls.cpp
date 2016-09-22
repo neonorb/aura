@@ -59,11 +59,21 @@ Value* exitFunction(List<Value*>* arguments) {
 
 int booleanCounter = 0;
 Value* getBooleanFunction(List<Value*>* arguments) {
-	if(booleanCounter == 5) {
+	if(booleanCounter == 3) {
 		booleanCounter = 0;
 		return (Value*) new BooleanValue(false);
 	}
 	booleanCounter++;
+	return (Value*) new BooleanValue(true);
+}
+
+int booleanCounter2 = 0;
+Value* getBoolean2Function(List<Value*>* arguments) {
+	if(booleanCounter2 == 3) {
+		booleanCounter2 = 0;
+		return (Value*) new BooleanValue(false);
+	}
+	booleanCounter2++;
 	return (Value*) new BooleanValue(true);
 }
 
@@ -147,6 +157,13 @@ void registerSyscalls() {
 			getBooleanParameterTypes, BOOLEAN_VALUE, getBooleanFunction);
 	syscalls.add(getBoolean);
 	mish_syscalls.add(getBoolean);
+
+	// __getBoolean2
+	List<ValueType>* getBoolean2ParameterTypes = new List<ValueType>();
+	Function* getBoolean2 = new Function(L"__getBoolean2",
+			getBoolean2ParameterTypes, BOOLEAN_VALUE, getBoolean2Function);
+	syscalls.add(getBoolean2);
+	mish_syscalls.add(getBoolean2);
 }
 
 void unregisterSyscalls() {
