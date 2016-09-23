@@ -4,16 +4,16 @@
 #include <modules/screen/uefi.h>
 #include <log.h>
 
-#define DEFAULT_FOREGROUND_COLOR EFI_LIGHTGRAY
-#define DEFAULT_BACKGROUND_COLOR EFI_BLACK
+#define DEFAULT_FOREGROUND_COLOR EFI_BLACK
+#define DEFAULT_BACKGROUND_COLOR EFI_LIGHTGRAY
 
 // ---- terminal ----
 
 void screen_terminal_init() {
 	uefi_terminal_init();
-	screen_terminal_clear();
 	screen_terminal_resetForegroundColor();
 	screen_terminal_resetBackgroundColor();
+	screen_terminal_clear();
 }
 
 void screen_terminal_clear() {

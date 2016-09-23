@@ -96,8 +96,8 @@ int is_transmit_empty() {
 }
 
 void write_serial(char a) {
-	while (is_transmit_empty() == 0)
-		;
+	while (is_transmit_empty() == 0) {
+	}
 
 	outb(PORT, a);
 }
