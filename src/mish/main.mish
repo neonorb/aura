@@ -17,11 +17,4 @@
 #__println('_\'')
 #__println('_\'_')
 
-while (__getBoolean()) {
-	__println('outer');
-	while (__getBoolean2()) {
-		__println('  inner');
-	}
-}
-
 __println('Hello! Enter a Mish command to do stuff!')
