@@ -45,6 +45,13 @@ void uefi_terminal_writeString(String message) {
 	}
 }
 
+uint64 uefi_terminal_cursorColumn() {
+	return systemTable->ConOut->Mode->CursorColumn;
+}
+uint64 uefi_terminal_cursorRow() {
+	return systemTable->ConOut->Mode->CursorRow;
+}
+
 static void updateColor() {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->ConOut->SetAttribute, 2, systemTable->ConOut,

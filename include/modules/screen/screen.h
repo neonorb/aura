@@ -15,6 +15,9 @@ void screen_terminal_resetBackgroundColor();
 void screen_terminal_writeString(String data);
 void screen_terminal_writeString(CHAR16 data);
 
+uint64 screen_terminal_cursorColumn();
+uint64 screen_terminal_cursorRow();
+
 void screen_graphics_rectangle(uint32 x, uint32 y, uint32 width, uint32 height,	uint8 red, uint8 green, uint8 blue);
 void screen_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,	uint8 blue);
 void screen_graphics_flip();

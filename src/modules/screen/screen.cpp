@@ -25,8 +25,14 @@ void screen_terminal_writeString(String data) {
 }
 
 void screen_terminal_writeString(CHAR16 data) {
-	wchar_t string[2] = {data, 0};
+	wchar_t string[2] = { data, 0 };
 	screen_terminal_writeString((String) string);
+}
+uint64 screen_terminal_cursorColumn() {
+	return uefi_terminal_cursorColumn();
+}
+uint64 screen_terminal_cursorRow() {
+	return uefi_terminal_cursorRow();
 }
 
 void screen_terminal_setForegroundColor(UINTN color) {

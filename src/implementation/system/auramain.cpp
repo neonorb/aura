@@ -26,6 +26,7 @@ void auraMain() {
 		asm("hlt");
 		// wait for an interrupt
 		modules_probe(); // probe modules for input, input will trigger an event
+		mish_runScheduler(); // execute threads
 	}
 
 	unregisterSyscalls();
