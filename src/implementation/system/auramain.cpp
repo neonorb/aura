@@ -23,8 +23,12 @@ void auraMain() {
 	console();
 
 	while (probeLoop) {
-		asm("hlt");
 		// wait for an interrupt
+		if (mish_activeThreadCount() == 0) {
+			//stallMilli(1000);
+			asm("hlt");
+		}
+
 		modules_probe(); // probe modules for input, input will trigger an event
 		mish_runScheduler(); // execute threads
 	}

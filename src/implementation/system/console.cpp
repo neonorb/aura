@@ -42,7 +42,7 @@ void console_onThreadExit(Thread* thread) {
 	printShell();
 }
 static void newThread(Code* code) {
-	Thread* thread = new Thread(code);
+	Thread* thread = new Thread(code, ACTIVE);
 	thread->onThreadExit = console_onThreadExit;
 	mish_spawnThread(thread);
 	currentThread = thread;

@@ -8,11 +8,16 @@
 #ifndef INCLUDE_BOOT_UEFI_H_
 #define INCLUDE_BOOT_UEFI_H_
 
+#include <int.h>
+
 extern "C" {
 #include <efi.h>
 #include <efilib.h>
 }
 
 extern EFI_SYSTEM_TABLE* systemTable;
+
+void stallMilli(uint64 milliseconds);
+void stall(uint64 microseconds);
 
 #endif /* INCLUDE_BOOT_UEFI_H_ */

@@ -36,3 +36,16 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 
 	return EFI_SUCCESS;
 }
+
+void stallMilli(uint64 milliseconds) {
+	stall(milliseconds * 1000);
+}
+
+void stall(uint64 microseconds) {
+	EFI_STATUS status = uefi_call_wrapper(
+			(void* )systemTable->BootServices->Stall, 1, microseconds);
+
+	if (status != EFI_SUCCESS) {
+		crash(L"error while stalling");
+	}
+}
