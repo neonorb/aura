@@ -1,7 +1,7 @@
 # Aura
 A x86-64 hobby operating system written in C++.
 
-See the [wiki](http://neonorb.com/wiki/Project_Asiago) for more information.
+See the [main project page](https://github.com/neonorb/project-asiago) for more information.
 
 # Depends
 + GNU Toolchain (gcc, make)
