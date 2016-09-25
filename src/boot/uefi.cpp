@@ -32,6 +32,12 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 	}
 #endif
 
+	// disable the watchdog timer - if this is enabled, the firmware will reset the system after 5 minutes
+	EFI_STATUS watchdogStatus = uefi_call_wrapper((void*) systemTable->BootServices->SetWatchdogTimer, 4, 0, 0, 0, NULL);
+	if(watchdogStatus != EFI_SUCCESS) {
+		crash(L"error while disabling the watchdog timer");
+	}
+
 	kernel_main();
 
 	return EFI_SUCCESS;

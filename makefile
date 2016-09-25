@@ -33,6 +33,7 @@ build/aura.so: $(OBJECTS) | build/.dirstamp
 		-znocombreloc                 \
 		-T gnu-efi/elf_x86_64_efi.lds \
 		-shared                       \
+		-fPIC                         \
 		-Bsymbolic                    \
 		-L gnu-efi/libs               \
 		-l:libgnuefi.a                \
@@ -41,21 +42,21 @@ build/aura.so: $(OBJECTS) | build/.dirstamp
 		-o build/aura.so
 
 REGULAR_SECTIONS=-j .text    \
-		         -j .sdata   \
-		         -j .data    \
-	        	 -j .dynamic \
-		         -j .dynsym  \
-		         -j .rel     \
-		         -j .rela    \
-		         -j .reloc   \
-		         -j .mish
+				 -j .sdata   \
+				 -j .data    \
+				 -j .dynamic \
+				 -j .dynsym  \
+				 -j .rel     \
+				 -j .rela    \
+				 -j .reloc   \
+				 -j .mish
 DEBUG_SECTIONS=-j .debug_info     \
-		       -j .debug_abbrev   \
-		       -j .debug_loc      \
-		       -j .debug_aranges  \
-		       -j .debug_line     \
-		       -j .debug_macinfo  \
-		       -j .debug_debugstr \
+			   -j .debug_abbrev   \
+			   -j .debug_loc      \
+			   -j .debug_aranges  \
+			   -j .debug_line     \
+			   -j .debug_macinfo  \
+			   -j .debug_debugstr \
 
 OBJCOPY_FLAGS=--target=efi-app-x86_64
 build/aura.efi: build/aura.so | build/.dirstamp

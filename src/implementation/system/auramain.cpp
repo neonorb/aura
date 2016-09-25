@@ -25,6 +25,7 @@ void auraMain() {
 	while (probeLoop) {
 		// wait for an interrupt
 		if (mish_activeThreadCount() == 0) {
+			// TODO don't run background threads when there are active ones
 			//stallMilli(1000);
 			asm("hlt");
 		}
