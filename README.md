@@ -1,7 +1,9 @@
 # Aura
 A x86-64 hobby operating system written in C++.
 
-See the [wiki](http://neonorb.com/wiki/Project_Asiago) for more information.
+See the [main project page](https://github.com/neonorb/project-asiago) for more information.
+
+View [this](https://rogerdudler.github.io/git-guide/) if you're unfamiliar with using git.
 
 # Depends
 + GNU Toolchain (gcc, make)
@@ -27,11 +29,6 @@ If you want to use QEMU (recommended), run `make run`.
 [UEFI Specification](http://www.uefi.org/sites/default/files/resources/UEFI%20Spec%202_6.pdf)
 
 Also check the Google Drive folder.
-
-# Code Style Guide
-Refer to the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html) for a general guide.
-
-View [this](https://rogerdudler.github.io/git-guide/) if you're unfamiliar with using git.
   
 # License
 GPL v3.0 or later (See LICENSE file for details.)
