@@ -21,7 +21,7 @@ List<wchar_t> line;
 
 static void printShell() {
 	// if we don't have a new line, print a character to indicate that
-	if(screen_terminal_cursorColumn() != 0) {
+	if (screen_terminal_cursorColumn() != 0) {
 		screen_terminal_setBackgroundColor(EFI_BLACK);
 		screen_terminal_setForegroundColor(EFI_WHITE);
 		screen_terminal_writeString(L"%");
@@ -75,6 +75,8 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 
 				if (code != NULL) {
 					newThread(code);
+				} else {
+					printShell();
 				}
 			} else if (keyEvent.UnicodeChar == 0x8) { // backspace
 				if (line.size() == 0) {
