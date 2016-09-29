@@ -79,7 +79,7 @@ Value* getBoolean2Function(List<Value*>* arguments) {
 	return (Value*) new BooleanValue(true);
 }
 
-// ----- register & unregister -----
+// ----- register & unregister syscalls -----
 
 List<Function*> syscalls;
 

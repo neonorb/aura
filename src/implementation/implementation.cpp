@@ -1,6 +1,7 @@
 #include <implementation/pong.h>
 #include <implementation/system/auramain.h>
 
+#define TESTING
 #ifdef TESTING
 #include "test.cpp"
 #endif

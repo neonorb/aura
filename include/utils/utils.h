@@ -12,8 +12,17 @@
 #include <string.h>
 #include <memory.h>
 
-void cli();
-void sti();
+inline void cli() {
+	asm("cli");
+}
+
+inline void sti() {
+	asm("sti");
+}
+
+inline void hlt() {
+	asm("hlt");
+}
 
 int array_length_char(char a[]);
 
@@ -38,6 +47,5 @@ uint64 merge(uint32 mostSignificant, uint32 leastSignificant);
 int rand();
 
 int random(int min, int max);
-
 
 #endif /* INCLUDE_UTILS_H_ */

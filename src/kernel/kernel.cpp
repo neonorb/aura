@@ -36,14 +36,19 @@ void kernel_main() {
 
 	implementation();
 
-	// returning from here will clear interrupts, halt the system
-	crash(L"we have just returned from the implementation :(");
+	// hang kernel
+	log(L"kernel exiting");
+	hang();
 }
 
 void crash(String message) {
 	fault(message);
 	fault(L"halting system!");
 
+	hang();
+}
+
+void hang() {
 	cli();
-	asm("hlt");
+	hlt();
 }
