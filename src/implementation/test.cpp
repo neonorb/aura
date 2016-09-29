@@ -195,8 +195,16 @@ static Value* triggerFlag1Function(List<Value*>* arguments) {
 	return NULL;
 }
 
+bool trueThenFalseCounter = true;
+static Value* trueThenFalseFunction(List<Value*>* arguments){
+	BooleanValue* ret = new BooleanValue(trueThenFalseCounter);
+	trueThenFalseCounter = false;
+	return ret;
+}
+
 static void resetFlags() {
 	flag1 = 0;
+	trueThenFalseCounter = true;
 }
 
 static void testMishCode(String sourceCode) {
@@ -215,21 +223,39 @@ static void mish() {
 	mish_syscalls.add(triggerFlag1);
 	testSyscalls.add(triggerFlag1);
 
+	List<ValueType>* trueThenFalseParameterTypes = new List<ValueType>();
+	Function* trueThenFalse = new Function(L"__trueThenFalse", trueThenFalseParameterTypes, VOID_VALUE, trueThenFalseFunction);
+	mish_syscalls.add(trueThenFalse);
+	testSyscalls.add(trueThenFalse);
+
+
 	// get allocated count
 	uint64 originalAllocatedCount = getAllocatedCount();
 
 	// ---- tests ----
 
 	testMishCode(L"__triggerFlag1()");
-	assert(flag1 == 1, L"flag1 invalid");
+	assert(flag1 == 1, L"1");
 	resetFlags();
 
 	testMishCode(L"if(false){ __triggerFlag1() }");
-	assert(flag1 == 0, L"flag1 invalid");
+	assert(flag1 == 0, L"2");
 	resetFlags();
 
 	testMishCode(L"if(true){ __triggerFlag1() }");
-	assert(flag1 == 1, L"flag1 invalid");
+	assert(flag1 == 1, L"3");
+	resetFlags();
+
+	testMishCode(L"if(true){ while(false){ __triggerFlag1() } }");
+	assert(flag1 == 0, L"4");
+	resetFlags();
+
+	testMishCode(L"if(false){ while(true){ __triggerFlag1() } }");
+	assert(flag1 == 0, L"5");
+	resetFlags();
+
+	testMishCode(L"while(__trueThenFalse()){ __triggerFlag1() }");
+	assert(flag1 == 1, L"6");
 	resetFlags();
 
 	// ---- done tests ----
@@ -246,7 +272,6 @@ static void mish() {
 		mish_syscalls.remove(function);
 		delete function;
 	}
-
 	testSyscalls.clear();
 }
 

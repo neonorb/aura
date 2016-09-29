@@ -61,11 +61,9 @@ int booleanCounter = 0;
 Value* getBooleanFunction(List<Value*>* arguments) {
 	if(booleanCounter == 1) {
 		booleanCounter = 0;
-		log(L"returning false");
 		return (Value*) new BooleanValue(false);
 	}
 	booleanCounter++;
-	log(L"returning true");
 	return (Value*) new BooleanValue(true);
 }
 
