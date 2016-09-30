@@ -44,11 +44,13 @@ Value* compileAndExecuteFunction(List<Value*>* arguments) {
 	return NULL;
 }
 
+#ifdef MEMORY_LOG
 Value* dumpAllocatedFunction(List<Value*>* arguments) {
 	dumpAllocated();
 
 	return NULL;
 }
+#endif
 
 extern bool probeLoop;
 Value* exitFunction(List<Value*>* arguments) {
@@ -137,12 +139,14 @@ void registerSyscalls() {
 	syscalls.add(compileAndExecute);
 	mish_syscalls.add(compileAndExecute);
 
+#ifdef MEMORY_LOG
 	// __dumpAllocated
 	List<ValueType>* dumpAllocatedParameterTypes = new List<ValueType>();
 	Function* dumpAllocated = new Function(L"__dumpAllocated",
 			dumpAllocatedParameterTypes, VOID_VALUE, dumpAllocatedFunction);
 	syscalls.add(dumpAllocated);
 	mish_syscalls.add(dumpAllocated);
+#endif
 
 	// __exit
 	List<ValueType>* exitParameterTypes = new List<ValueType>();
