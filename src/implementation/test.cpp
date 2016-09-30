@@ -180,14 +180,14 @@ static void stack() {
 	assert(stack.size() == 3, L"stack size is not 3");
 }
 
-/*static void string() {
- log(L"  - string");
+static void string() {
+	log(L"  - string");
 
- String first = substring(L"__print", 2, 7);
- String second = L"print";
+	String first = substring(L"__print", 2, 7);
+	String second = L"print";
 
- assert(strequ(first, second), L"String not equal");
- }*/
+	assert(strequ(first, second), L"string not equal");
+}
 
 int flag1 = 0;
 static Value* triggerFlag1Function(List<Value*>* arguments) {
@@ -315,7 +315,7 @@ void test() {
 	//memory();
 	list();
 	stack();
-	//string();
+	string();
 	mish();
 	log(L" -- TESTS PASSED --");
 }
