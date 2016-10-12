@@ -21,8 +21,8 @@ void uefi_terminal_setCursorVisibility(bool cursorVisibility) {
 			(void* ) systemTable->ConOut->EnableCursor, 2, systemTable->ConOut,
 			cursorVisibility);
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to set cursor visibility");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to set cursor visibility");
 	}
 }
 
@@ -30,8 +30,8 @@ void uefi_terminal_clear() {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->ConOut->ClearScreen, 1, systemTable->ConOut);
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to clear terminal");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to clear terminal");
 	}
 }
 
@@ -40,8 +40,8 @@ void uefi_terminal_writeString(String message) {
 			(void* ) systemTable->ConOut->OutputString, 2, systemTable->ConOut,
 			message);
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to write string");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to write string");
 	}
 }
 
@@ -57,8 +57,8 @@ static void updateColor() {
 			(void* ) systemTable->ConOut->SetAttribute, 2, systemTable->ConOut,
 			EFI_TEXT_ATTR(foreground,background));
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to set terminal color");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to set terminal color");
 	}
 }
 

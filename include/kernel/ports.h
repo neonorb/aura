@@ -3,6 +3,8 @@
 
 #include <int.h>
 
+using namespace feta;
+
 // out
 
 inline void outb(uint16 port, uint8 val) {

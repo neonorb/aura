@@ -6,43 +6,8 @@ int array_length_char(char a[]) {
 	return sizeof(&a) / sizeof(char);
 }
 
-String toString(int value, wchar_t* str, int base) {
-	wchar_t* rc;
-	wchar_t* ptr;
-	wchar_t* low;
-	// Check for supported base.
-	if (base < 2 || base > 36) {
-		*str = '\0';
-		return str;
-	}
-	rc = ptr = str;
-	// Set '-' for negative decimals.
-	if (value < 0 && base == 10) {
-		*ptr++ = '-';
-	}
-	// Remember where the numbers start.
-	low = ptr;
-	// The actual conversion.
-	do {
-		// Modulo is negative for negative value. This trick makes abs() unnecessary.
-		*ptr++ =
-				"zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35
-						+ value % base];
-		value /= base;
-	} while (value);
-	// Terminating the string.
-	*ptr-- = '\0';
-	// Invert the numbers.
-	while (low < ptr) {
-		char tmp = *low;
-		*low++ = *ptr;
-		*ptr-- = tmp;
-	}
-	return rc;
-}
-
-void* memcpy(uint8* dst, const uint8* src, size_t len) {
-	size_t i;
+void* memcpy(uint8* dst, const uint8* src, size len) {
+	size i;
 
 	/*
 	 * memcpy does not support overlapping buffers, so always do it
@@ -85,7 +50,7 @@ String dynamicString(String string) {
 }
 
 // Write len copies of val into dest.
-void memset(uint8* dest, uint8 val, size_t len) {
+void memset(uint8* dest, uint8 val, size len) {
 	for (uint64 i = 0; i < len; i++) {
 		dest[i] = val;
 	}
@@ -108,7 +73,7 @@ static int memcmp_uint8_ts(unsigned long int a, unsigned long int b) {
 #  define MERGE(w0, sh_1, w1, sh_2) (((w0) << (sh_1)) | ((w1) >> (sh_2)))
 # define CMP_LT_OR_GT(a, b) memcmp_uint8_ts ((a), (b))
 
-int memcmp_not_common_alignment(long int srcp1, long int srcp2, size_t len) {
+int memcmp_not_common_alignment(long int srcp1, long int srcp2, size len) {
 	unsigned long int a0, a1, a2, a3;
 	unsigned long int b0, b1, b2, b3;
 	unsigned long int x;
@@ -199,7 +164,7 @@ int memcmp_not_common_alignment(long int srcp1, long int srcp2, size_t len) {
 	return 0;
 }
 
-int memcmp_common_alignment(long int srcp1, long int srcp2, size_t len) {
+int memcmp_common_alignment(long int srcp1, long int srcp2, size len) {
 	unsigned long int a0, a1;
 	unsigned long int b0, b1;
 
@@ -269,7 +234,7 @@ int memcmp_common_alignment(long int srcp1, long int srcp2, size_t len) {
 	return 0;
 }
 
-int memcmp(const void* s1, const void* s2, size_t len) {
+int memcmp(const void* s1, const void* s2, size len) {
 	unsigned long int a0;
 	unsigned long int b0;
 	long int srcp1 = (long int) s1;

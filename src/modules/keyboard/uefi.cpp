@@ -27,8 +27,8 @@ void uefi_keyboard_init() {
 			(void* ) systemTable->BootServices->LocateProtocol, 3, &stip_guid,
 			NULL, &stip);
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to initialize keyboard");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to initialize keyboard");
 	}
 
 	/* EFI_STATUS registerStatus = uefi_call_wrapper((void* ) stip, 3, &keyData,
@@ -42,31 +42,19 @@ void uefi_keyboard_init() {
 	//EFI_STATUS setStateStatus = uefi_call_wrapper((void* ) stip->SetState, 2, &stip, EFI_KEY_STATE_EXPOSED);
 }
 
-static String code = L"__println(__getTime())";
-static int position = 0;
-
 void uefi_keyboard_probe() {
 	EFI_INPUT_KEY key;
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->ConIn->ReadKeyStroke, 2, systemTable->ConIn,
 			&key);
 	if (!(status == EFI_SUCCESS || status == EFI_NOT_READY)) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to initialize keyboard");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to initialize keyboard");
 	}
 
 	if (status == EFI_SUCCESS) {
 		keyboard_keyUpdate(key);
-	}/* else {
-		if (position >= strlen(code)) {
-			position = -1;
-			key.UnicodeChar = 0xD;
-		} else {
-			key.UnicodeChar = code[position];
-		}
-		keyboard_keyUpdate(key);
-		position++;
-	}*/
+	}
 
 	// no keystroke
 }

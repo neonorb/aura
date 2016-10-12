@@ -24,8 +24,8 @@ void screen_terminal_writeString(String data) {
 	uefi_terminal_writeString(data);
 }
 
-void screen_terminal_writeString(CHAR16 data) {
-	wchar_t string[2] = { data, 0 };
+void screen_terminal_writeString(strchar data) {
+	strchar string[] = { data, 0 };
 	screen_terminal_writeString((String) string);
 }
 uint64 screen_terminal_cursorColumn() {

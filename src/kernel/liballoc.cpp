@@ -21,25 +21,25 @@ int liballoc_unlock() {
 
 static unsigned int l_pageSize = 4096; ///< The size of an individual page. Set up in liballoc_init.
 
-void* liballoc_alloc(size_t pageCount) {
+void* liballoc_alloc(size pageCount) {
 	EFI_PHYSICAL_ADDRESS location;
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* )systemTable->BootServices->AllocatePages, 4,
 			AllocateAnyPages, EfiLoaderData, pageCount, &location);
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to allocate page");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to allocate page");
 	}
 	return (void*) location;
 }
 
-int liballoc_free(void* location, size_t pageCount) {
+int liballoc_free(void* location, size pageCount) {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->BootServices->FreePages, 2,
 			(EFI_PHYSICAL_ADDRESS ) location, pageCount);
 	if (status != EFI_SUCCESS) {
-		debug(L"EFI_STATUS", status);
-		crash(L"failed to free page");
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to free page");
 	}
 	return 0;
 }
@@ -128,14 +128,14 @@ static long long l_possibleOverruns = 0;	///< Number of possible overruns
 
 // ***********   HELPER FUNCTIONS  *******************************
 
-static void *liballoc_memset(void* s, int c, size_t n) {
+static void *liballoc_memset(void* s, int c, size n) {
 	unsigned int i;
 	for (i = 0; i < n; i++)
 		((char*) s)[i] = c;
 
 	return s;
 }
-static void* liballoc_memcpy(void* s1, const void* s2, size_t n) {
+static void* liballoc_memcpy(void* s1, const void* s2, size n) {
 	char *cdest;
 	char *csrc;
 	unsigned int *ldest = (unsigned int*) s1;
@@ -197,7 +197,7 @@ static struct liballoc_major *allocate_new_page(unsigned int size) {
 	return maj;
 }
 
-void* malloc(size_t req_size) {
+void* malloc(size req_size) {
 	int startedBet = 0;
 	unsigned long long bestSize = 0;
 	void *p = NULL;
@@ -452,7 +452,7 @@ void* malloc(size_t req_size) {
 
 	liballoc_unlock(); // release the lock
 
-	crash(L"out of memory");
+	crash("out of memory");
 
 	return NULL;
 }
@@ -539,7 +539,7 @@ void free(void *ptr) {
 	liballoc_unlock();		// release the lock
 }
 
-void* calloc(size_t nobj, size_t size) {
+void* calloc(size nobj, size size) {
 	int real_size;
 	void *p;
 
@@ -552,7 +552,7 @@ void* calloc(size_t nobj, size_t size) {
 	return p;
 }
 
-void* realloc(void *p, size_t size) {
+void* realloc(void *p, size size) {
 	void *ptr;
 	struct liballoc_minor *min;
 	unsigned int real_size;

@@ -7,7 +7,7 @@ modules/modules \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
 modules/keyboard/keyboard modules/keyboard/uefi \
 modules/screen/screen modules/screen/uefi \
-utils/utils
+utils/utils utils/icxxabi
 ASOURCES=
 MSOURCES=mish/main
 
@@ -15,6 +15,7 @@ LIBS=feta mish
 
 -include ../make-base/make-base.mk
 
+CFLAGS+=-nostdlib -ffreestanding
 MOBJECTS=$(patsubst %, build/%.o, $(MSOURCES))
 OBJECTS:=$(OBJECTS) $(MOBJECTS)
 INCLUDE_FLAGS:=$(INCLUDE_FLAGS) -I gnu-efi/headers -I gnu-efi/headers/x86_64

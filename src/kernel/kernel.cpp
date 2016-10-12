@@ -27,23 +27,25 @@
 
 #include <implementation/implementation.h>
 
+using namespace feta;
+
 void kernel_main() {
 	cli();
 	modules_init();
 	sti();
 
-	log(L"boot complete");
+	log("boot complete");
 
 	implementation();
 
 	// hang kernel
-	log(L"kernel exiting");
+	log("kernel exiting");
 	hang();
 }
 
 void crash(String message) {
 	fault(message);
-	fault(L"halting system!");
+	fault("halting system!");
 
 	hang();
 }

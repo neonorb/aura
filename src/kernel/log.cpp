@@ -21,8 +21,9 @@
 
 #include <kernel/ports.h>
 
-#include <modules/screen/uefi.h> // TODO remove this include
 #include <utils/utils.h>
+
+namespace feta {
 
 void log(String message) {
 	log_write(NORMAL, message);
@@ -40,40 +41,40 @@ void log_write(LogType logType, String message) {
 	switch (logType) {
 	case NORMAL:
 		screen_terminal_setForegroundColor(EFI_GREEN);
-		screen_terminal_writeString(L"[NORMAL] ");
+		screen_terminal_writeString("[NORMAL] ");
 		break;
 	case WARNING:
 		screen_terminal_setForegroundColor(EFI_YELLOW);
-		screen_terminal_writeString(L"[WARNING] ");
+		screen_terminal_writeString("[WARNING] ");
 		break;
 	case FAULT:
 		screen_terminal_setForegroundColor(EFI_RED);
-		screen_terminal_writeString(L"[FAULT] ");
+		screen_terminal_writeString("[FAULT] ");
 		break;
 	}
 
 	screen_terminal_resetForegroundColor();
 	screen_terminal_writeString(message);
-	screen_terminal_writeString(L"\n\r");
+	screen_terminal_writeString("\n\r");
 }
 
 void status(String message) {
 	screen_terminal_setForegroundColor(EFI_BLUE);
-	screen_terminal_writeString(L"[STATUS] ");
+	screen_terminal_writeString("[STATUS] ");
 	screen_terminal_resetForegroundColor();
 	screen_terminal_writeString(message);
-	screen_terminal_writeString(L"...");
+	screen_terminal_writeString("...");
 }
 
 void statusDone() {
 	screen_terminal_setForegroundColor(EFI_GREEN);
-	screen_terminal_writeString(L"done\n\r");
+	screen_terminal_writeString("done\n\r");
 	screen_terminal_resetForegroundColor();
 }
 
 void statusFail() {
 	screen_terminal_setForegroundColor(EFI_RED);
-	screen_terminal_writeString(L"failed");
+	screen_terminal_writeString("failed");
 	screen_terminal_resetForegroundColor();
 }
 
@@ -102,23 +103,10 @@ void write_serial(char a) {
 	outb(PORT, a);
 }
 
-void debug(String name, uint64 value) {
-	debug(name, value, 16);
-}
-
-void debug(String name, uint64 value, uint8 base) {
-	debugPrint(name);
-	debugPrint(L": ");
-	debug(toString(value, L"          ", base));
-}
-
-void debug(String message) {
-	debugPrint(message);
-	debugPrint(L"\n\r");
-}
-
 void debugPrint(String message) {
 	for (uint64 i = 0; i < strlen(message); i++) {
 		write_serial(message[i]);
 	}
+}
+
 }
