@@ -180,14 +180,14 @@ static void stack() {
 	assert(stack.size() == 3, L"stack size is not 3");
 }
 
-/*static void string() {
- log(L"  - string");
+static void string() {
+	log(L"  - string");
 
- String first = substring(L"__print", 2, 7);
- String second = L"print";
+	String first = substring(L"__print", 2, 7);
+	String second = L"print";
 
- assert(strequ(first, second), L"String not equal");
- }*/
+	assert(strequ(first, second), L"string not equal");
+}
 
 int flag1 = 0;
 static Value* triggerFlag1Function(List<Value*>* arguments) {
@@ -195,16 +195,40 @@ static Value* triggerFlag1Function(List<Value*>* arguments) {
 	return NULL;
 }
 
-bool trueThenFalseCounter = true;
-static Value* trueThenFalseFunction(List<Value*>* arguments){
-	BooleanValue* ret = new BooleanValue(trueThenFalseCounter);
-	trueThenFalseCounter = false;
+int trueFalseCounter = 0;
+static Value* trueFalseFunction(List<Value*>* arguments) {
+	Value* ret;
+
+	if(trueFalseCounter == 1) {
+		ret = new BooleanValue(false);
+		trueFalseCounter = 0;
+	} else {
+		ret = new BooleanValue(true);
+		trueFalseCounter++;
+	}
+
+	return ret;
+}
+
+int trueTrueFalseCounter = 0;
+static Value* trueTrueFalseFunction(List<Value*>* arguments) {
+	Value* ret;
+
+	if(trueTrueFalseCounter == 2) {
+		ret = new BooleanValue(false);
+		trueTrueFalseCounter = 0;
+	} else {
+		ret = new BooleanValue(true);
+		trueTrueFalseCounter++;
+	}
+
 	return ret;
 }
 
 static void resetFlags() {
 	flag1 = 0;
-	trueThenFalseCounter = true;
+	trueFalseCounter = 0;
+	trueTrueFalseCounter = 0;
 }
 
 static void testMishCode(String sourceCode) {
@@ -217,22 +241,28 @@ List<Function*> testSyscalls;
 static void mish() {
 	log(L"  - mish");
 
-	// register syscalls
+	// ---- register syscalls ----
 	List<ValueType>* triggerFlag1ParameterTypes = new List<ValueType>();
 	Function* triggerFlag1 = new Function(L"__triggerFlag1", triggerFlag1ParameterTypes, VOID_VALUE, triggerFlag1Function);
 	mish_syscalls.add(triggerFlag1);
 	testSyscalls.add(triggerFlag1);
 
-	List<ValueType>* trueThenFalseParameterTypes = new List<ValueType>();
-	Function* trueThenFalse = new Function(L"__trueThenFalse", trueThenFalseParameterTypes, VOID_VALUE, trueThenFalseFunction);
-	mish_syscalls.add(trueThenFalse);
-	testSyscalls.add(trueThenFalse);
+	List<ValueType>* trueFalseParameterTypes = new List<ValueType>();
+	Function* trueFalse = new Function(L"__trueFalse", trueFalseParameterTypes, VOID_VALUE, trueFalseFunction);
+	mish_syscalls.add(trueFalse);
+	testSyscalls.add(trueFalse);
 
+	List<ValueType>* trueTrueFalseParameterTypes = new List<ValueType>();
+	Function* trueTrueFalse = new Function(L"__trueTrueFalse", trueTrueFalseParameterTypes, VOID_VALUE, trueTrueFalseFunction);
+	mish_syscalls.add(trueTrueFalse);
+	testSyscalls.add(trueTrueFalse);
 
 	// get allocated count
-	uint64 originalAllocatedCount = getAllocatedCount();
+	uint64 origionalAllocatedCount = getAllocatedCount();
 
 	// ---- tests ----
+
+	resetFlags();
 
 	testMishCode(L"__triggerFlag1()");
 	assert(flag1 == 1, L"1");
@@ -254,16 +284,21 @@ static void mish() {
 	assert(flag1 == 0, L"5");
 	resetFlags();
 
-	testMishCode(L"while(__trueThenFalse()){ __triggerFlag1() }");
+	testMishCode(L"while(__trueFalse()){ __triggerFlag1() }");
 	assert(flag1 == 1, L"6");
+	resetFlags();
+
+	testMishCode(L"while(__trueTrueFalse()){ __triggerFlag1() }");
+	assert(flag1 == 2, L"7");
 	resetFlags();
 
 	// ---- done tests ----
 
 	// get allocated count
 	uint64 laterAllocatedCount = getAllocatedCount();
+
 	// confirm no memory leaks
-	assert(originalAllocatedCount == laterAllocatedCount, L"memory leak");
+	assert(origionalAllocatedCount == laterAllocatedCount, L"memory leak");
 
 	// unregister syscalls
 	Iterator<Function*> iterator = testSyscalls.iterator();
@@ -280,7 +315,7 @@ void test() {
 	//memory();
 	list();
 	stack();
-	//string();
+	string();
 	mish();
 	log(L" -- TESTS PASSED --");
 }

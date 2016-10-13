@@ -16,7 +16,9 @@
 bool probeLoop = true;
 
 void auraMain() {
+#ifdef MEMORY_LOG
 	dumpAllocated();
+#endif
 
 	registerSyscalls();
 
@@ -36,5 +38,7 @@ void auraMain() {
 
 	unregisterSyscalls();
 
+#ifdef MEMORY_LOG
 	dumpAllocated();
+#endif
 }

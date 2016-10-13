@@ -10,6 +10,8 @@
 
 #include <int.h>
 
+using namespace feta;
+
 extern "C" {
 #include <efi.h>
 #include <efilib.h>

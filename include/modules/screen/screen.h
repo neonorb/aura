@@ -13,7 +13,7 @@ void screen_terminal_resetForegroundColor();
 void screen_terminal_setBackgroundColor(UINTN color);
 void screen_terminal_resetBackgroundColor();
 void screen_terminal_writeString(String data);
-void screen_terminal_writeString(CHAR16 data);
+void screen_terminal_writeString(strchar data);
 
 uint64 screen_terminal_cursorColumn();
 uint64 screen_terminal_cursorRow();

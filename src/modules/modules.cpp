@@ -15,7 +15,7 @@
 void modules_init() {
 	screen_init();
 
-	status(L"initializing keyboard");
+	status("initializing keyboard");
 	keyboard_init();
 	statusDone();
 }

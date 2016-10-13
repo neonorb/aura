@@ -31,7 +31,7 @@ typedef enum {
 
 uint8 vga_terminal_makeColor(VGATextColor fg, VGATextColor bg);
 void vga_terminal_backgroundColor(uint8 color);
-void vga_terminal_writeString(const char* data);
+void vga_terminal_writeString(String data);
 void vga_terminal_initialize();
 
 // ---- graphics ----

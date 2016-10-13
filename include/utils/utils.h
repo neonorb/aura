@@ -12,6 +12,8 @@
 #include <string.h>
 #include <memory.h>
 
+using namespace feta;
+
 inline void cli() {
 	asm("cli");
 }
@@ -26,16 +28,14 @@ inline void hlt() {
 
 int array_length_char(char a[]);
 
-String toString(int value, wchar_t* str, int base);
-
-void* memcpy(uint8* dst, const uint8* src, size_t len);
+void* memcpy(uint8* dst, const uint8* src, size len);
 
 String dynamicString(String string);
 
 // Write len copies of val into dest.
-void memset(uint8* dest, uint8 val, size_t len);
+void memset(uint8* dest, uint8 val, size len);
 
-int memcmp(const void* s1, const void* s2, size_t len);
+int memcmp(const void* s1, const void* s2, size len);
 
 uint8 setBit(uint8 number, uint8 pos);
 uint8 clearBit(uint8 number, uint8 pos);

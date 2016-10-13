@@ -8,10 +8,7 @@
 #ifndef INCLUDE_KERNEL_KERNEL_H_
 #define INCLUDE_KERNEL_KERNEL_H_
 
-#include <string.h>
-
 void kernel_main();
-void crash(String message);
 void hang();
 
 #endif /* INCLUDE_KERNEL_KERNEL_H_ */

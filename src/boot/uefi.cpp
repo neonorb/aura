@@ -21,11 +21,11 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 			&LoadedImageProtocol, (void** )&imageBase);
 
 	if (status != EFI_SUCCESS) {
-		crash(L"error while checking image base");
+		crash("error while checking image base");
 	}
 
 #ifdef DEBUGGING
-	debug(L"image base", (uint64) imageBase);
+	debug("image base", (uint64) imageBase);
 	int wait = 1;
 	while (wait) {
 		__asm__ __volatile__("pause");
@@ -35,7 +35,7 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 	// disable the watchdog timer - if this is enabled, the firmware will reset the system after 5 minutes
 	EFI_STATUS watchdogStatus = uefi_call_wrapper((void*) systemTable->BootServices->SetWatchdogTimer, 4, 0, 0, 0, NULL);
 	if(watchdogStatus != EFI_SUCCESS) {
-		crash(L"error while disabling the watchdog timer");
+		crash("error while disabling the watchdog timer");
 	}
 
 	kernel_main();
@@ -52,6 +52,6 @@ void stall(uint64 microseconds) {
 			(void* )systemTable->BootServices->Stall, 1, microseconds);
 
 	if (status != EFI_SUCCESS) {
-		crash(L"error while stalling");
+		crash("error while stalling");
 	}
 }
