@@ -7,6 +7,8 @@
 #include <kernel/kernel.h>
 #include <boot/uefi.h>
 
+namespace fetaimpl {
+
 // ---- system functions ----
 
 int liballoc_lock() {
@@ -26,10 +28,12 @@ void* liballoc_alloc(size pageCount) {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* )systemTable->BootServices->AllocatePages, 4,
 			AllocateAnyPages, EfiLoaderData, pageCount, &location);
+
 	if (status != EFI_SUCCESS) {
 		debug("EFI_STATUS", (uint64) status);
 		crash("failed to allocate page");
 	}
+
 	return (void*) location;
 }
 
@@ -37,10 +41,12 @@ int liballoc_free(void* location, size pageCount) {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->BootServices->FreePages, 2,
 			(EFI_PHYSICAL_ADDRESS ) location, pageCount);
+
 	if (status != EFI_SUCCESS) {
 		debug("EFI_STATUS", (uint64) status);
 		crash("failed to free page");
 	}
+
 	return 0;
 }
 
@@ -615,4 +621,6 @@ void* realloc(void *p, size size) {
 	free(p);
 
 	return ptr;
+}
+
 }
