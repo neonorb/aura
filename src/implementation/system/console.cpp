@@ -48,6 +48,16 @@ static void newThread(Code* code) {
 	currentThread = thread;
 }
 
+static void execute(String sourceCode) {
+	Code* code = mish_compile(sourceCode);
+
+	if (code != NULL) {
+		newThread(code);
+	} else {
+		printShell();
+	}
+}
+
 void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 	if (keyEvent.UnicodeChar > 0) {
 		// if we have a thread running, don't
@@ -59,25 +69,20 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 		} else {
 			if (keyEvent.UnicodeChar == 0xD) { // carriage return
 				screen_terminal_writeString("\n\r");
-				strchar* str = (strchar*) create(line.size() * sizeof(strchar) + 1);
+				strchar* sourceCode = (strchar*) create(
+						line.size() * sizeof(strchar) + 1);
 
 				Iterator<strchar> stringIterator = line.iterator();
 				uint64 strIndex = 0;
 				while (stringIterator.hasNext()) {
-					str[strIndex] = stringIterator.next();
+					sourceCode[strIndex] = stringIterator.next();
 					strIndex++;
 				}
-				str[strIndex] = NULL; // null terminate
+				sourceCode[strIndex] = NULL; // null terminate
 				line.clear();
 
-				Code* code = mish_compile(str);
-				delete str;
-
-				if (code != NULL) {
-					newThread(code);
-				} else {
-					printShell();
-				}
+				execute(sourceCode);
+				delete sourceCode;
 			} else if (keyEvent.UnicodeChar == 0x8) { // backspace
 				if (line.size() == 0) {
 					return;
@@ -103,10 +108,6 @@ void console() {
 	}
 	sourceCode[charCount] = 0; // NULL terminate
 
-	Code* code = mish_compile(sourceCode);
+	execute(sourceCode);
 	delete sourceCode;
-
-	if (code != NULL) {
-		newThread(code);
-	}
 }
