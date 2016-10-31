@@ -1,13 +1,12 @@
 #include <implementation/pong.h>
 #include <implementation/system/auramain.h>
 
-//#define TESTING
-#ifdef TESTING
+#ifdef DO_TEST
 #include "test.cpp"
 #endif
 
 void implementation() {
-#ifdef TESTING
+#ifdef DO_TEST
 	test();
 #else
 	auraMain();
