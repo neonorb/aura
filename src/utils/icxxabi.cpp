@@ -59,7 +59,7 @@ void __cxa_finalize(void *f) {
 		return;
 	}
 
-	for (; i >= 0; --i) {
+	for (; i != (unsigned) -1; --i) {
 		/*
 		 * The ABI states that multiple calls to the __cxa_finalize(destructor_func_ptr) function
 		 * should not destroy objects multiple times. Only one call is needed to eliminate multiple
