@@ -13,6 +13,7 @@
 #include <modules/modules.h>
 #include <modules/screen/screen.h>
 #include <kernel/events.h>
+#include <feta.h>
 
 extern uint8 mishStart; // &mishStart - start of Mish code
 extern uint8 mishEnd; // &mishEnd - end of Mish code
@@ -38,6 +39,8 @@ static void printShell() {
 
 Thread* currentThread = NULL;
 void console_onThreadExit(Thread* thread) {
+	UNUSED(thread);
+
 	currentThread = NULL;
 	printShell();
 }

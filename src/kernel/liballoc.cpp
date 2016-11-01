@@ -67,7 +67,7 @@ int liballoc_free(void* location, size pageCount) {
 #define USE_CASE5
 
 /** This macro will conveniently align our pointer upwards */
-#define ALIGN( ptr )													\
+#define ALIGNPTR( ptr )													\
 		if ( ALIGNMENT > 1 )											\
 		{																\
 			uint64 diff;												\
@@ -82,7 +82,7 @@ int liballoc_free(void* location, size pageCount) {
 				diff + ALIGN_INFO;										\
 		}
 
-#define UNALIGN( ptr )													\
+#define UNALIGNPTR( ptr )													\
 		if ( ALIGNMENT > 1 )											\
 		{																\
 			uint64 diff = *((ALIGN_TYPE*)((uint64)ptr - ALIGN_INFO));	\
@@ -313,7 +313,7 @@ void* malloc(size req_size) {
 
 			p = (void*) ((uint64) (maj->first) + sizeof(struct liballoc_minor));
 
-			ALIGN(p);
+			ALIGNPTR(p);
 
 			liballoc_unlock();		// release the lock
 			return p;
@@ -345,7 +345,7 @@ void* malloc(size req_size) {
 			l_inuse += size;
 
 			p = (void*) ((uint64) (maj->first) + sizeof(struct liballoc_minor));
-			ALIGN(p);
+			ALIGNPTR(p);
 
 			liballoc_unlock();		// release the lock
 			return p;
@@ -385,7 +385,7 @@ void* malloc(size req_size) {
 					l_inuse += size;
 
 					p = (void*) ((uint64) min + sizeof(struct liballoc_minor));
-					ALIGN(p);
+					ALIGNPTR(p);
 
 					liballoc_unlock();		// release the lock
 					return p;
@@ -420,7 +420,7 @@ void* malloc(size req_size) {
 
 					p = (void*) ((uint64) new_min
 							+ sizeof(struct liballoc_minor));
-					ALIGN(p);
+					ALIGNPTR(p);
 
 					liballoc_unlock();		// release the lock
 					return p;
@@ -472,7 +472,7 @@ void free(void *ptr) {
 		return;
 	}
 
-	UNALIGN(ptr);
+	UNALIGNPTR(ptr);
 
 	liballoc_lock();		// lockit
 
@@ -575,7 +575,7 @@ void* realloc(void *p, size size) {
 
 	// Unalign the pointer if required.
 	ptr = p;
-	UNALIGN(ptr);
+	UNALIGNPTR(ptr);
 
 	liballoc_lock();		// lockit
 

@@ -5,10 +5,14 @@
 #include <kernel/ports.h>
 #include <log.h>
 #include <kernel/idt.h>
+#include <feta.h>
 
 static RTCHandler rtcHandler;
 
 static void rtcInterrupt(uint64 errorCode, registers_t* regs) {
+	UNUSED(errorCode);
+	UNUSED(regs);
+
 	if (rtcHandler != 0) {
 		rtcHandler();
 	}

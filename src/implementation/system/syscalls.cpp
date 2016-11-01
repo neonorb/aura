@@ -1,6 +1,7 @@
 #include <mish.h>
 
 #include <modules/screen/screen.h>
+#include <feta.h>
 
 // ----- syscalls -----
 
@@ -13,7 +14,7 @@ Value* printFunction(List<Value*>* arguments) {
 		screen_terminal_writeString(message2);
 	}
 
-	return NULL;
+	return VALUE_NOT_USED;
 }
 
 Value* printlnFunction(List<Value*>* arguments) {
@@ -21,16 +22,20 @@ Value* printlnFunction(List<Value*>* arguments) {
 
 	screen_terminal_writeString("\n\r");
 
-	return NULL;
+	return VALUE_NOT_USED;
 }
 
 Value* clearFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	screen_terminal_clear();
 
-	return NULL;
+	return VALUE_NOT_USED;
 }
 
 Value* getTimeFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	return (Value*) new StringValue("10 AM");
 }
 
@@ -41,26 +46,32 @@ Value* compileAndExecuteFunction(List<Value*>* arguments) {
 	mish_execute(code);
 	delete code;
 
-	return NULL;
+	return VALUE_NOT_USED;
 }
 
 #ifdef MEMORY_LOG
 Value* dumpAllocatedFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	dumpAllocated();
 
-	return NULL;
+	return VALUE_NOT_USED;
 }
 #endif
 
 extern bool probeLoop;
 Value* exitFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	probeLoop = false;
 
-	return NULL;
+	return VALUE_NOT_USED;
 }
 
 int booleanCounter = 0;
 Value* getBooleanFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	if(booleanCounter == 1) {
 		booleanCounter = 0;
 		return (Value*) new BooleanValue(false);
@@ -71,6 +82,8 @@ Value* getBooleanFunction(List<Value*>* arguments) {
 
 int booleanCounter2 = 0;
 Value* getBoolean2Function(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	if(booleanCounter2 == 3) {
 		booleanCounter2 = 0;
 		return (Value*) new BooleanValue(false);

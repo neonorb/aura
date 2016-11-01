@@ -64,7 +64,7 @@ void screen_graphics_rectangle(uint32 x, uint32 y, uint32 width, uint32 height,
 	CUNUSED(red);
 	CUNUSED(green);
 	CUNUSED(blue);
-	NIMPL
+	NIMPL;
 //vga_graphics_rectangle(x, y, width, height, red, green, blue);
 }
 void screen_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,
@@ -74,12 +74,12 @@ void screen_graphics_pixel(uint32 x, uint32 y, uint8 red, uint8 green,
 	CUNUSED(red);
 	CUNUSED(green);
 	CUNUSED(blue);
-	NIMPL
+	NIMPL;
 //vga_graphics_pixel(x, y, red, green, blue);
 }
 void screen_graphics_flip() {
 //vga_graphics_flip();
-	NIMPL
+	NIMPL;
 }
 
 void screen_graphicsMode() {

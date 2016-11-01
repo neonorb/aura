@@ -11,6 +11,7 @@
 #include <stack.h>
 #include <log.h>
 #include <mish.h>
+#include <feta.h>
 
 static void assert(bool b, String message) {
 	if(!b) {
@@ -144,12 +145,16 @@ static void string() {
 
 int flag1 = 0;
 static Value* triggerFlag1Function(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	flag1++;
-	return NULL;
+	return VALUE_NOT_USED;
 }
 
 int trueFalseCounter = 0;
 static Value* trueFalseFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	Value* ret;
 
 	if(trueFalseCounter == 1) {
@@ -165,6 +170,8 @@ static Value* trueFalseFunction(List<Value*>* arguments) {
 
 int trueTrueFalseCounter = 0;
 static Value* trueTrueFalseFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
 	Value* ret;
 
 	if(trueTrueFalseCounter == 2) {

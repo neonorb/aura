@@ -4,12 +4,15 @@
 #include <kernel/ports.h>
 #include <kernel/idt.h>
 #include <log.h>
+#include <feta.h>
 
 #define CLOCK_FREQUENCY 60
 
 static PITHandler pitHandler;
 
 static void pitInterrupt(uint64 errorCode, registers_t* regs) {
+	UNUSED(errorCode);
+	UNUSED(regs);
 	if (pitHandler != 0) {
 		pitHandler();
 	}
