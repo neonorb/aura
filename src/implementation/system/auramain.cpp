@@ -26,14 +26,14 @@ void auraMain() {
 
 	while (probeLoop) {
 		// wait for an interrupt
-		if (mish_activeThreadCount() == 0) {
+		if (mish::execute::schedule::activeThreadCount() == 0) {
 			// TODO don't run background threads when there are active ones
 			//stallMilli(1000);
 			asm("hlt");
 		}
 
 		modules_probe(); // probe modules for input, input will trigger an event
-		mish_runScheduler(); // execute threads
+		mish::execute::schedule::run(); // execute threads
 	}
 
 	unregisterSyscalls();

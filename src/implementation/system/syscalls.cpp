@@ -42,8 +42,8 @@ Value* getTimeFunction(List<Value*>* arguments) {
 Value* compileAndExecuteFunction(List<Value*>* arguments) {
 	String sourceCode = ((StringValue*) arguments->get(0))->value;
 
-	Code* code = mish_compile(sourceCode);
-	mish_execute(code);
+	Code* code = mish::compile::compile(sourceCode);
+	mish::execute::execute(code);
 	delete code;
 
 	return VALUE_NOT_USED;

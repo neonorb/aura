@@ -47,12 +47,12 @@ void console_onThreadExit(Thread* thread) {
 static void newThread(Code* code) {
 	Thread* thread = new Thread(code, ACTIVE);
 	thread->onThreadExit = console_onThreadExit;
-	mish_spawnThread(thread);
+	mish::execute::schedule::spawn(thread);
 	currentThread = thread;
 }
 
 static void execute(String sourceCode) {
-	Code* code = mish_compile(sourceCode);
+	Code* code = mish::compile::compile(sourceCode);
 
 	if (code != NULL) {
 		newThread(code);
@@ -66,7 +66,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 		// if we have a thread running, don't
 		if (currentThread != NULL) {
 			if (keyEvent.UnicodeChar == 0x3) { // end of text (ctrl + C)
-				mish_killThread(currentThread);
+				mish::execute::schedule::kill(currentThread);
 				currentThread = NULL;
 			}
 		} else {
