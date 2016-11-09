@@ -4,8 +4,6 @@
 #include <modules/screen/screen.h>
 
 #include <mish.h>
-#include <syscall.h>
-#include <value.h>
 #include <implementation/system/syscalls.h>
 #include <implementation/system/console.h>
 #include <modules/modules.h>

@@ -46,7 +46,7 @@ void console_onThreadExit(Thread* thread) {
 }
 static void newThread(Code* code) {
 	Thread* thread = new Thread(code, ACTIVE);
-	thread->onThreadExit = console_onThreadExit;
+	thread->onThreadExit = BIND_FREE_CB(console_onThreadExit);
 	mish::execute::schedule::spawn(thread);
 	currentThread = thread;
 }
