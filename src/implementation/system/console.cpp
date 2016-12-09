@@ -15,6 +15,8 @@
 #include <kernel/events.h>
 #include <feta.h>
 
+using namespace mish;
+
 extern uint8 mishStart; // &mishStart - start of Mish code
 extern uint8 mishEnd; // &mishEnd - end of Mish code
 
@@ -84,7 +86,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				sourceCode[strIndex] = NULL; // null terminate
 				line.clear();
 
-				execute(sourceCode);
+				::execute(sourceCode);
 				delete sourceCode;
 			} else if (keyEvent.UnicodeChar == 0x8) { // backspace
 				if (line.size() == 0) {
@@ -111,6 +113,6 @@ void console() {
 	}
 	sourceCode[charCount] = 0; // NULL terminate
 
-	execute(sourceCode);
+	::execute(sourceCode);
 	delete sourceCode;
 }

@@ -3,6 +3,8 @@
 #include <mish.h>
 #include <memory.h>
 
+using namespace mish;
+
 // ----- syscalls -----
 
 Value* printFunction(List<Value*>* arguments) {
