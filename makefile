@@ -28,7 +28,7 @@ build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
 
 # building binaries
 build/aura.so: $(OBJECTS) | build/.dirstamp
-	@ld $(OBJECTS)                     \
+	@ld $(OBJECTS)                    \
 		gnu-efi/crt0-efi-x86_64.o     \
 		-nostdlib                     \
 		-znocombreloc                 \
