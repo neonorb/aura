@@ -1,9 +1,6 @@
 #include <modules/clock/rtc.h>
 
-#include <int.h>
-
 #include <kernel/ports.h>
-#include <log.h>
 #include <kernel/idt.h>
 #include <feta.h>
 

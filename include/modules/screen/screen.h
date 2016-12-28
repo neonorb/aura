@@ -1,8 +1,7 @@
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
-#include <int.h>
-#include <string.h>
+#include <feta.h>
 #include <boot/uefi.h>
 
 void screen_init();

@@ -8,9 +8,7 @@
 #ifndef INCLUDE_UTILS_H_
 #define INCLUDE_UTILS_H_
 
-#include <int.h>
-#include <string.h>
-#include <memory.h>
+#include <feta.h>
 
 using namespace feta;
 

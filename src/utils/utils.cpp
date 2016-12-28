@@ -1,6 +1,6 @@
 #include <utils/utils.h>
 
-#include <log.h>
+#include <feta.h>
 
 int array_length_char(char a[]) {
 	return sizeof(&a) / sizeof(char);

@@ -1,9 +1,7 @@
 #include <modules/clock/pit.h>
 
-#include <int.h>
 #include <kernel/ports.h>
 #include <kernel/idt.h>
-#include <log.h>
 #include <feta.h>
 
 #define CLOCK_FREQUENCY 60

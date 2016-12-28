@@ -1,6 +1,4 @@
-#include <memory.h>
-
-#include <log.h>
+#include <feta.h>
 #include <modules/screen/screen.h>
 
 #include <mish.h>
@@ -8,7 +6,6 @@
 #include <implementation/system/console.h>
 #include <modules/modules.h>
 #include <kernel/events.h>
-#include <memory.h>
 #include <boot/uefi.h>
 
 bool probeLoop = true;

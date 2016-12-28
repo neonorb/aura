@@ -1,6 +1,6 @@
 #include <modules/keyboard/keyboard.h>
 
-#include <int.h>
+#include <feta.h>
 #include <utils/utils.h>
 #include <kernel/idt.h>
 

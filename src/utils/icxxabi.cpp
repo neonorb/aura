@@ -5,7 +5,7 @@
  *      Author: chris
  */
 
-#include <icxxabi.h>
+#include <feta/icxxabi.h>
 
 extern "C" {
 

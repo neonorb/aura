@@ -10,7 +10,7 @@
 #include <modules/screen/screen.h>
 #include <modules/keyboard/keyboard.h>
 
-#include <log.h>
+#include <feta.h>
 
 void modules_init() {
 	screen_init();

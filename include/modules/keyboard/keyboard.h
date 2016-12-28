@@ -2,7 +2,7 @@
 #define KEYBOARD_H_
 
 #include <boot/uefi.h>
-#include <bool.h>
+#include <feta.h>
 
 /*typedef enum {
 	KEY_UNDEFINED,

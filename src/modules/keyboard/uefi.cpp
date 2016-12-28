@@ -10,7 +10,7 @@
 #include <modules/keyboard/keyboard.h>
 #include <boot/uefi.h>
 
-#include <log.h>
+#include <feta.h>
 
 static EFI_GUID stip_guid = EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID;
 static EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL* stip;

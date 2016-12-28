@@ -8,7 +8,7 @@
 #ifndef INCLUDE_BOOT_UEFI_H_
 #define INCLUDE_BOOT_UEFI_H_
 
-#include <int.h>
+#include <feta.h>
 
 using namespace feta;
 

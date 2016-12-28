@@ -1,7 +1,7 @@
 #ifndef PS2_H_
 #define PS2_H_
 
-#include <int.h>
+#include <feta.h>
 
 #include <modules/keyboard/keyboard.h>
 

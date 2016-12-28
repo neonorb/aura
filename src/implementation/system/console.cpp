@@ -7,13 +7,10 @@
 
 #include <implementation/system/console.h>
 
-#include <memory.h>
-#include <log.h>
 #include <mish.h>
 #include <modules/modules.h>
 #include <modules/screen/screen.h>
 #include <kernel/events.h>
-#include <feta.h>
 
 using namespace mish;
 
@@ -83,7 +80,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 					sourceCode[strIndex] = stringIterator.next();
 					strIndex++;
 				}
-				sourceCode[strIndex] = NULL; // null terminate
+				sourceCode[strIndex] = '\0'; // null terminate
 				line.clear();
 
 				::execute(sourceCode);

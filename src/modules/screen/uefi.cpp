@@ -5,10 +5,8 @@
  *      Author: chris13524
  */
 
-#include <string.h>
+#include <feta.h>
 #include <modules/screen/uefi.h>
-#include <log.h>
-#include <memory.h>
 
 static UINTN foreground;
 static UINTN background;

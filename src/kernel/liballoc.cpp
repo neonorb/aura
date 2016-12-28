@@ -1,8 +1,5 @@
-#include <memory.h>
+#include <feta.h>
 #include <kernel/liballoc.h>
-#include <int.h>
-#include <string.h>
-#include <log.h>
 #include <utils/utils.h>
 #include <kernel/kernel.h>
 #include <boot/uefi.h>

@@ -8,7 +8,9 @@
 #ifndef KERNEL_IDT_H_
 #define KERNEL_IDT_H_
 
-#include <int.h>
+#include <feta.h>
+
+using namespace feta;
 
 struct idt_gate {
     uint16 offset015;

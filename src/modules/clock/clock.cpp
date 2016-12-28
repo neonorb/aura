@@ -1,7 +1,7 @@
 #include <modules/clock/clock.h>
 
 #include <kernel/ports.h>
-#include <log.h>
+#include <feta.h>
 
 #include <modules/clock/pit.h>
 #include <modules/clock/rtc.h>

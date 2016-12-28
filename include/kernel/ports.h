@@ -1,7 +1,7 @@
 #ifndef PORTS_H_
 #define PORTS_H_
 
-#include <int.h>
+#include <feta.h>
 
 using namespace feta;
 

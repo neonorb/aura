@@ -1,8 +1,6 @@
 #include <modules/screen/screen.h>
 
-#include <int.h>
 #include <modules/screen/uefi.h>
-#include <log.h>
 #include <feta.h>
 
 #define DEFAULT_FOREGROUND_COLOR EFI_BLACK

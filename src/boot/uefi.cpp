@@ -7,7 +7,7 @@
 
 #include <boot/uefi.h>
 #include <kernel/kernel.h>
-#include <log.h>
+#include <feta.h>
 
 EFI_SYSTEM_TABLE* systemTable;
 EFI_LOADED_IMAGE* imageBase;
