@@ -16,7 +16,7 @@
 
 #include <kernel/kernel.h>
 
-#include <memory.h>
+#include <feta.h>
 #include <kernel/liballoc.h>
 
 #include <boot/uefi.h>
