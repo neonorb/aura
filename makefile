@@ -14,21 +14,20 @@ MSOURCES=mish/main
 LIBS=feta mish
 
 -include ../make-base/make-base.mk
+ARCHS=x86_64
 
-CFLAGS+=-nostdlib -ffreestanding -fno-rtti -fno-exceptions
+CFLAGS+=-nostdlib -ffreestanding -fno-rtti -fno-exceptions -fPIC
 MOBJECTS=$(patsubst %, build/%.o, $(MSOURCES))
-OBJECTS:=$(OBJECTS) $(MOBJECTS)
-INCLUDE_FLAGS:=$(INCLUDE_FLAGS) -I gnu-efi/headers -I gnu-efi/headers/x86_64
-
-all: $(OBJECTS)
+OBJECTS-all+=$(MOBJECTS)
+INCLUDE_FLAGS+=-I gnu-efi/headers -I gnu-efi/headers/x86_64
 
 # Mish "compiling"
 build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
 	@objcopy -I binary -O elf64-x86-64 -B i386 --rename-section .data=.mish $^ $@
 
 # building binaries
-build/aura.so: $(OBJECTS) | build/.dirstamp
-	@ld $(OBJECTS)                    \
+build/aura.so: $(OBJECTS-all) | build/.dirstamp
+	@ld $^                            \
 		gnu-efi/crt0-efi-x86_64.o     \
 		-nostdlib                     \
 		-znocombreloc                 \
@@ -39,8 +38,8 @@ build/aura.so: $(OBJECTS) | build/.dirstamp
 		-L gnu-efi/libs               \
 		-l:libgnuefi.a                \
 		-l:libefi.a                   \
-		$(LIBS_FLAGS)                 \
-		-o build/aura.so
+		$(LIB_FLAGS)                  \
+		-o $@
 
 REGULAR_SECTIONS=-j .text    \
 				 -j .sdata   \
@@ -112,6 +111,3 @@ run: img
 
 .PHONY:
 gdb: build/debug.aura.efi
-	
-
-

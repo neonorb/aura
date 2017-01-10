@@ -19,7 +19,7 @@ extern "C" {
 
 extern EFI_SYSTEM_TABLE* systemTable;
 
-void stallMilli(uint64 milliseconds);
-void stall(uint64 microseconds);
+void stallMilli(uinteger milliseconds);
+void stall(uinteger microseconds);
 
 #endif /* INCLUDE_BOOT_UEFI_H_ */
