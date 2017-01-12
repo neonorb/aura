@@ -101,8 +101,8 @@ void vga_terminal_backgroundColor(uint8 color) {
 }
 
 void vga_terminal_writeString(const char* data) {
-	size_t datalen = strlen((char*) data);
-	for (size_t i = 0; i < datalen; i++) {
+	size datalen = stringlength((char*) data);
+	for (size i = 0; i < datalen; i++) {
 		char c = data[i];
 		putChar(c);
 	}
@@ -113,9 +113,9 @@ void vga_terminal_initialize() {
 	terminalColumn = 0;
 	terminalColor = vga_terminal_makeColor(COLOR_LIGHT_GREY, COLOR_BLACK);
 	terminalBuffer = (uint16*) 0xB8000;
-	for (size_t y = 0; y < VGA_TEXT_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_TEXT_WIDTH; x++) {
-			const size_t index = y * VGA_TEXT_WIDTH + x;
+	for (size y = 0; y < VGA_TEXT_HEIGHT; y++) {
+		for (size x = 0; x < VGA_TEXT_WIDTH; x++) {
+			const size index = y * VGA_TEXT_WIDTH + x;
 			terminalBuffer[index] = entry(' ', terminalColor);
 		}
 	}

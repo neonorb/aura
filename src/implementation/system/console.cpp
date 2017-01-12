@@ -51,10 +51,14 @@ static void newThread(Code* code) {
 }
 
 static void execute(String sourceCode) {
+	debug("compiling");
 	Code* code = mish::compile::compile(sourceCode);
+	debug("done compiling");
 
 	if (code != NULL) {
+		debug("new thread");
 		newThread(code);
+		debug("new thread done");
 	} else {
 		printShell();
 	}
@@ -109,7 +113,11 @@ void console() {
 		sourceCode[i] = (strchar) ((&mishStart)[i]);
 	}
 	sourceCode[charCount] = 0; // NULL terminate
+	debug(sourceCode);
 
+	debug("executing");
 	::execute(sourceCode);
+	debug("deleting");
 	delete sourceCode;
+	debug("done");
 }

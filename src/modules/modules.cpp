@@ -12,6 +12,7 @@
 
 #include <feta.h>
 
+#include <boot/uefi.h>
 void modules_init() {
 	screen_init();
 

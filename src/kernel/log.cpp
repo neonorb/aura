@@ -103,7 +103,7 @@ void write_serial(char a) {
 }
 
 void debugPrint(String message) {
-	for (uint64 i = 0; i < strlen(message); i++) {
+	for (uint64 i = 0; i < stringlength(message); i++) {
 		write_serial(message[i]);
 	}
 }

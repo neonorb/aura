@@ -40,7 +40,7 @@ void uefi_terminal_writeString(String message) {
 	uint16* output;
 	bool didAllocate = false;
 	if (sizeof(strchar) == 1) {
-		uinteger length = strlen(message);
+		uinteger length = stringlength(message);
 
 		// create
 		output = (uint16*) create(sizeof(uint16) * (length + 1));

@@ -44,8 +44,8 @@ void* memcpy(uint8* dst, const uint8* src, size len) {
 }
 
 String dynamicString(String string) {
-	String retString = (String) create(strlen(string) + 1);
-	memcpy((uint8*) retString, (uint8*) string, strlen(string) + 1);
+	String retString = (String) create(stringlength(string) + 1);
+	memcpy((uint8*) retString, (uint8*) string, stringlength(string) + 1);
 	return retString;
 }
 

@@ -1,4 +1,4 @@
-/* kernel.c - The kernel of project asiago, it's the heart the OS! */
+/* kernel.cpp - The kernel of project asiago, it's the heart the OS! */
 /* Copyright (C) 2016   Chris Smith */
 
 /* This program is free software: you can redistribute it and/or modify */
@@ -15,7 +15,6 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <kernel/kernel.h>
-
 #include <feta.h>
 #include <kernel/liballoc.h>
 
@@ -29,6 +28,7 @@
 
 using namespace feta;
 
+#include <boot/uefi.h>
 void kernel_main() {
 	cli();
 	modules_init();

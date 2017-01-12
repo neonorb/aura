@@ -1,7 +1,6 @@
 #include <modules/screen/screen.h>
 #include <feta.h>
 #include <mish.h>
-#include <memory.h>
 
 using namespace mish;
 
