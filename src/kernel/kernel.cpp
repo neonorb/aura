@@ -14,22 +14,25 @@
 /* You should have received a copy of the GNU General Public License */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+#define dyninit
 #include <kernel/kernel.h>
 #include <feta.h>
 #include <kernel/liballoc.h>
 
 #include <boot/uefi.h>
-
 #include <utils/utils.h>
 
 #include <modules/modules.h>
+#include <modules/power/power.h>
 
 #include <implementation/implementation.h>
 
 using namespace feta;
 
-#include <boot/uefi.h>
-void kernel_main() {
+void kernel_main(void* imageBase) {
+	// run dynamic initialization
+	dynamicInit((uinteger) imageBase);
+
 	cli();
 	modules_init();
 	sti();
@@ -38,9 +41,10 @@ void kernel_main() {
 
 	implementation();
 
-	// hang kernel
 	log("kernel exiting");
-	hang();
+
+	power_powerOff();
+	//hang();
 }
 
 void crash(String message) {

@@ -12,6 +12,8 @@
 EFI_SYSTEM_TABLE* systemTable;
 EFI_LOADED_IMAGE* loadedImage;
 
+// see the UEFI specifications for more information: http://www.uefi.org/sites/default/files/resources/UEFI%20Spec%202_6.pdf
+
 extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 		EFI_SYSTEM_TABLE* _systemTable) {
 	systemTable = _systemTable;
@@ -26,8 +28,10 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 	}
 
 	// disable the watchdog timer - if this is enabled, the firmware will reset the system after 5 minutes
-	EFI_STATUS watchdogStatus = uefi_call_wrapper((void*) systemTable->BootServices->SetWatchdogTimer, 4, 0, 0, 0, NULL);
-	if(watchdogStatus != EFI_SUCCESS) {
+	EFI_STATUS watchdogStatus = uefi_call_wrapper(
+			(void* ) systemTable->BootServices->SetWatchdogTimer, 4, 0, 0, 0,
+			NULL);
+	if (watchdogStatus != EFI_SUCCESS) {
 		crash("error while disabling the watchdog timer");
 	}
 
@@ -38,7 +42,37 @@ extern "C" EFIAPI EFI_STATUS efi_main(EFI_HANDLE ImageHandle,
 		__asm__ __volatile__("pause");
 	}
 #endif
-	kernel_main();
+	kernel_main(loadedImage->ImageBase);
+
+	/*uinteger memoryMapSize = 4096;
+	EFI_MEMORY_DESCRIPTOR memoryMap[4096];
+	uinteger mapKey;
+	uinteger descriptorSize;
+	uint32 descriptorVersion;
+
+	debug("getting memory map");
+	EFI_STATUS getMemoryMapStatus = uefi_call_wrapper(
+			(void* ) systemTable->BootServices->GetMemoryMap, 5, &memoryMapSize,
+			memoryMap, &mapKey, &descriptorSize, &descriptorVersion);
+	if (getMemoryMapStatus != EFI_SUCCESS) {
+		crash("error while getting memory map");
+	}
+
+	debug("exiting boot services");
+	EFI_STATUS exitBootServicesStatus = uefi_call_wrapper(
+			(void* ) systemTable->BootServices->ExitBootServices, 2,
+			ImageHandle, mapKey);
+	if (exitBootServicesStatus != EFI_SUCCESS) {
+		crash("error while exiting boot services");
+	}
+	debug("init ACPI");
+	int initAcpiStatus = initAcpi();
+	if (initAcpiStatus == 0) {
+		debug("ACPI power off");
+		acpiPowerOff();
+	} else {
+		debug("error while initializing ACPI");
+	}*/
 
 	return EFI_SUCCESS;
 }

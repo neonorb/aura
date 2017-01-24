@@ -5,13 +5,11 @@
  *      Author: chris
  */
 
-#ifdef DO_TEST
-#include <memory.h>
-#include <list.h>
-#include <stack.h>
-#include <log.h>
+#ifdef AURA_DOTEST
+
 #include <mish.h>
 #include <feta.h>
+#include <fetatest.h>
 #include <mishtest.h>
 
 /*static void memory() {
@@ -69,6 +67,7 @@
 void test() {
 	log(" -- TESTING -- ");
 	//memory();
+	fetatest::test();
 	mishtest::test();
 	log(" -- TESTS PASSED --");
 }

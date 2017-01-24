@@ -23,6 +23,8 @@ SECTIONS
    *(.mish)
    mishEnd = .;
    . = ALIGN(16);
+   *(dynamicInit)
+   . = ALIGN(16);
   }
   _etext = .;
   _text_size = . - _text;

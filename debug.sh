@@ -1,6 +1,5 @@
 #!/bin/bash
 
-make clean
 DEBUGGING=true make build/x86_64/aura.efi
 DEBUGGING=true make build/x86_64/debug.aura.efi
 

@@ -15,13 +15,9 @@ void auraMain() {
 	dumpAllocated();
 #endif
 
-	debug("auraMain");
-
 	registerSyscalls();
-	debug("syscalls registered");
 
 	console();
-	debug("console");
 
 	while (probeLoop) {
 		// wait for an interrupt

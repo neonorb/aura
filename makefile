@@ -1,13 +1,15 @@
 # Makefile for Aura
 
-CSOURCES=boot/uefi \
+CPPSOURCES=boot/uefi \
 kernel/kernel kernel/liballoc kernel/log kernel/ports kernel/events \
 implementation/implementation implementation/system/auramain implementation/system/syscalls implementation/system/console \
 modules/modules \
 modules/clock/clock modules/clock/pit modules/clock/rtc \
 modules/keyboard/keyboard modules/keyboard/uefi \
 modules/screen/screen modules/screen/uefi \
+modules/power/power modules/power/uefi \
 utils/utils utils/icxxabi
+CSOURCES=
 ASOURCES=
 MSOURCES=mish/main
 
@@ -16,7 +18,7 @@ LIBS=feta mish
 ARCHS=x86_64
 -include ../make-base/make-base.mk
 
-CFLAGS+=-nostdlib -ffreestanding -fno-rtti -fno-exceptions -fPIC
+CFLAGS+=-nostdlib -ffreestanding -fno-rtti -fno-exceptions -fPIC -DEFI_FUNCTION_WRAPPER
 MOBJECTS=$(patsubst %, build/%.o, $(MSOURCES))
 OBJECTS-x86_64+=$(MOBJECTS)
 INCLUDE_FLAGS+=-I gnu-efi/headers -I gnu-efi/headers/x86_64
@@ -27,8 +29,8 @@ build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
 
 # building binaries
 build/%/aura.so: $$(OBJECTS-$$(CURRENT_ARCH)) | $$(dir $$@)/.dirstamp
-	@ld $^                            \
-		gnu-efi/crt0-efi-x86_64.o     \
+	@ld gnu-efi/crt0-efi-x86_64.o     \
+	    $^ \
 		-nostdlib                     \
 		-znocombreloc                 \
 		-T gnu-efi/elf_x86_64_efi.lds \
@@ -49,8 +51,8 @@ REGULAR_SECTIONS=-j .text    \
 				 -j .dynsym  \
 				 -j .rel     \
 				 -j .rela    \
-				 -j .reloc   \
-				 -j .mish
+				 -j .reloc \
+				 -j dynamicInit
 DEBUG_SECTIONS=-j .debug_info     \
 			   -j .debug_abbrev   \
 			   -j .debug_loc      \
@@ -106,7 +108,7 @@ build/%/aura.vdi: build/$(CURRENT_ARCH)/aura.img
 
 .PHONY:
 run: img
-	@qemu-system-x86_64 $(if $(DEBUGGING),-s -daemonize -serial file:/tmp/osoutput, -serial stdio) -cpu qemu64 -bios OVMF.fd -drive file=build/x86_64/aura.img,if=ide,format=raw
+	@qemu-system-x86_64 $(if $(DEBUGGING),-s -daemonize -serial file:/tmp/osoutput, $(if $(TESTING),,-serial stdio)) $(if $(TESTING),-nographic) -cpu qemu64 -bios OVMF.fd -drive file=build/x86_64/aura.img,if=ide,format=raw
 
 # ---- debugging ----
 
@@ -114,8 +116,3 @@ run: img
 gdb: build/x86_64/debug.aura.efi
 
 all: img
-
-
-
-test:
-	yes
