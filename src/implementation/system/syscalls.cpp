@@ -1,4 +1,5 @@
 #include <modules/screen/screen.h>
+#include <modules/power/power.h>
 #include <feta.h>
 #include <mish.h>
 
@@ -65,6 +66,22 @@ Value* exitFunction(List<Value*>* arguments) {
 	UNUSED(arguments);
 
 	probeLoop = false;
+
+	return VALUE_NOT_USED;
+}
+
+Value* shutdownFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
+	power_powerOff();
+
+	return VALUE_NOT_USED;
+}
+
+Value* resetFunction(List<Value*>* arguments) {
+	UNUSED(arguments);
+
+	power_reset();
 
 	return VALUE_NOT_USED;
 }
@@ -170,6 +187,20 @@ void registerSyscalls() {
 			BIND_FREE_CB(exitFunction));
 	syscalls.add(exit);
 	mish_syscalls.add(exit);
+
+	// __shutdown
+	List<ValueType>* shutdownParameterTypes = new List<ValueType>();
+	Function* shutdown = new Function("__shutdown", shutdownParameterTypes, ValueType::VOID,
+			BIND_FREE_CB(shutdownFunction));
+	syscalls.add(shutdown);
+	mish_syscalls.add(shutdown);
+
+	// __reset
+	List<ValueType>* resetParameterTypes = new List<ValueType>();
+	Function* reset = new Function("__reset", resetParameterTypes, ValueType::VOID,
+			BIND_FREE_CB(resetFunction));
+	syscalls.add(reset);
+	mish_syscalls.add(reset);
 
 	// __getBoolean
 	List<ValueType>* getBooleanParameterTypes = new List<ValueType>();
