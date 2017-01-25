@@ -81,6 +81,27 @@ uint64 uefi_terminal_cursorRow() {
 	return systemTable->ConOut->Mode->CursorRow;
 }
 
+void uefi_terminal_setCursorColumn(uinteger column) {
+	EFI_STATUS status = uefi_call_wrapper(
+			(void* ) systemTable->ConOut->SetCursorPosition, 3,
+			systemTable->ConOut, column, uefi_terminal_cursorRow());
+
+	if (status != EFI_SUCCESS) {
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to set cursor column");
+	}
+}
+void uefi_terminal_setCursorRow(uinteger row) {
+	EFI_STATUS status = uefi_call_wrapper(
+			(void* ) systemTable->ConOut->SetCursorPosition, 3,
+			systemTable->ConOut, uefi_terminal_cursorColumn(), row);
+
+	if (status != EFI_SUCCESS) {
+		debug("EFI_STATUS", (uint64) status);
+		crash("failed to set cursor row");
+	}
+}
+
 static void updateColor() {
 	EFI_STATUS status = uefi_call_wrapper(
 			(void* ) systemTable->ConOut->SetAttribute, 2, systemTable->ConOut,

@@ -3,8 +3,8 @@
 #include <modules/screen/uefi.h>
 #include <feta.h>
 
-#define DEFAULT_FOREGROUND_COLOR EFI_BLACK
-#define DEFAULT_BACKGROUND_COLOR EFI_LIGHTGRAY
+#define DEFAULT_FOREGROUND_COLOR EFI_WHITE
+#define DEFAULT_BACKGROUND_COLOR EFI_BLACK
 
 // ---- terminal ----
 
@@ -32,6 +32,12 @@ uint64 screen_terminal_cursorColumn() {
 }
 uint64 screen_terminal_cursorRow() {
 	return uefi_terminal_cursorRow();
+}
+void screen_terminal_setCursorColumn(uinteger column) {
+	uefi_terminal_setCursorColumn(column);
+}
+void screen_terminal_setCursorRow(uinteger row) {
+	uefi_terminal_setCursorRow(row);
 }
 
 void screen_terminal_setForegroundColor(UINTN color) {

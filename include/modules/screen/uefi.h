@@ -20,5 +20,7 @@ void uefi_terminal_setBackgroundColor(UINTN color);
 
 uinteger uefi_terminal_cursorColumn();
 uinteger uefi_terminal_cursorRow();
+void uefi_terminal_setCursorColumn(uinteger column);
+void uefi_terminal_setCursorRow(uinteger row);
 
 #endif /* INCLUDE_MODULES_SCREEN_UEFI_H_ */
