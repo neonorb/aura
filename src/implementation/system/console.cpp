@@ -195,6 +195,10 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				screen_terminal_setCursorColumn(
 						screen_terminal_cursorColumn() + 1);
 			}
+		} else if (keyEvent.ScanCode == 0x5) { // home
+			moveCursor(-cursor);
+		} else if (keyEvent.ScanCode == 0x6) { // end
+			moveCursor(line.size() - cursor);
 		} else if (keyEvent.ScanCode == 0x1) { // move cursor up
 			if ((unsigned) historyIndex + 1 < history.size()) {
 				historyIndex++;
