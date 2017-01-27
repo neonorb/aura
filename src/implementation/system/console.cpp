@@ -61,8 +61,8 @@ static void execute(String sourceCode) {
 List<strchar> line;
 uinteger cursor = 0;
 
-List<List<strchar>> previousCommands;
-integer previousCommandIndex = -1;
+List<List<strchar>> history;
+integer historyIndex = -1;
 
 static void moveCursor(integer distance) {
 	uinteger currentColumn = screen_terminal_cursorColumn();
@@ -99,69 +99,88 @@ static void setCommand(List<strchar>& command) {
 	}
 }
 
+static Boolean linesEqual(List<strchar>& one, List<strchar>& two) {
+	Iterator<strchar> oneIterator = one.iterator();
+	Iterator<strchar> twoIterator = two.iterator();
+
+	while (oneIterator.hasNext() && twoIterator.hasNext()) {
+		if (oneIterator.next() != twoIterator.next()) {
+			return false;
+		}
+	}
+	return oneIterator.hasNext() == twoIterator.hasNext();
+}
+
 void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 	if (keyEvent.UnicodeChar > 0) {
-		// if we have a thread running, don't
 		if (keyEvent.UnicodeChar == 0x3) { // end of text (ctrl + C)
 			if (currentThread != NULL) {
 				mish::execute::schedule::kill(currentThread);
 			} else {
 				screen_terminal_writeString("\n\r");
-				previousCommandIndex = -1;
+				historyIndex = -1;
 				line.clear();
 				cursor = 0;
 
 				printShell();
 			}
-		} else if (keyEvent.UnicodeChar == 0xD) { // carriage return
-			strchar* sourceCode = (strchar*) create(
-					line.size() * sizeof(strchar) + 1);
-
-			Iterator<strchar> stringIterator = line.iterator();
-			uint64 strIndex = 0;
-			while (stringIterator.hasNext()) {
-				sourceCode[strIndex] = stringIterator.next();
-				strIndex++;
+		} else {
+			// if we have a thread going, ignore key stroke
+			if (mish::execute::schedule::threadCount() > 0) {
+				return;
 			}
-			sourceCode[strIndex] = '\0'; // null terminate
-			if (true) { // TODO if commands are different & command not empty
-				previousCommands.add(0, line);
-			}
-			screen_terminal_writeString("\n\r");
-			previousCommandIndex = -1;
-			line.clear();
-			cursor = 0;
 
-			::execute(sourceCode);
-			delete sourceCode;
-		} else if (keyEvent.UnicodeChar == 0x8) { // backspace
-			if (cursor > 0) {
-				screen_terminal_writeString(0x8);
-				cursor--;
-				line.remove(cursor);
-				previousCommandIndex = -1;
+			if (keyEvent.UnicodeChar == 0xD) { // carriage return
+				// construct source code from line
+				String sourceCode = charListToString(&line);
+
+				// if not blank & different from previous command, then add it to the history
+				if (line.size() > 0
+						&& (history.size() == 0 ?
+								true : !linesEqual(line, history.get(0)))) {
+					history.add(0, line);
+				}
+
+				// write to screen and update variables
+				screen_terminal_writeString("\n\r");
+				historyIndex = -1;
+				line.clear();
+				cursor = 0;
+
+				// execute
+				::execute(sourceCode);
+				// delete code
+				delete sourceCode;
+			} else if (keyEvent.UnicodeChar == 0x8) { // backspace
+				if (cursor > 0) {
+					screen_terminal_writeString(0x8);
+					cursor--;
+					line.remove(cursor);
+					historyIndex = -1;
+					// update line
+					uinteger i = cursor;
+					for (; i < line.size(); i++) {
+						screen_terminal_writeString(line.get(i));
+					}
+					screen_terminal_writeString(" ");
+					// reset cursor
+					screen_terminal_setCursorColumn(
+							screen_terminal_cursorColumn()
+									- (line.size() + 1 - cursor));
+				}
+			} else {
+				line.add(cursor, keyEvent.UnicodeChar);
+				historyIndex = -1;
 				// update line
-				uinteger i = cursor;
-				for (; i < line.size(); i++) {
+				for (uinteger i = cursor; i < line.size(); i++) {
 					screen_terminal_writeString(line.get(i));
 				}
-				screen_terminal_writeString(" ");
+				cursor++;
 				// reset cursor
 				screen_terminal_setCursorColumn(
 						screen_terminal_cursorColumn()
-								- (line.size() + 1 - cursor));
+								- (line.size() - cursor));
 			}
-		} else {
-			line.add(cursor, keyEvent.UnicodeChar);
-			previousCommandIndex = -1;
-			// update line
-			for (uinteger i = cursor; i < line.size(); i++) {
-				screen_terminal_writeString(line.get(i));
-			}
-			cursor++;
-			// reset cursor
-			screen_terminal_setCursorColumn(
-					screen_terminal_cursorColumn() - (line.size() - cursor));
 		}
 	} else if (keyEvent.ScanCode > 0) {
 		if (keyEvent.ScanCode == 0x4) { // move cursor left
@@ -177,18 +196,18 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 						screen_terminal_cursorColumn() + 1);
 			}
 		} else if (keyEvent.ScanCode == 0x1) { // move cursor up
-			if ((unsigned) previousCommandIndex + 1 < previousCommands.size()) {
-				previousCommandIndex++;
-				setCommand(previousCommands.get(previousCommandIndex));
+			if ((unsigned) historyIndex + 1 < history.size()) {
+				historyIndex++;
+				setCommand(history.get(historyIndex));
 			}
 		} else if (keyEvent.ScanCode == 0x2) { // move cursor down
-			if (previousCommandIndex > -1) {
-				previousCommandIndex--;
-				if (previousCommandIndex == -1) {
+			if (historyIndex > -1) {
+				historyIndex--;
+				if (historyIndex == -1) {
 					List<strchar> emptyList;
 					setCommand(emptyList);
 				} else {
-					setCommand(previousCommands.get(previousCommandIndex));
+					setCommand(history.get(historyIndex));
 				}
 			}
 		} else if (keyEvent.ScanCode == 0x8) { // delete
