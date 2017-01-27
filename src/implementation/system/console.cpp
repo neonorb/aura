@@ -235,6 +235,8 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 void console() {
 	eventHandler_keyboard = keyboardHandler;
 
+	// execute startup script
+
 	// convert encoding of string if necessary
 	uint64 charCount = &mishEnd - &mishStart;
 	strchar* sourceCode = (strchar*) create(charCount * sizeof(strchar) + 1);
