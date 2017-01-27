@@ -58,8 +58,47 @@ static void execute(String sourceCode) {
 	}
 }
 
-uinteger cursor = 0;
 List<strchar> line;
+uinteger cursor = 0;
+
+List<List<strchar>> previousCommands;
+integer previousCommandIndex = -1;
+
+static void moveCursor(integer distance) {
+	uinteger currentColumn = screen_terminal_cursorColumn();
+	screen_terminal_setCursorColumn(currentColumn + distance);
+	cursor += distance;
+}
+
+static void writeConsole(strchar c) {
+	screen_terminal_writeString(c);
+	cursor++;
+}
+static void writeConsole(String string) {
+	writeConsole(string[0]);
+}
+
+static void setCommand(List<strchar>& command) {
+	uinteger currentCommandLength = line.size();
+	uinteger newCommandLength = command.size();
+	// delete extra letters
+	if (newCommandLength < currentCommandLength) {
+		moveCursor(-(currentCommandLength - newCommandLength));
+		for (; cursor < currentCommandLength;) {
+			writeConsole(" ");
+		}
+	}
+	// move to beginning & clear
+	moveCursor(-cursor);
+	line.clear();
+	// write new command
+	while (cursor < newCommandLength) {
+		strchar c = command.get(cursor);
+		line.add(c);
+		writeConsole(c);
+	}
+}
+
 void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 	if (keyEvent.UnicodeChar > 0) {
 		// if we have a thread running, don't
@@ -68,12 +107,13 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				mish::execute::schedule::kill(currentThread);
 			} else {
 				screen_terminal_writeString("\n\r");
+				previousCommandIndex = -1;
 				line.clear();
 				cursor = 0;
+
 				printShell();
 			}
 		} else if (keyEvent.UnicodeChar == 0xD) { // carriage return
-			screen_terminal_writeString("\n\r");
 			strchar* sourceCode = (strchar*) create(
 					line.size() * sizeof(strchar) + 1);
 
@@ -84,6 +124,11 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				strIndex++;
 			}
 			sourceCode[strIndex] = '\0'; // null terminate
+			if (true) { // TODO if commands are different & command not empty
+				previousCommands.add(0, line);
+			}
+			screen_terminal_writeString("\n\r");
+			previousCommandIndex = -1;
 			line.clear();
 			cursor = 0;
 
@@ -94,6 +139,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				screen_terminal_writeString(0x8);
 				cursor--;
 				line.remove(cursor);
+				previousCommandIndex = -1;
 				// update line
 				uinteger i = cursor;
 				for (; i < line.size(); i++) {
@@ -107,6 +153,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 			}
 		} else {
 			line.add(cursor, keyEvent.UnicodeChar);
+			previousCommandIndex = -1;
 			// update line
 			for (uinteger i = cursor; i < line.size(); i++) {
 				screen_terminal_writeString(line.get(i));
@@ -114,8 +161,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 			cursor++;
 			// reset cursor
 			screen_terminal_setCursorColumn(
-					screen_terminal_cursorColumn()
-							- (line.size() - cursor));
+					screen_terminal_cursorColumn() - (line.size() - cursor));
 		}
 	} else if (keyEvent.ScanCode > 0) {
 		if (keyEvent.ScanCode == 0x4) { // move cursor left
@@ -129,6 +175,21 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 				cursor++;
 				screen_terminal_setCursorColumn(
 						screen_terminal_cursorColumn() + 1);
+			}
+		} else if (keyEvent.ScanCode == 0x1) { // move cursor up
+			if ((unsigned) previousCommandIndex + 1 < previousCommands.size()) {
+				previousCommandIndex++;
+				setCommand(previousCommands.get(previousCommandIndex));
+			}
+		} else if (keyEvent.ScanCode == 0x2) { // move cursor down
+			if (previousCommandIndex > -1) {
+				previousCommandIndex--;
+				if (previousCommandIndex == -1) {
+					List<strchar> emptyList;
+					setCommand(emptyList);
+				} else {
+					setCommand(previousCommands.get(previousCommandIndex));
+				}
 			}
 		} else if (keyEvent.ScanCode == 0x8) { // delete
 			if (cursor < line.size()) {
@@ -151,7 +212,7 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 void console() {
 	eventHandler_keyboard = keyboardHandler;
 
-// convert to 16-bit string
+	// convert encoding of string if necessary
 	uint64 charCount = &mishEnd - &mishStart;
 	strchar* sourceCode = (strchar*) create(charCount * sizeof(strchar) + 1);
 	for (uint64 i = 0; i < charCount; i++) {
