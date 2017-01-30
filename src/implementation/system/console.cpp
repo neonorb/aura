@@ -69,6 +69,9 @@ static void moveCursor(integer distance) {
 	screen_terminal_setCursorColumn(currentColumn + distance);
 	cursor += distance;
 }
+static void moveCursorAbsolute(uinteger position) {
+	moveCursor((position - cursor));
+}
 
 static void writeConsole(strchar c) {
 	screen_terminal_writeString(c);
