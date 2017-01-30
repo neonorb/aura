@@ -84,7 +84,7 @@ static void setCommand(List<strchar>& command) {
 	// delete extra letters
 	if (newCommandLength < currentCommandLength) {
 		moveCursor(-(currentCommandLength - newCommandLength));
-		for (; cursor < currentCommandLength;) {
+		while (cursor < currentCommandLength) {
 			writeConsole(" ");
 		}
 	}
