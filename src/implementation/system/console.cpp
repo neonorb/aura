@@ -69,6 +69,9 @@ static void moveCursor(integer distance) {
 	screen_terminal_setCursorColumn(currentColumn + distance);
 	cursor += distance;
 }
+static void moveCursorAbsolute(uinteger position) {
+	moveCursor((position - cursor));
+}
 
 static void writeConsole(strchar c) {
 	screen_terminal_writeString(c);
@@ -83,7 +86,7 @@ static void setCommand(List<strchar>& command) {
 	uinteger newCommandLength = command.size();
 	// delete extra letters
 	if (newCommandLength < currentCommandLength) {
-		moveCursor(-(currentCommandLength - newCommandLength));
+		moveCursorAbsolute(newCommandLength);
 		for (; cursor < currentCommandLength;) {
 			writeConsole(" ");
 		}
@@ -183,6 +186,11 @@ void keyboardHandler(EFI_INPUT_KEY keyEvent) {
 			}
 		}
 	} else if (keyEvent.ScanCode > 0) {
+		// if we have a thread going, ignore key stroke
+		if (mish::execute::schedule::threadCount() > 0) {
+			return;
+		}
+
 		if (keyEvent.ScanCode == 0x4) { // move cursor left
 			if (cursor > 0) {
 				cursor--;
