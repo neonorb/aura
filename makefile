@@ -13,7 +13,7 @@ CSOURCES=
 ASOURCES=
 MSOURCES=mish/main
 
-LIBS=feta mish
+LIBS=feta mish danbo
 
 ARCHS=x86_64
 -include ../make-base/make-base.mk
@@ -25,11 +25,11 @@ INCLUDE_FLAGS+=-I gnu-efi/headers -I gnu-efi/headers/x86_64
 
 # Mish "compiling"
 build/%.o: src/%.mish | $$(dir $$@)/.dirstamp
-	@objcopy -I binary -O elf64-x86-64 -B i386 --rename-section .data=.mish $^ $@
+	$(NO_PRINT_COMMAND)objcopy -I binary -O elf64-x86-64 -B i386 --rename-section .data=.mish $^ $@
 
 # building binaries
 build/%/aura.so: $$(OBJECTS-$$(CURRENT_ARCH)) | $$(dir $$@)/.dirstamp
-	@ld gnu-efi/crt0-efi-x86_64.o     \
+	$(NO_PRINT_COMMAND)ld gnu-efi/crt0-efi-x86_64.o     \
 	    $^ \
 		-nostdlib                     \
 		-znocombreloc                 \
@@ -63,13 +63,13 @@ DEBUG_SECTIONS=-j .debug_info     \
 
 OBJCOPY_FLAGS=--target=efi-app-x86_64
 build/%/aura.efi: build/$$(CURRENT_ARCH)/aura.so | $$(dir $$@)/.dirstamp
-	@objcopy $(REGULAR_SECTIONS) \
+	$(NO_PRINT_COMMAND)objcopy $(REGULAR_SECTIONS) \
 		$(OBJCOPY_FLAGS)        \
 		$^ \
 		$@
 
 build/%/debug.aura.efi: build/$$(CURRENT_ARCH)/aura.so | $$(dir $$@)/.dirstamp
-	@objcopy $(REGULAR_SECTIONS) $(DEBUG_SECTIONS) \
+	$(NO_PRINT_COMMAND)objcopy $(REGULAR_SECTIONS) $(DEBUG_SECTIONS) \
 		$(OBJCOPY_FLAGS)      \
 		$^ \
 		$@
@@ -80,35 +80,35 @@ IMG-all=$(foreach A,$(ARCHS),build/$A/aura.img)
 .PHONY:
 img: $(IMG-all)
 build/%/aura.img: build/$$(CURRENT_ARCH)/aura.efi | $$(dir $$@)/.dirstamp
-	@dd if=/dev/zero of=$@ bs=512 count=93750 status=none # allocate disk
-	@parted $@ -s -a minimal mklabel gpt # make gpt table
-	@parted $@ -s -a minimal mkpart EFI FAT16 2048s 93716s # make EFI partition
-	@parted $@ -s -a minimal toggle 1 boot # make it bootable
-	@dd if=/dev/zero of=/tmp/part.img bs=512 count=91669 status=none # allocate partition
-	@mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1 # format partition
+	$(NO_PRINT_COMMAND)dd if=/dev/zero of=$@ bs=512 count=93750 status=none # allocate disk
+	$(NO_PRINT_COMMAND)parted $@ -s -a minimal mklabel gpt # make gpt table
+	$(NO_PRINT_COMMAND)parted $@ -s -a minimal mkpart EFI FAT16 2048s 93716s # make EFI partition
+	$(NO_PRINT_COMMAND)parted $@ -s -a minimal toggle 1 boot # make it bootable
+	$(NO_PRINT_COMMAND)dd if=/dev/zero of=/tmp/part.img bs=512 count=91669 status=none # allocate partition
+	$(NO_PRINT_COMMAND)mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1 # format partition
 	
-	@if [ -d "build/img_root" ]; then rm -r build/img_root; fi
+	$(NO_PRINT_COMMAND)if [ -d "build/img_root" ]; then rm -r build/img_root; fi
 	
 	@# build FS structure
-	@mkdir build/img_root
-	@mkdir build/img_root/EFI
-	@mkdir build/img_root/EFI/BOOT
-	@cp $^ build/img_root/EFI/BOOT/BOOTX64.efi # hard coded file name and path
+	$(NO_PRINT_COMMAND)mkdir build/img_root
+	$(NO_PRINT_COMMAND)mkdir build/img_root/EFI
+	$(NO_PRINT_COMMAND)mkdir build/img_root/EFI/BOOT
+	$(NO_PRINT_COMMAND)cp $^ build/img_root/EFI/BOOT/BOOTX64.efi # hard coded file name and path
 	
-	@mcopy -s -i /tmp/part.img build/img_root/* :: # copy FS to partition
-	@dd if=/tmp/part.img of=$@ bs=512 count=91669 seek=2048 conv=notrunc status=none # copy parition to disk
-	@rm /tmp/part.img # remove tmp partition file
+	$(NO_PRINT_COMMAND)mcopy -s -i /tmp/part.img build/img_root/* :: # copy FS to partition
+	$(NO_PRINT_COMMAND)dd if=/tmp/part.img of=$@ bs=512 count=91669 seek=2048 conv=notrunc status=none # copy parition to disk
+	$(NO_PRINT_COMMAND)rm /tmp/part.img # remove tmp partition file
 
 .PHONY:
 vdi: build/$(CURRENT_ARCH)/aura.vdi
 build/%/aura.vdi: build/$(CURRENT_ARCH)/aura.img
-	@vboxmanage convertfromraw --format VDI $^ $@
+	$(NO_PRINT_COMMAND)vboxmanage convertfromraw --format VDI $^ $@
 	
 # ---- running ----
 
 .PHONY:
 run: img
-	@qemu-system-x86_64 $(if $(DEBUGGING),-s -daemonize -serial file:/tmp/osoutput, $(if $(TESTING),,-serial stdio)) $(if $(TESTING),-nographic) -cpu qemu64 -bios OVMF.fd -drive file=build/x86_64/aura.img,if=ide,format=raw
+	$(NO_PRINT_COMMAND)qemu-system-x86_64 $(if $(DEBUGGING),-s -daemonize -serial file:/tmp/osoutput, $(if $(TESTING),,-serial stdio)) $(if $(TESTING),-nographic) -cpu qemu64 -bios OVMF.fd -drive file=build/x86_64/aura.img,if=ide,format=raw
 
 # ---- debugging ----
 
